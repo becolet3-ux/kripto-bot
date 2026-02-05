@@ -11,6 +11,11 @@ RUN apt-get update && apt-get install -y \
     wget \
     curl \
     git \
+    libssl-dev \
+    openssl \
+    libgomp1 \
+    cmake \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TA-Lib C library
@@ -26,6 +31,9 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
 # Copy requirements first for caching
 COPY requirements.txt .
 
+# Upgrade pip tooling and preinstall heavy dependencies with longer timeout
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir --default-timeout=1000 cryptography
 # Install Python dependencies with increased timeout for slow connections/large libs
 RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
 
