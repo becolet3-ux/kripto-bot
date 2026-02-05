@@ -25,9 +25,15 @@ class BinanceDataLoader:
             else:
                 mode = 'future' if settings.TRADING_MODE == 'futures' else 'spot'
                 print(f"🌍 Using Binance Global Client (Sync CCXT) - Mode: {mode.upper()}")
+                
+                # Fetch keys directly from env to ensure they are loaded
+                import os
+                api_key = os.getenv("BINANCE_API_KEY", settings.BINANCE_API_KEY)
+                secret_key = os.getenv("BINANCE_SECRET_KEY", settings.BINANCE_SECRET_KEY)
+                
                 self.exchange = ccxt.binance({
-                    'apiKey': settings.BINANCE_API_KEY,
-                    'secret': settings.BINANCE_SECRET_KEY,
+                    'apiKey': api_key,
+                    'secret': secret_key,
                     'enableRateLimit': True,
                     'verify': False, # Disable SSL verification
                     'options': {
