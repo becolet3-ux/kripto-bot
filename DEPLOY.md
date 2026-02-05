@@ -14,23 +14,32 @@ Aylık 5-10$ maliyetle en sorunsuz yöntemdir. (DigitalOcean, Hetzner, vb.)
 
 Sürekli açık bir sunucu için "Sonsuza Kadar Ücretsiz" (Always Free) paketleri olan bulut sağlayıcıları kullanabilirsiniz. Kurulum biraz daha teknik bilgi gerektirebilir ancak **ücretsizdir**.
 
-### A. Google Cloud Platform (GCP) - Always Free
-Google, belirli bölgelerde (us-west1, us-central1) **e2-micro** sunucusunu ücretsiz verir.
-1.  [Google Cloud Free Tier](https://cloud.google.com/free) sayfasına gidin ve kaydolun (Kredi kartı doğrulama için gereklidir, para çekilmez).
-2.  **Compute Engine** > **VM Instances** sayfasına gidin.
-3.  **Create Instance** deyin:
-    -   **Region:** `us-central1` veya `us-west1` seçin (Önemli!).
-    -   **Machine Type:** `e2-micro` (2 vCPU, 1 GB RAM) seçin.
-    -   **Boot Disk:** "Change" diyip `Ubuntu 22.04 LTS` seçin ve disk boyutunu `30 GB` (Standart Persistent Disk) yapın.
-4.  Oluşturduktan sonra "SSH" butonuna basarak bağlanın ve alttaki kurulum komutlarını uygulayın.
+### A. AWS Free Tier (✅ EN İYİ ALTERNATİF - 1 Yıl Ücretsiz)
+Oracle sorunu yaşayanlar için en iyi seçenek Amazon Web Services (AWS) kullanmaktır.
+*   **Süre:** Yeni üyelere 12 ay boyunca ücretsiz.
+*   **Bölge:** Frankfurt (eu-central-1) veya İrlanda seçerek Binance yasağından kurtulabilirsiniz.
+*   **Sunucu:** **t2.micro** veya **t3.micro** (1 vCPU, 1 GB RAM).
 
-### B. Oracle Cloud Free Tier (En Güçlüsü)
-Oracle, çok cömert bir ücretsiz paket sunar (4 vCPU, 24 GB RAM ARM sunucu).
-1.  [Oracle Cloud Free Tier](https://www.oracle.com/cloud/free/) sayfasına kaydolun.
-2.  **VM Standard.A1.Flex** (ARM işlemci) seçerek bir sunucu oluşturun.
-3.  Ubuntu işletim sistemini seçin.
-4.  SSH ile bağlanıp kurulumu yapın.
-    *Not: ARM işlemci kullandığı için Dockerfile dosyasındaki `FROM python:3.11-slim` satırı otomatik uyum sağlar, ekstra ayar gerekmez.*
+**Kurulum Adımları:**
+1.  [AWS Free Tier](https://aws.amazon.com/free/) sayfasına gidip hesap oluşturun.
+2.  Giriş yaptıktan sonra sağ üstten bölgeyi **Frankfurt (eu-central-1)** seçin (Önemli!).
+3.  **EC2** servisini aratıp açın ve **Launch Instance** (Sunucu Başlat) butonuna tıklayın.
+4.  **Name:** `kripto-bot` yazın.
+5.  **OS Image:** `Ubuntu Server 22.04 LTS` seçin (Free Tier Eligible yazar).
+6.  **Instance Type:** `t2.micro` (veya t3.micro) seçin.
+7.  **Key Pair:** "Create new key pair" diyip bir isim verin ve `.pem` dosyasını indirin (Bunu kaybetmeyin!).
+8.  **Launch Instance** diyerek başlatın.
+9.  Bağlanmak için indirilen `.pem` dosyasını kullanacaksınız.
+
+### B. Google Cloud Platform (GCP) - Always Free (⚠️ DİKKAT: Binance İçin Uygun Değil)
+Google, `us-central1` gibi ABD bölgelerinde ücretsiz sunucu verir.
+**Ancak Binance Global, ABD IP'lerini engeller (Hata Kodu: 451).**
+Bu yüzden bot için GCP Free Tier **kullanılamaz**. Avrupa seçerseniz aylık 7-10$ ücret çıkar.
+
+### C. Oracle Cloud Free Tier (Zor Kayıt)
+Oracle kayıt aşamasında çok fazla hata verebilir. Eğer kaydolabilirseniz en güçlüsüdür, ancak kayıt olmak zordur.
+1.  **Home Region** seçerken **Germany Central (Frankfurt)** veya **Netherlands** seçin.
+2.  **VM.Standard.A1.Flex** (ARM) sunucu oluşturun.
 
 ---
 
