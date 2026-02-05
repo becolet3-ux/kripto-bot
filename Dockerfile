@@ -26,8 +26,8 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
 # Copy requirements first for caching
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies with increased timeout for slow connections/large libs
+RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
