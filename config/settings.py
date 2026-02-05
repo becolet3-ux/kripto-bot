@@ -65,7 +65,6 @@ class Settings(BaseSettings):
     # Dev Mode
     USE_MOCK_DATA: bool = False # Set to False to use real API
     LIVE_TRADING: bool = True   # Set to True to enable real orders
-    IS_TR_BINANCE: bool = True  # Set to True to use Binance TR (trbinance.com)
     SLEEP_INTERVAL: int = 10    # Sleep time between scans in seconds
 
     class Config:
