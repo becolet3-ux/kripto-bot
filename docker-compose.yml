@@ -1,0 +1,28 @@
+services:
+  bot:
+    build: .
+    container_name: kripto-bot-core
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    command: python src/main.py
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  dashboard:
+    build: .
+    container_name: kripto-bot-dashboard
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    command: streamlit run src/dashboard.py --server.port 8501 --server.address 0.0.0.0
+    depends_on:
+      - bot

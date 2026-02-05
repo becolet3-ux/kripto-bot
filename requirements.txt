@@ -1,0 +1,14 @@
+ccxt
+pandas
+python-dotenv
+ta-lib
+numpy
+aiohttp
+streamlit
+watchdog
+tweepy
+praw
+textblob
+binance-connector
+requests
+urllib3
