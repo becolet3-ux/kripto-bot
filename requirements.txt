@@ -12,3 +12,5 @@ textblob
 binance-connector
 requests
 urllib3
+pydantic>=2.0
+pydantic-settings
