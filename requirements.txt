@@ -15,5 +15,5 @@ urllib3
 pydantic>=2.0
 pydantic-settings
 scikit-learn
-xgboost
-lightgbm
+# xgboost
+# lightgbm

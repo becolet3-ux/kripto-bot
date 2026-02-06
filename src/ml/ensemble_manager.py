@@ -9,8 +9,15 @@ import logging
 
 # ML Libraries
 from sklearn.ensemble import RandomForestClassifier
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
+try:
+    from xgboost import XGBClassifier
+except ImportError:
+    XGBClassifier = None
+try:
+    from lightgbm import LGBMClassifier
+except ImportError:
+    LGBMClassifier = None
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, classification_report
 
@@ -23,10 +30,15 @@ class EnsembleManager:
             os.makedirs(self.models_dir)
             
         self.models = {
-            'rf': RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42),
-            'xgb': XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, eval_metric='logloss'),
-            'lgbm': LGBMClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, verbose=-1)
+            'rf': RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
         }
+        
+        if XGBClassifier:
+            self.models['xgb'] = XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, eval_metric='logloss')
+        
+        if LGBMClassifier:
+            self.models['lgbm'] = LGBMClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, verbose=-1)
+
         
         self.is_trained = False
         self.feature_columns = [
