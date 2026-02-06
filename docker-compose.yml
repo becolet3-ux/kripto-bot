@@ -72,13 +72,14 @@ services:
       - TRADING_MODE=live
       - LIVE_TRADING=True
       - STATE_FILE=data/bot_state_live.json
-      - LOG_FILE=logs/bot_live.log
+      - LOG_FILE=data/bot_activity_live.log
       - PAPER_TRADING_BALANCE=10000
     volumes:
       - ./src:/app/src
       - ./data:/app/data
       - ./logs:/app/logs
       - ./config:/app/config
+    command: streamlit run src/dashboard.py --server.port 8501 --server.address 0.0.0.0
     depends_on:
       - bot-live
     restart: always
