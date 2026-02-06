@@ -73,11 +73,10 @@ async def run_bot():
 
     # Dynamic Symbol Loading for Binance Global (Futures/Spot)
     if not settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
-        log("🔄 Fetching Active Pairs from Binance Global (DEBUG: Block Entered)...")
+        log("🔄 Fetching Active Pairs from Binance Global...")
         try:
              if hasattr(loader, 'exchange'):
                  # Ensure markets are loaded
-                 log("DEBUG: Loading markets...")
                  if not loader.exchange.markets:
                      await asyncio.to_thread(loader.exchange.load_markets)
                  
@@ -85,9 +84,7 @@ async def run_bot():
                  quote_currency = 'USDT'
                  
                  # Fetch tickers to sort by volume (get top 100 liquid pairs to avoid junk)
-                 log("DEBUG: Fetching tickers...")
                  tickers = await asyncio.to_thread(loader.exchange.fetch_tickers)
-                 log(f"DEBUG: Fetched {len(tickers)} tickers.")
                  
                  active_symbols = []
                  sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
