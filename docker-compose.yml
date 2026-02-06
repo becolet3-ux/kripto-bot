@@ -63,9 +63,7 @@ services:
           memory: 1G
 
   dashboard-live:
-    build: 
-      context: .
-      dockerfile: Dockerfile.dashboard
+    build: .
     image: kripto-bot_dashboard-live
     container_name: kripto-bot-dashboard-live
     ports:
