@@ -63,18 +63,24 @@ services:
           memory: 1G
 
   dashboard-live:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.dashboard
+    image: kripto-bot_dashboard-live
     container_name: kripto-bot-dashboard-live
-    restart: unless-stopped
     ports:
-      - "8502:8501"
+      - "80:8501"  # Expose on port 80 (Standard HTTP) for easy access
+    environment:
+      - TRADING_MODE=live
+      - LIVE_TRADING=True
+      - STATE_FILE=data/bot_state_live.json
+      - LOG_FILE=logs/bot_live.log
+      - PAPER_TRADING_BALANCE=10000
     volumes:
+      - ./src:/app/src
       - ./data:/app/data
       - ./logs:/app/logs
-      - ./.env:/app/.env
-    environment:
-      - STATE_FILE=data/bot_state_live.json
-      - LOG_FILE=data/bot_activity_live.log
-    command: streamlit run src/dashboard.py --server.port 8501 --server.address 0.0.0.0
+      - ./config:/app/config
     depends_on:
       - bot-live
+    restart: always
