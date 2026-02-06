@@ -72,7 +72,7 @@ async def run_bot():
     #          log(f"⚠️ Failed to update symbols: {e}")
 
     # Dynamic Symbol Loading for Binance Global (Futures/Spot)
-    if settings.LIVE_TRADING and not settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
+    if not settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
         log("🔄 Fetching Active Pairs from Binance Global...")
         try:
              if hasattr(loader, 'exchange'):
@@ -82,20 +82,24 @@ async def run_bot():
                  
                  # Filter symbols: USDT pairs only
                  quote_currency = 'USDT'
-                 active_symbols = [
-                     s for s in loader.exchange.symbols 
-                     if s.endswith(f'/{quote_currency}') 
-                     and loader.exchange.markets[s]['active']
-                 ]
                  
-                 # Futures specific: filter for specific contract type if needed (e.g. swap)
-                 # CCXT usually handles 'future' mode by returning only future markets if defaultType is future
+                 # Fetch tickers to sort by volume (get top 100 liquid pairs to avoid junk)
+                 tickers = await asyncio.to_thread(loader.exchange.fetch_tickers)
+                 
+                 active_symbols = []
+                 sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
+                 
+                 for symbol, ticker in sorted_tickers:
+                     if symbol.endswith(f'/{quote_currency}') and loader.exchange.markets[symbol]['active']:
+                         active_symbols.append(symbol)
                  
                  if active_symbols:
-                     # Limit to top 100 or all? Futures has fewer pairs than spot, maybe 200-300.
-                     # Scanning all might take time with 0.1s delay (30s for 300 pairs). Acceptable.
-                     settings.SYMBOLS = active_symbols
-                     log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols ({quote_currency} Pairs)")
+                     # Limit to top 200 for performance (20s scan time)
+                     # User asked for "everything", but full scan (400+) takes ~40s. Let's do 200.
+                     # Or let's make it configurable or just 300.
+                     # Let's try to get a good coverage.
+                     settings.SYMBOLS = active_symbols[:300]
+                     log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
                  else:
                      log("⚠️ No active symbols found, using default list.")
         except Exception as e:
