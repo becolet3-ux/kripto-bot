@@ -86,16 +86,16 @@ async def run_bot():
                 quote_currency = 'USDT'
                 
                 # Fetch tickers to sort by volume (get top 100 liquid pairs to avoid junk)
-                    tickers = await asyncio.wait_for(asyncio.to_thread(loader.exchange.fetch_tickers), timeout=30.0)
-                    log(f"DEBUG: Fetched {len(tickers)} tickers. Sample: {list(tickers.keys())[:5]}")
-                    
-                    active_symbols = []
-                    sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
-                    
-                    for symbol, ticker in sorted_tickers:
-                        # log(f"DEBUG: Checking {symbol} - Active: {loader.exchange.markets.get(symbol, {}).get('active')}")
-                        if symbol.endswith(f'/{quote_currency}') and loader.exchange.markets.get(symbol, {}).get('active'):
-                            active_symbols.append(symbol)
+                tickers = await asyncio.wait_for(asyncio.to_thread(loader.exchange.fetch_tickers), timeout=30.0)
+                log(f"DEBUG: Fetched {len(tickers)} tickers. Sample: {list(tickers.keys())[:5]}")
+                
+                active_symbols = []
+                sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
+                
+                for symbol, ticker in sorted_tickers:
+                    # log(f"DEBUG: Checking {symbol} - Active: {loader.exchange.markets.get(symbol, {}).get('active')}")
+                    if symbol.endswith(f'/{quote_currency}') and loader.exchange.markets.get(symbol, {}).get('active'):
+                        active_symbols.append(symbol)
                 
                 if active_symbols:
                     # Limit to top 400 for broad market coverage
