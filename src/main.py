@@ -93,9 +93,13 @@ async def run_bot():
                 sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
                 
                 for symbol, ticker in sorted_tickers:
-                    # log(f"DEBUG: Checking {symbol} - Active: {loader.exchange.markets.get(symbol, {}).get('active')}")
-                    if symbol.endswith(f'/{quote_currency}') and loader.exchange.markets.get(symbol, {}).get('active'):
-                        active_symbols.append(symbol)
+                        # log(f"DEBUG: Checking {symbol} - Active: {loader.exchange.markets.get(symbol, {}).get('active')}")
+                        # Handle CCXT Futures format (e.g. BTC/USDT:USDT) and Spot (BTC/USDT)
+                        is_usdt_pair = '/USDT' in symbol
+                        is_active = loader.exchange.markets.get(symbol, {}).get('active', False)
+                        
+                        if is_usdt_pair and is_active:
+                            active_symbols.append(symbol)
                 
                 if active_symbols:
                     # Limit to top 400 for broad market coverage
