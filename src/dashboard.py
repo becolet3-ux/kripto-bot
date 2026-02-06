@@ -170,11 +170,20 @@ else:
         except Exception as e:
             pass # Fail silently for metric, handled in table
     
-    # If calculated value > 0, use it. Otherwise fallback to state value.
-    if total_asset_value_usdt > 0:
+    # If calculated value > 0 and LIVE, use it. 
+    # If PAPER mode, prefer the executor calculated total_balance which includes paper positions + paper cash
+    if is_live and total_asset_value_usdt > 0:
         display_balance = total_asset_value_usdt
+        balance_label = "Toplam Bakiye (Canlı)"
+        balance_help = "Cüzdandaki gerçek varlıkların USDT karşılığı"
+    elif not is_live:
+        display_balance = total_try # This is set by executor to be paper_balance + paper_pos_value
+        balance_label = "Toplam Bakiye (Paper)"
+        balance_help = "Sanal Nakit + Açık Pozisyon Değerleri"
     else:
-        display_balance = total_try # total_balance key in state usually
+        display_balance = total_try 
+        balance_label = "Toplam Bakiye"
+        balance_help = "Hesaplanan bakiye"
 
     # Override with learning_data if available (more persistent)
     if learning_data:
@@ -193,11 +202,12 @@ else:
     win_rate = (wins / total_trades * 100) if total_trades > 0 else 0
     avg_pnl = (total_pnl / total_trades) if total_trades > 0 else 0
     
-    col1.metric("Toplam Bakiye (Tahmini)", f"{display_balance:.2f} USDT", help="Cüzdandaki varlıkların yaklaşık USDT karşılığı (veya Sanal Bakiye)")
+    col1.metric(balance_label, f"{display_balance:.2f} USDT", help=balance_help)
     
     if not is_live:
         paper_bal = state.get('paper_balance', 0.0)
         col1.caption(f"Sanal Nakit: {paper_bal:.2f} USDT")
+        col1.info("🧪 SİMÜLASYON MODU")
 
     col2.metric("Açık Pozisyonlar", f"{open_positions_count} Adet")
     col3.metric("Tamamlanan İşlem", f"{total_trades}")
@@ -435,7 +445,13 @@ else:
 
     # 3. Trade History
     st.markdown("---")
-    st.subheader("📜 İşlem ve Emir Geçmişi (Order History)")
+    history_title = "📜 İşlem ve Emir Geçmişi (Order History)"
+    if not is_live:
+        history_title += " | [SİMÜLASYON]"
+    
+    st.subheader(history_title)
+    if not is_live:
+         st.caption("ℹ️ Aşağıdaki işlemler Paper Trading (Sanal) modunda gerçekleşen simülasyon emirleridir. Gerçek bakiye etkilenmez.")
     
     hist_data = []
     
