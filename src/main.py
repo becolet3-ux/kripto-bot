@@ -77,16 +77,16 @@ async def run_bot():
         try:
              if hasattr(loader, 'exchange'):
                  # Ensure markets are loaded
-                 if not loader.exchange.markets:
-                     await asyncio.to_thread(loader.exchange.load_markets)
-                 
-                 # Filter symbols: USDT pairs only
+                if not loader.exchange.markets:
+                    await asyncio.wait_for(asyncio.to_thread(loader.exchange.load_markets), timeout=30.0)
+                
+                # Filter symbols: USDT pairs only
                  quote_currency = 'USDT'
                  
                  # Fetch tickers to sort by volume (get top 100 liquid pairs to avoid junk)
-                 tickers = await asyncio.to_thread(loader.exchange.fetch_tickers)
-                 
-                 active_symbols = []
+                tickers = await asyncio.wait_for(asyncio.to_thread(loader.exchange.fetch_tickers), timeout=30.0)
+                
+                active_symbols = []
                  sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
                  
                  for symbol, ticker in sorted_tickers:

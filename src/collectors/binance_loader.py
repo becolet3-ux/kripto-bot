@@ -36,6 +36,7 @@ class BinanceDataLoader:
                     'secret': secret_key,
                     'enableRateLimit': True,
                     'verify': False, # Disable SSL verification
+                    'timeout': 30000,
                     'options': {
                         'defaultType': mode, # 'spot' or 'future'
                     }
@@ -50,7 +51,7 @@ class BinanceDataLoader:
                     await asyncio.to_thread(self.exchange.get_time)
                     print("✅ Binance TR Initialized")
                 else:
-                    await asyncio.to_thread(self.exchange.load_markets)
+                    await asyncio.wait_for(asyncio.to_thread(self.exchange.load_markets), timeout=30.0)
             except Exception as e:
                 print(f"Authenticated load_markets failed: {e}")
                 if not self.is_tr:

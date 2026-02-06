@@ -43,7 +43,7 @@ class FundingRateLoader:
         try:
             # fetchFundingRates is supported by Binance
             log("🔄 Funding Rates Güncelleniyor (Bulk Fetch)...")
-            rates = await asyncio.to_thread(self.exchange.fetch_funding_rates)
+            rates = await asyncio.wait_for(asyncio.to_thread(self.exchange.fetch_funding_rates), timeout=30.0)
             
             # Map by symbol
             count = 0
