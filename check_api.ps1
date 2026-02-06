@@ -1,0 +1,1 @@
+ssh -i kripto-bot.pem -o StrictHostKeyChecking=no ubuntu@63.180.55.81 "curl -v https://fapi.binance.com/fapi/v1/time"

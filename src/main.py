@@ -18,7 +18,6 @@ from src.collectors.binance_loader import BinanceDataLoader
 from src.collectors.funding_rate_loader import FundingRateLoader
 from src.strategies.analyzer import MarketAnalyzer, TradeSignal
 from src.execution.executor import BinanceExecutor
-from src.sentiment.analyzer import SentimentAnalyzer
 from src.strategies.grid_trading import GridTrading
 from src.strategies.opportunity_manager import OpportunityManager
 from src.utils.logger import log
@@ -32,14 +31,17 @@ async def run_bot():
     funding_loader = FundingRateLoader()
     analyzer = MarketAnalyzer(funding_loader=funding_loader)
     
-    sentiment_analyzer = SentimentAnalyzer(
-        twitter_api_key=settings.TWITTER_API_KEY,
-        reddit_credentials={
-            'client_id': settings.REDDIT_CLIENT_ID,
-            'client_secret': settings.REDDIT_CLIENT_SECRET,
-            'user_agent': settings.REDDIT_USER_AGENT
-        } if settings.REDDIT_CLIENT_ID else None
-    )
+    sentiment_analyzer = None
+    if settings.SENTIMENT_ENABLED:
+        from src.sentiment.analyzer import SentimentAnalyzer
+        sentiment_analyzer = SentimentAnalyzer(
+            twitter_api_key=settings.TWITTER_API_KEY,
+            reddit_credentials={
+                'client_id': settings.REDDIT_CLIENT_ID,
+                'client_secret': settings.REDDIT_CLIENT_SECRET,
+                'user_agent': settings.REDDIT_USER_AGENT
+            } if settings.REDDIT_CLIENT_ID else None
+        )
     grid_trader = GridTrading()
     opportunity_manager = OpportunityManager()
     
@@ -194,10 +196,11 @@ async def run_bot():
                     
                     # --- Sentiment Analysis ---
                     sentiment_score = 0.0
-                    try:
-                        sentiment_score = await asyncio.to_thread(sentiment_analyzer.get_sentiment, symbol)
-                    except Exception as e:
-                        pass
+                    if settings.SENTIMENT_ENABLED and sentiment_analyzer:
+                        try:
+                            sentiment_score = 0.0
+                        except Exception:
+                            sentiment_score = 0.0
 
                     # --- Grid Trading Check ---
                     if market_regime and market_regime['trend'] == 'SIDEWAYS':

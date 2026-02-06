@@ -90,6 +90,9 @@ class Settings(BaseSettings):
     LIVE_TRADING: bool = False   # Set to True to enable real orders
     PAPER_TRADING_BALANCE: float = 10000.0 # Virtual balance (USDT) for paper trading
     SLEEP_INTERVAL: int = 10    # Sleep time between scans in seconds
+    
+    # Feature Flags
+    SENTIMENT_ENABLED: bool = False
 
     class Config:
         env_file = ".env"

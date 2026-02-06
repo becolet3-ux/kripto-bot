@@ -1,0 +1,2 @@
+$cmd = "cd kripto-bot && git pull && sudo docker-compose down && sudo docker system prune -af && sudo docker-compose up -d --build"
+ssh -i kripto-bot.pem -o StrictHostKeyChecking=no ubuntu@63.180.55.81 $cmd

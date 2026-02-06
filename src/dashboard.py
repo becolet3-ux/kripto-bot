@@ -4,6 +4,7 @@ import pandas as pd
 import time
 import os
 import sys
+from collections import deque
 
 # Add project root to path to ensure imports work
 sys.path.append(os.getcwd())
@@ -65,13 +66,13 @@ def load_json(filepath):
     except:
         return None
 
-def load_logs(filepath, lines=50):
+def load_logs(filepath, lines=100):
     if not os.path.exists(filepath):
         return []
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
-            # Read all lines and keep the last N
-            return f.readlines()[-lines:]
+            # Use deque to efficiently read only the last N lines
+            return list(deque(f, maxlen=lines))
     except:
         return []
 
@@ -554,6 +555,7 @@ else:
     else:
         st.info("Henüz log kaydı yok.")
 
-# Auto-refresh loop using empty placeholder (Streamlit trick)
-time.sleep(2)
-st.rerun()
+# Optional auto-refresh loop
+if st.session_state.get('auto_refresh', False):
+    time.sleep(5)
+    st.rerun()

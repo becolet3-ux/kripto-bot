@@ -1,0 +1,1 @@
+ssh -i "kripto-bot.pem" -o StrictHostKeyChecking=no ubuntu@63.180.55.81 "cd /home/ubuntu/kripto-bot && git pull && sudo docker restart kripto-bot-dashboard-live && sudo docker restart kripto-bot-live && sleep 6 && sudo docker logs --tail 50 kripto-bot-dashboard-live"
