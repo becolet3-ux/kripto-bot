@@ -43,9 +43,11 @@ async def run_bot():
     grid_trader = GridTrading()
     opportunity_manager = OpportunityManager()
     
+    # 4. Initialize Data Sources
     await loader.initialize()
-    if not settings.IS_TR_BINANCE:
-        await funding_loader.initialize()
+    # Funding loader is updated in the loop, no need to block startup
+    # if not settings.IS_TR_BINANCE:
+    #     await funding_loader.initialize()
 
     # Initialize Executor with the exchange client from loader
     exchange_client = None
