@@ -44,7 +44,12 @@ async def run_bot():
     opportunity_manager = OpportunityManager()
     
     # 4. Initialize Data Sources
-    await loader.initialize()
+    try:
+        await asyncio.wait_for(loader.initialize(), timeout=60.0)
+    except Exception as e:
+        log(f"⚠️ Loader initialization timed out or failed: {e}")
+        # Proceed, maybe loader switched to mock internally or we handle it later
+    
     # Funding loader is updated in the loop, no need to block startup
     # if not settings.IS_TR_BINANCE:
     #     await funding_loader.initialize()

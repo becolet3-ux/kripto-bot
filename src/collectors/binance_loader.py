@@ -66,7 +66,7 @@ class BinanceDataLoader:
                         'options': {'defaultType': 'future' if settings.TRADING_MODE == 'futures' else 'spot'}
                     })
                     try:
-                        await asyncio.to_thread(self.exchange.load_markets)
+                        await asyncio.wait_for(asyncio.to_thread(self.exchange.load_markets), timeout=30.0)
                         print("✅ Public Client Initialized (Real Data)")
                     except Exception as e2:
                         print(f"Public connect failed: {repr(e2)}. Switching to Mock Mode.")
