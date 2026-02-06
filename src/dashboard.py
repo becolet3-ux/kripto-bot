@@ -294,10 +294,10 @@ else:
     
     # 2. Wallet Balances
     if wallet:
-        st.subheader("💰 Cüzdan Varlıkları (Binance TR)")
+        st.subheader("💰 Cüzdan Varlıkları (Binance Global)")
         
-        # Calculate Total Asset Value in TRY
-        total_asset_value_try = 0.0
+        # Calculate Total Asset Value in USDT
+        total_asset_value_usdt = 0.0
         exchange = get_exchange()
         
         w_df = pd.DataFrame.from_dict(wallet, orient='index')
@@ -314,7 +314,7 @@ else:
         
         # Fetch prices (Cached)
         try:
-            price_map = get_asset_prices_in_try(assets_list)
+            price_map = get_asset_prices_in_usdt(assets_list)
         except Exception as e:
             st.error(f"Fiyatlar çekilemedi: {e}")
             price_map = {a: 0.0 for a in assets_list}
@@ -331,15 +331,15 @@ else:
             val = amount * price
             
             if val > 0:
-                total_asset_value_try += val
-                asset_values_display.append(f"₺{val:,.2f}")
+                total_asset_value_usdt += val
+                asset_values_display.append(f"${val:,.2f}")
             else:
                 asset_values_display.append("-")
                 
-        w_df['Tahmini Değer (TRY)'] = asset_values_display
+        w_df['Tahmini Değer (USDT)'] = asset_values_display
         
         # Display Total Value Metric prominently above the table
-        st.metric("💎 Toplam Varlık Değeri (Cüzdan)", f"₺{total_asset_value_try:,.2f}", help="Cüzdanınızdaki tüm varlıkların (TRY + Kripto) güncel kurdan hesaplanan toplam değeri.")
+        st.metric("💎 Toplam Varlık Değeri (Cüzdan)", f"${total_asset_value_usdt:,.2f}", help="Cüzdanınızdaki tüm varlıkların (USDT + Kripto) güncel kurdan hesaplanan toplam değeri.")
         
         st.dataframe(w_df, hide_index=True)
         st.markdown("---")
