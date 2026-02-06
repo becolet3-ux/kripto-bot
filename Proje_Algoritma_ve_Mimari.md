@@ -59,7 +59,7 @@ graph TD
 
 2.  **Execution Layer (Yürütme Katmanı):**
     *   **Hybrid Executor:** `src/execution/executor.py` artık hem Binance TR (Spot) hem de Binance Global (Futures) modlarını destekler.
-    *   **Futures Support:** Kaldıraçlı işlemler (Leverage 2x), Short/Long pozisyon mantığı ve USDT teminat yönetimi eklendi.
+    *   **Futures Support:** Kaldıraçlı işlemler (Leverage 2x), Long-Only stratejisi ve USDT teminat yönetimi eklendi.
     *   **Dynamic Limits:** 
         *   **Spot (TR):** Min işlem limiti 40 TRY.
         *   **Futures (Global):** Min işlem limiti 6.0 USDT.
@@ -89,31 +89,57 @@ Botun karar mekanizması artık **Mod Bazlı (Mode-Based)** çalışmaktadır:
     *   Global: `market buy` emri ile Long pozisyon açılır.
     *   TR: `limit buy` veya `market buy` ile coin alınır.
 *   **Satım (Close/Short):**
-    *   Global: Mevcut Long pozisyonu kapatmak için ters yönde (Sell) işlem yapılır.
+    *   Global: Mevcut Long pozisyonu kapatmak için ters yönde (Sell) işlem yapılır. `reduceOnly=True` flag'i ile yeni bir Short pozisyon açılması engellenir.
     *   TR: Eldeki coin TRY'ye dönüştürülür.
 *   **Toz (Dust) Yönetimi:** Min işlem limitinin (40 TRY / 6 USDT) altında kalan "toz" bakiyeler, işlem kilitlenmesini önlemek için kağıt üzerinde (paper_positions) silinir ancak cüzdanda tutulur.
 
-## 3. Bot Brain: Karar Mekanizması
+## 3. Binance Global (Futures) Modu Detaylı Çalışma Mantığı
+
+Botun Global versiyonu, Spot piyasasına göre daha gelişmiş ve verimli olan **Vadeli İşlemler (Futures)** altyapısını kullanır. İşte bu modun detaylı çalışma prensipleri:
+
+### 3.1. Neden Global Futures?
+*   **Tek Teminat Havuzu (USDT):** Spot piyasasında bir coin almak için TRY'ye dönmeniz gerekirken, Futures modunda tüm işlemler **USDT** teminatı üzerinden yapılır. Bir pozisyonu kapatıp diğerini açmak ("Direct Swap" benzeri etki) çok daha hızlıdır ve ara dönüşüm maliyeti yoktur.
+*   **Kaldıraç (Leverage):** Bot, bakiyeyi daha verimli kullanmak için varsayılan olarak **2x Kaldıraç** kullanır. Bu, 100 USDT bakiye ile 200 USDT'lik işlem hacmi yaratabilmek demektir.
+*   **Short İmkanı (Gelecek Planı):** Şu an sistem **Long-Only** (sadece yükselişten kazanma) modunda çalışsa da, altyapı düşüşlerden de kazanmaya (Short) uygundur.
+
+### 3.2. İşlem Stratejisi: Long-Only
+Şu anki versiyonda bot, Futures piyasasında sadece **Long (Uzun)** pozisyonlar alır.
+*   **AL Sinyali Geldiğinde:** Eğer bakiye uygunsa ve risk parametreleri (Volatility, ATR) onay veriyorsa, kaldıraçlı bir **Buy** emri girilir.
+*   **SAT Sinyali Geldiğinde:** Bot, elindeki Long pozisyonunu kapatmak için **Sell** emri girer.
+*   **Önemli:** Bot, elinde pozisyon yoksa ve SAT sinyali gelirse **Short (Açığa Satış) işlemi açmaz.** Sadece nakitte (USDT) bekler.
+
+### 3.3. Emir Yönetimi ve Güvenlik (ReduceOnly)
+Futures piyasasında yanlışlıkla pozisyon açmayı engellemek kritiktir.
+*   **ReduceOnly Flag:** Satış emirleri gönderilirken `reduceOnly=True` parametresi eklenir. Bu, Binance borsasına şu mesajı verir: *"Bu emir sadece mevcut pozisyonumu azaltmak veya kapatmak içindir. Eğer elimde pozisyon yoksa, yeni bir Short pozisyon açma, emri iptal et."*
+*   **Hata Önleme:** Bu sayede botun yanlışlıkla ters pozisyona girmesi veya bakiyesinden fazla satış yapması engellenir.
+
+### 3.4. Başlatma Süreci (Initialization)
+Bot başladığında (`executor.initialize`):
+1.  Tüm izlenen semboller için (örn. BTC/USDT, ETH/USDT) **Kaldıraç Ayarı (2x)** otomatik olarak set edilir.
+2.  Mevcut açık pozisyonlar ve USDT bakiyesi Binance'den çekilir (`fetch_balance`).
+3.  Eğer açık bir pozisyon varsa ve botun hafızasında (state) yoksa, otomatik olarak sisteme dahil edilir (**Auto-Import**).
+
+## 4. Bot Brain: Karar Mekanizması
 
 Botun "Beyni" (`brain.py`), geçmiş işlem sonuçlarına göre strateji ağırlıklarını dinamik olarak günceller.
 
-### 3.1. Kullanılan İndikatörler
+### 4.1. Kullanılan İndikatörler
 1.  **Trend:** SuperTrend, SMA, EMA, MACD, ADX.
 2.  **Momentum:** RSI, StochRSI, CCI, MFI.
 3.  **Volatilite:** Bollinger Bands, ATR, VWAP.
 4.  **Market Structure:** Volume Profile (POC, VAH, VAL), Order Book Imbalance.
 
-## 4. Gelişmiş Risk Yönetimi (v1.7)
+## 5. Gelişmiş Risk Yönetimi (v1.7)
 
-### 4.1. Portfolio Optimizer
+### 5.1. Portfolio Optimizer
 *   **Korelasyon Analizi:** Portföydeki varlıkların birbirine olan bağımlılığı ölçülür. Yüksek korelasyonlu varlıkların aynı anda alınması engellenir.
 
-### 4.2. Güvenlik Mekanizmaları
+### 5.2. Güvenlik Mekanizmaları
 *   **Geo-Block Protection:** AWS sunucusu Avrupa bölgesinde (Frankfurt/Ireland) konumlandırılarak Binance erişim engeli aşılmıştır.
 *   **Circuit Breaker:** Üst üste hata alınması durumunda (API ban riski), bot kendini geçici olarak duraklatır.
 *   **Emergency Stop:** Günlük %5 zarar durumunda bot otomatik olarak tüm işlemleri durdurur.
 
-## 5. Teknik İyileştirmeler (v1.7)
+## 6. Teknik İyileştirmeler (v1.7)
 
 *   **Pydantic V2:** Konfigürasyon yönetimi `pydantic-settings` ile modernize edildi.
 *   **Docker & Cloud:** Tamamen konteynerize edilmiş yapı ile her ortamda (Local, VPS, Cloud) sorunsuz çalışma.
