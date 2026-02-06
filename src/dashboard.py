@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 import ccxt
 import asyncio
 from datetime import datetime
-from src.collectors.binance_tr_client import BinanceTRClient
+# from src.collectors.binance_tr_client import BinanceTRClient
 
 # Set page config
 st.set_page_config(
@@ -27,41 +27,31 @@ LOG_FILE = "data/bot_activity.log"
 
 @st.cache_resource
 def get_exchange():
-    return BinanceTRClient()
+    return ccxt.binance()
 
 @st.cache_data(ttl=60)
-def get_asset_prices_in_try(assets):
+def get_asset_prices_in_usdt(assets):
     """
-    Varlıkların TRY karşılıklarını çeker. 60 saniye önbellekte tutar.
-    Performans sorununu ve API limitlerini aşmayı engeller.
+    Varlıkların USDT karşılıklarını çeker. 60 saniye önbellekte tutar.
     """
     exchange = get_exchange()
     prices = {}
     
     for asset in assets:
-        if asset == 'TRY':
+        if asset == 'USDT':
             prices[asset] = 1.0
             continue
             
-        # 1. Doğrudan TRY çiftine bak (Örn: BTC -> BTCTRY)
+        # 1. Doğrudan USDT çiftine bak (Örn: BTC -> BTC/USDT)
         try:
-            symbol = f"{asset}TRY"
+            symbol = f"{asset}/USDT"
             ticker = exchange.fetch_ticker(symbol)
             prices[asset] = float(ticker['last'])
             continue
         except:
             pass
             
-        # 2. USDT ise USDTTRY bak
-        if asset == 'USDT':
-            try:
-                ticker = exchange.fetch_ticker("USDTTRY")
-                prices[asset] = float(ticker['last'])
-                continue
-            except:
-                pass
-        
-        # 3. Bulunamadı
+        # 2. Bulunamadı
         prices[asset] = 0.0
         
     return prices
@@ -162,7 +152,7 @@ else:
     open_positions_count = len(positions) if positions else 0
 
     # --- Pre-calculate Total Asset Value for Metric ---
-    total_asset_value_try = 0.0
+    total_asset_value_usdt = 0.0
     if wallet:
         try:
             w_df_temp = pd.DataFrame.from_dict(wallet, orient='index')
@@ -170,21 +160,21 @@ else:
             w_df_temp = w_df_temp[w_df_temp['total'] > 0]
             
             assets_list = w_df_temp['Varlık'].tolist()
-            price_map = get_asset_prices_in_try(assets_list)
+            price_map = get_asset_prices_in_usdt(assets_list)
             
             for index, row in w_df_temp.iterrows():
                 asset = row['Varlık']
                 amount = row['total']
                 price = price_map.get(asset, 0.0)
-                total_asset_value_try += amount * price
+                total_asset_value_usdt += amount * price
         except Exception as e:
             pass # Fail silently for metric, handled in table
     
     # If calculated value > 0, use it. Otherwise fallback to state value.
-    if total_asset_value_try > 0:
-        display_balance = total_asset_value_try
+    if total_asset_value_usdt > 0:
+        display_balance = total_asset_value_usdt
     else:
-        display_balance = total_try
+        display_balance = total_try # total_balance key in state usually
 
     # Override with learning_data if available (more persistent)
     if learning_data:
@@ -203,11 +193,16 @@ else:
     win_rate = (wins / total_trades * 100) if total_trades > 0 else 0
     avg_pnl = (total_pnl / total_trades) if total_trades > 0 else 0
     
-    col1.metric("Toplam Bakiye (Tahmini)", f"₺{display_balance:,.2f}", delta_color="normal")
-    col2.metric("Tamamlanan İşlem", f"{total_trades}")
-    col3.metric("Kazanma Oranı", f"%{win_rate:.1f}")
-    col4.metric("Ortalama PnL", f"%{avg_pnl:.2f}", delta=f"{avg_pnl:.2f}%")
-    col5.metric("Açık Pozisyon", f"{open_positions_count}", help="Şu an botun elinde tuttuğu varlık sayısı.")
+    col1.metric("Toplam Bakiye (Tahmini)", f"{display_balance:.2f} USDT", help="Cüzdandaki varlıkların yaklaşık USDT karşılığı (veya Sanal Bakiye)")
+    
+    if not is_live:
+        paper_bal = state.get('paper_balance', 0.0)
+        col1.caption(f"Sanal Nakit: {paper_bal:.2f} USDT")
+
+    col2.metric("Açık Pozisyonlar", f"{open_positions_count} Adet")
+    col3.metric("Tamamlanan İşlem", f"{total_trades}")
+    col4.metric("Kazanma Oranı", f"%{win_rate:.1f}")
+    col5.metric("Ortalama PnL", f"%{avg_pnl:.2f}", delta=f"{avg_pnl:.2f}%")
 
     st.markdown("---")
 

@@ -1,8 +1,8 @@
-# Kripto Bot Projesi - Algoritma ve Mimari Dokümantasyonu (v1.7)
+# Kripto Bot Projesi - Algoritma ve Mimari Dokümantasyonu (v2.0)
 
-Bu belge, Kripto Bot projesinin güncellenmiş sistem mimarisini, algoritma akışını ve eklenen **Binance Global Futures** ile **AWS Cloud** entegrasyonlarını detaylı bir şekilde açıklamaktadır. Sistem, hem Spot (TR) hem de Vadeli İşlemler (Global) modlarında çalışabilen hibrit bir yapıya kavuşmuştur.
+Bu belge, Kripto Bot projesinin güncellenmiş **Binance Global (USDT)** sistem mimarisini ve algoritma akışını açıklamaktadır. Proje, önceki versiyonlardaki Binance TR (Spot) desteğini devre dışı bırakarak tamamen **Binance Global (Futures/Spot)** altyapısına ve **USDT** bazlı işlemlere odaklanmıştır.
 
-## 1. Sistem Mimarisi (Hybrid Architecture)
+## 1. Sistem Mimarisi (Global - USDT Focused)
 
 Sistem, veri toplama, çok boyutlu analiz, karar verme (beyin), yürütme ve gelişmiş izleme olmak üzere beş ana katmandan oluşur.
 
@@ -10,7 +10,7 @@ Sistem, veri toplama, çok boyutlu analiz, karar verme (beyin), yürütme ve gel
 graph TD
     subgraph Data Layer
         A1[Binance Global Loader (CCXT)]
-        A2[Binance TR Loader (Custom)]
+        A2[Funding Rate Loader]
         A3[Sentiment Analyzer]
     end
     
@@ -19,128 +19,100 @@ graph TD
         B2[Multi-Timeframe Analysis]
         B3[Sentiment Score]
         B4[Advanced Indicators]
+        B5[Market Regime Detector]
     end
     
     subgraph Decision Layer
-        C1[Bot Brain Learning]
-        C2[Dynamic Weighting System]
+        C1[Multi-Strategy Manager (Phase 5)]
+        C2[Voting System]
         C3[Safety Checks & Risk Manager]
+        C4[Regime Adaptive Strategy]
     end
     
     subgraph Execution Layer
-        D1[Executor (Hybrid)]
-        D2[Spot Execution (TR)]
-        D3[Futures Execution (Global)]
+        D1[Executor (Global/USDT)]
+        D2[Paper Trading Engine]
+        D3[Futures Execution]
         D4[Wallet & Asset Manager]
+        D5[Position Sizer (Volatility Based)]
     end
     
     subgraph Infrastructure Layer
         I1[Docker Containerization]
         I2[AWS EC2 Cloud]
-        I3[Advanced Dashboard]
+        I3[Advanced Dashboard (USDT)]
     end
-
-    A1 & A2 --> B1 & B2 & B4
+    
+    A1 & A2 --> B1 & B2 & B4 & B5
     A3 --> B3
-    B1 & B2 & B3 & B4 --> C1
-    C1 --> C2 --> C3 --> D1
+    B1 & B2 & B3 & B4 & B5 --> C1
+    C1 --> C2 --> C3 --> C4 --> D1
     C3 --> D1
-    D1 --> D2 & D3
+    D1 --> D5 --> D2 & D3
     D2 & D3 --> D4
     D1 --> I3
 ```
 
-### Yeni ve Güncellenen Bileşenler (v1.7)
+### Yeni ve Güncellenen Bileşenler (v2.0)
 
-1.  **Infrastructure Layer (Altyapı Katmanı):**
-    *   **AWS Cloud Integration:** Bot artık AWS EC2 üzerinde, Docker konteynerleri içinde 7/24 çalışmaktadır.
-    *   **Dockerization:** `kripto-bot-core` ve `kripto-bot-dashboard` olmak üzere iki ayrı servis olarak yapılandırılmıştır.
-    *   **Swap Memory:** Düşük RAM'li sunucularda (t2.micro) OOM hatalarını önlemek için Swap alanı yapılandırılmıştır.
+1.  **Global & USDT Odaklı Yapı:**
+    *   **Exchange:** Binance Global (`ccxt` kütüphanesi ile).
+    *   **Base Currency:** Tamamen **USDT** (Tether) tabanlı.
+    *   **Semboller:** `BTC/USDT`, `ETH/USDT` vb.
+    *   **TR Desteği:** Kaldırıldı/Devre dışı bırakıldı.
 
-2.  **Execution Layer (Yürütme Katmanı):**
-    *   **Hybrid Executor:** `src/execution/executor.py` artık hem Binance TR (Spot) hem de Binance Global (Futures) modlarını destekler.
-    *   **Futures Support:** Kaldıraçlı işlemler (Leverage 2x), Long-Only stratejisi ve USDT teminat yönetimi eklendi.
-    *   **Dynamic Limits:** 
-        *   **Spot (TR):** Min işlem limiti 40 TRY.
-        *   **Futures (Global):** Min işlem limiti 6.0 USDT.
+2.  **Multi-Strategy Framework (Phase 5):**
+    *   **Strategy Manager:** 3 farklı alt stratejiyi yönetir ve oylama sistemiyle (Weighted Voting) final sinyali üretir.
+    *   **Alt Stratejiler:**
+        *   **BREAKOUT (Weight 0.4):** Bollinger Band sıkışması sonrası kırılım ve hacim artışı.
+        *   **MOMENTUM (Weight 0.3):** Güçlü trend (ADX), SuperTrend ve MACD Golden Cross.
+        *   **MEAN REVERSION (Weight 0.3):** RSI < 30 (Oversold), Alt Bollinger Band tepkisi ve MACD dönüşü.
+    *   **Consensus:** Toplam oyların %60'ı "ENTRY" derse işlem açılır.
 
-3.  **Data Layer (Veri Katmanı):**
-    *   **CCXT Integration:** Binance Global verileri için `ccxt` kütüphanesi entegre edildi.
-    *   **Dynamic Symbol Loading:** Bot, çalıştırıldığı moda göre (TR veya Global) taranacak sembolleri (TRY veya USDT çiftleri) otomatik belirler.
+3.  **Paper Trading (Simülasyon) Modu:**
+    *   **Sanal Bakiye:** 10.000 USDT (Ayarlanabilir).
+    *   **Takip:** Gerçek borsa verileriyle sanal alım-satım yapar.
+    *   **Dashboard:** "Sanal Nakit" ve "Toplam Varlık" (USDT) olarak ayrı bir sekmede/bölümde takip edilir.
+    *   **Risk:** Sıfır risk ile strateji testi imkanı.
 
-## 2. Güncellenmiş Algoritma Akışı
+4.  **Risk Management & Sizing:**
+    *   **Volatility Based Position Sizing:** ATR ve volatiliteye göre dinamik pozisyon büyüklüğü.
+    *   **Min İşlem Limiti:** 6.0 USDT.
+    *   **Stop Loss:** ATR tabanlı dinamik stop loss.
 
-Botun karar mekanizması artık **Mod Bazlı (Mode-Based)** çalışmaktadır:
+## 2. Algoritma Akışı
 
-### Adım 1: Mod Tespiti ve Başlatma
-*   **Env Kontrolü:** `.env` dosyasındaki `IS_TR_BINANCE` ve `TRADING_MODE` değişkenlerine göre bot kimliğini belirler.
-*   **Global Futures:** `IS_TR_BINANCE=False` ise Global moduna geçer, kaldıraç ayarlarını (2x) yapar ve USDT çiftlerini tarar.
-*   **TR Spot:** `IS_TR_BINANCE=True` ise TR moduna geçer, TRY çiftlerini tarar.
+Botun karar mekanizması artık **Global Mod** ve **Strateji Oylaması** üzerine kuruludur:
 
-### Adım 2: Sinyal ve Risk Yönetimi
-*   **Gelişmiş Teknik Analiz:** SuperTrend, CCI, ADX, MFI, VWAP ve Formasyonlar hesaplanır.
-*   **Volume Profile:** Fiyatın değer bölgesinde (Value Area) olup olmadığı analiz edilir.
-*   **Futures Risk Yönetimi:** 
-    *   **ReduceOnly:** Satış emirleri, sadece pozisyon kapatmak için (ReduceOnly=True) gönderilir.
-    *   **Margin Check:** Yetersiz teminat durumunda işlem açılmaz.
+### Adım 1: Başlatma
+*   **Ayarlar:** `IS_TR_BINANCE=False`, `PAPER_TRADING_BALANCE=10000.0` (USDT).
+*   **Bağlantı:** Binance Global API'ye bağlanır (veya Paper Trading için Public API).
+*   **Semboller:** USDT çiftlerini (örn. BTC/USDT) otomatik tarar.
+
+### Adım 2: Analiz ve Oylama
+*   **Veri:** 1 saatlik mum verileri ve Funding Rate çekilir.
+*   **Strateji Oylaması:**
+    *   Breakout, Momentum ve Mean Reversion stratejileri ayrı ayrı sinyal üretir.
+    *   Ağırlıklı ortalama hesaplanır.
+    *   Skor > 0.60 ise **ALIM** sinyali oluşur.
+*   **Rejim Kontrolü:** Piyasa rejimi (Trend/Yatay) tespit edilir ve risk parametreleri ayarlanır.
 
 ### Adım 3: Yürütme (Execution)
-*   **Alım (Long):** 
-    *   Global: `market buy` emri ile Long pozisyon açılır.
-    *   TR: `limit buy` veya `market buy` ile coin alınır.
-*   **Satım (Close/Short):**
-    *   Global: Mevcut Long pozisyonu kapatmak için ters yönde (Sell) işlem yapılır. `reduceOnly=True` flag'i ile yeni bir Short pozisyon açılması engellenir.
-    *   TR: Eldeki coin TRY'ye dönüştürülür.
-*   **Toz (Dust) Yönetimi:** Min işlem limitinin (40 TRY / 6 USDT) altında kalan "toz" bakiyeler, işlem kilitlenmesini önlemek için kağıt üzerinde (paper_positions) silinir ancak cüzdanda tutulur.
+*   **Mod Kontrolü:** 
+    *   **Live:** Gerçek emir gönderir (`create_order`).
+    *   **Paper:** Sanal bakiyeden düşer, `paper_positions` listesine ekler.
+*   **Alım (Long):** Market emri ile giriş yapılır.
+*   **Satım (Exit):** Kar al veya Stop Loss seviyelerinde pozisyon kapatılır.
+*   **İzleme:** Dashboard üzerinden anlık PnL ve bakiye USDT olarak izlenir.
 
-## 3. Binance Global (Futures) Modu Detaylı Çalışma Mantığı
+## 3. Kurulum ve Çalıştırma
 
-Botun Global versiyonu, Spot piyasasına göre daha gelişmiş ve verimli olan **Vadeli İşlemler (Futures)** altyapısını kullanır. İşte bu modun detaylı çalışma prensipleri:
+### Gereksinimler
+*   Docker & Docker Compose
+*   Binance Global API Anahtarları (Live Mod için)
+*   `.env` dosyası
 
-### 3.1. Neden Global Futures?
-*   **Tek Teminat Havuzu (USDT):** Spot piyasasında bir coin almak için TRY'ye dönmeniz gerekirken, Futures modunda tüm işlemler **USDT** teminatı üzerinden yapılır. Bir pozisyonu kapatıp diğerini açmak ("Direct Swap" benzeri etki) çok daha hızlıdır ve ara dönüşüm maliyeti yoktur.
-*   **Kaldıraç (Leverage):** Bot, bakiyeyi daha verimli kullanmak için varsayılan olarak **2x Kaldıraç** kullanır. Bu, 100 USDT bakiye ile 200 USDT'lik işlem hacmi yaratabilmek demektir.
-*   **Short İmkanı (Gelecek Planı):** Şu an sistem **Long-Only** (sadece yükselişten kazanma) modunda çalışsa da, altyapı düşüşlerden de kazanmaya (Short) uygundur.
-
-### 3.2. İşlem Stratejisi: Long-Only
-Şu anki versiyonda bot, Futures piyasasında sadece **Long (Uzun)** pozisyonlar alır.
-*   **AL Sinyali Geldiğinde:** Eğer bakiye uygunsa ve risk parametreleri (Volatility, ATR) onay veriyorsa, kaldıraçlı bir **Buy** emri girilir.
-*   **SAT Sinyali Geldiğinde:** Bot, elindeki Long pozisyonunu kapatmak için **Sell** emri girer.
-*   **Önemli:** Bot, elinde pozisyon yoksa ve SAT sinyali gelirse **Short (Açığa Satış) işlemi açmaz.** Sadece nakitte (USDT) bekler.
-
-### 3.3. Emir Yönetimi ve Güvenlik (ReduceOnly)
-Futures piyasasında yanlışlıkla pozisyon açmayı engellemek kritiktir.
-*   **ReduceOnly Flag:** Satış emirleri gönderilirken `reduceOnly=True` parametresi eklenir. Bu, Binance borsasına şu mesajı verir: *"Bu emir sadece mevcut pozisyonumu azaltmak veya kapatmak içindir. Eğer elimde pozisyon yoksa, yeni bir Short pozisyon açma, emri iptal et."*
-*   **Hata Önleme:** Bu sayede botun yanlışlıkla ters pozisyona girmesi veya bakiyesinden fazla satış yapması engellenir.
-
-### 3.4. Başlatma Süreci (Initialization)
-Bot başladığında (`executor.initialize`):
-1.  Tüm izlenen semboller için (örn. BTC/USDT, ETH/USDT) **Kaldıraç Ayarı (2x)** otomatik olarak set edilir.
-2.  Mevcut açık pozisyonlar ve USDT bakiyesi Binance'den çekilir (`fetch_balance`).
-3.  Eğer açık bir pozisyon varsa ve botun hafızasında (state) yoksa, otomatik olarak sisteme dahil edilir (**Auto-Import**).
-
-## 4. Bot Brain: Karar Mekanizması
-
-Botun "Beyni" (`brain.py`), geçmiş işlem sonuçlarına göre strateji ağırlıklarını dinamik olarak günceller.
-
-### 4.1. Kullanılan İndikatörler
-1.  **Trend:** SuperTrend, SMA, EMA, MACD, ADX.
-2.  **Momentum:** RSI, StochRSI, CCI, MFI.
-3.  **Volatilite:** Bollinger Bands, ATR, VWAP.
-4.  **Market Structure:** Volume Profile (POC, VAH, VAL), Order Book Imbalance.
-
-## 5. Gelişmiş Risk Yönetimi (v1.7)
-
-### 5.1. Portfolio Optimizer
-*   **Korelasyon Analizi:** Portföydeki varlıkların birbirine olan bağımlılığı ölçülür. Yüksek korelasyonlu varlıkların aynı anda alınması engellenir.
-
-### 5.2. Güvenlik Mekanizmaları
-*   **Geo-Block Protection:** AWS sunucusu Avrupa bölgesinde (Frankfurt/Ireland) konumlandırılarak Binance erişim engeli aşılmıştır.
-*   **Circuit Breaker:** Üst üste hata alınması durumunda (API ban riski), bot kendini geçici olarak duraklatır.
-*   **Emergency Stop:** Günlük %5 zarar durumunda bot otomatik olarak tüm işlemleri durdurur.
-
-## 6. Teknik İyileştirmeler (v1.7)
-
-*   **Pydantic V2:** Konfigürasyon yönetimi `pydantic-settings` ile modernize edildi.
-*   **Docker & Cloud:** Tamamen konteynerize edilmiş yapı ile her ortamda (Local, VPS, Cloud) sorunsuz çalışma.
-*   **Dashboard USDT Support:** Dashboard artık Global modda USDT bazlı raporlama yapabilmektedir.
+### Komutlar
+*   **Botu Başlat:** `docker-compose up -d --build`
+*   **Logları İzle:** `docker-compose logs -f bot`
+*   **Durdur:** `docker-compose down`

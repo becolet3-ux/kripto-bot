@@ -36,12 +36,22 @@ class BotBrain:
                             if k not in data["indicator_weights"]:
                                 data["indicator_weights"][k] = v
                                 
+                    if "regime_performance" not in data:
+                        data["regime_performance"] = {
+                            "TRENDING": {"wins": 0, "losses": 0, "pnl": 0.0},
+                            "RANGING": {"wins": 0, "losses": 0, "pnl": 0.0}
+                        }
+                                
                     return data
             except:
                 pass
         return {
             "coin_performance": {},  # symbol -> {wins: 0, losses: 0, consecutive_losses: 0, last_loss_time: 0}
             "global_stats": {"total_trades": 0, "wins": 0, "win_rate": 0.0},
+            "regime_performance": {
+                "TRENDING": {"wins": 0, "losses": 0, "pnl": 0.0},
+                "RANGING": {"wins": 0, "losses": 0, "pnl": 0.0}
+            },
             "trade_history": [],  # List of last N trades with features
             "strategy_weights": {
                 "trend_following": 1.0,
@@ -213,6 +223,23 @@ class BotBrain:
         indicator_signals = entry_features.get('indicator_signals', {})
         if indicator_signals:
             self.update_indicator_weights(indicator_signals, pnl_pct)
+
+        # 0.2 Update Regime Performance (Phase 3)
+        regime = entry_features.get('regime')
+        # Ensure dict exists if not migrated properly in load
+        if "regime_performance" not in self.memory:
+            self.memory["regime_performance"] = {
+                "TRENDING": {"wins": 0, "losses": 0, "pnl": 0.0},
+                "RANGING": {"wins": 0, "losses": 0, "pnl": 0.0}
+            }
+            
+        if regime and regime in self.memory["regime_performance"]:
+            r_stats = self.memory["regime_performance"][regime]
+            if is_win:
+                r_stats["wins"] += 1
+            else:
+                r_stats["losses"] += 1
+            r_stats["pnl"] += pnl_pct
 
         # 1. Update Global Stats
         stats = self.memory["global_stats"]

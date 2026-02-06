@@ -3,12 +3,15 @@ import logging
 import pandas as pd
 import asyncio
 import math
+from datetime import datetime
 from typing import Dict, Optional, Union, List, Any
 from binance.error import ClientError
 from src.utils.logger import log
 from src.utils.state_manager import StateManager
 from src.learning.brain import BotBrain
 from src.strategies.analyzer import TradeSignal
+from src.execution.stop_loss_manager import StopLossManager
+from src.execution.position_sizer import DynamicPositionSizer
 from config.settings import settings
 
 class BinanceExecutor:
@@ -43,6 +46,9 @@ class BinanceExecutor:
 
         self.paper_positions = self.full_state.get('paper_positions', {})
         self.order_history = self.full_state.get('order_history', [])
+        # Paper Trading Balance
+        self.paper_balance = self.full_state.get('paper_balance', settings.PAPER_TRADING_BALANCE)
+        
         self.stats = self.state_manager.load_stats()
         self.initialize_daily_stats()
         
@@ -53,19 +59,32 @@ class BinanceExecutor:
         self.max_daily_loss = settings.MAX_DAILY_LOSS_PCT
         self.emergency_stop = False
         
+        # Stop Loss Manager (Phase 1 Integration)
+        self.stop_loss_manager = StopLossManager()
+        
+        # Position Sizer (Phase 2 Integration)
+        self.position_sizer = DynamicPositionSizer()
+        
         # Min Trade Amount Configuration
-        if self.is_tr:
-            self.min_trade_amount = 40.0 # TRY
-        else:
-            self.min_trade_amount = 6.0 # USDT (Binance Futures min usually $5)
+        # Global / USDT Mode
+        self.min_trade_amount = 6.0 # USDT (Binance min usually $5)
             
-        log(f"Executor başlatıldı. Mod: {'CANLI' if self.is_live else 'KAĞIT'} | Min İşlem: {self.min_trade_amount}")
+        log(f"Executor başlatıldı. Mod: {'CANLI' if self.is_live else 'KAĞIT'} | Min İşlem: {self.min_trade_amount} USDT")
 
     def save_positions(self):
         """Pozisyonları state dosyasına kaydet"""
         self.full_state['paper_positions'] = self.paper_positions
         self.full_state['order_history'] = self.order_history
         self.full_state['is_live'] = self.is_live
+        self.full_state['paper_balance'] = self.paper_balance
+        
+        # Update total balance for dashboard if not live
+        if not self.is_live:
+             total_pos_value = 0.0
+             for sym, pos in self.paper_positions.items():
+                 total_pos_value += pos['quantity'] * pos['entry_price']
+             self.full_state['total_balance'] = self.paper_balance + total_pos_value
+
         self.state_manager.save_state(self.full_state)
 
     def update_commentary(self, commentary: Dict[str, Any]):
@@ -253,9 +272,10 @@ class BinanceExecutor:
         """Kullanılabilir (Free) bakiyeyi getir"""
         try:
             if not self.is_live:
-                # Paper trading için total_balance'ı kullan (Basitlik için)
-                # Daha detaylı paper wallet takibi gerekirse burası güncellenmeli
-                return self.full_state.get('total_balance', 1000.0)
+                # Paper trading için sanal bakiyeyi kullan
+                if asset in ['TRY', 'USDT']: # Quote currency
+                     return self.paper_balance
+                return 0.0
 
             if self.is_tr:
                 if not self.exchange_spot: return 0.0
@@ -292,9 +312,18 @@ class BinanceExecutor:
         """Toplam bakiyeyi hesapla (USDT/TRY)"""
         try:
             if not self.is_live:
-                # Kağıt işlem bakiyesi: Başlangıç (1000) + Kâr/Zarar
-                initial = 1000.0
-                return initial * (1 + (self.stats.get('total_pnl_pct', 0.0) / 100))
+                # Kağıt işlem bakiyesi: Nakit + Pozisyon Değerleri (yaklaşık)
+                # Basitlik için sadece nakit bakiyeyi ve realized PnL'yi takip ediyoruz
+                # Ancak pozisyon büyüklüğü hesaplanırken toplam varlık önemli
+                
+                # Pozisyonların güncel değerini ekle
+                total_pos_value = 0.0
+                for sym, pos in self.paper_positions.items():
+                    # Giriş fiyatını baz al (güncel fiyatı o an bilmiyor olabiliriz)
+                    # Daha doğrusu için o anki fiyatı çekmek lazım ama burası için maliyet bazlı gidelim
+                    total_pos_value += pos['quantity'] * pos['entry_price']
+                
+                return self.paper_balance + total_pos_value
             
             if self.is_tr:
                 if not self.exchange_spot:
@@ -334,72 +363,80 @@ class BinanceExecutor:
             log(f"⚠️ Bakiye hesaplama hatası: {e}")
             return 0.0
 
-    async def calculate_quantity(self, symbol: str, price: float, side: str, risk_score: float = 10.0, atr_value: float = 0.0) -> float:
-        """İşlem miktarını hesapla (Dinamik Risk Yönetimi + Volatilite Bazlı)"""
+    async def calculate_quantity(self, symbol: str, price: float, side: str, risk_score: float = 10.0, atr_value: float = 0.0, regime: str = 'NEUTRAL') -> float:
+        """İşlem miktarını hesapla (Dinamik Risk Yönetimi + Volatilite Bazlı + Market Rejimi - Phase 3)"""
         try:
             balance = await self.get_total_balance()
             if balance <= 0:
                 return 0.0
                 
-            # 1. Temel Pozisyon Büyüklüğü (Ayarlardan)
-            # settings.MAX_POSITION_PCT (örn: %20)
-            base_pct = settings.MAX_POSITION_PCT / 100.0
-            
-            # 2. Dinamik Ölçeklendirme (Sinyal Gücüne Göre)
-            # Skor 0-10 arası varsayılır. 
-            # Skor 10 -> %100 of MAX_POSITION_PCT
-            # Skor 5 -> %50 of MAX_POSITION_PCT
-            # Minimum %20 kullanım (skor çok düşükse bile biraz al)
-            confidence_factor = max(0.2, min(1.0, risk_score / 10.0))
-            
-            target_position_size = balance * base_pct * confidence_factor
-
-            # 3. Volatilite Bazlı Pozisyon Büyüklüğü (Volatility-Adjusted Sizing)
-            # Eğer ATR bilgisi varsa, pozisyon büyüklüğünü volatiliteye göre ayarla.
-            # Yüksek Volatilite -> Daha Küçük Pozisyon
-            # Düşük Volatilite -> Daha Büyük Pozisyon
+            # Phase 2 & 3: Volatility & Regime Based Position Sizing
             if atr_value > 0 and price > 0:
-                atr_pct = (atr_value / price) * 100
-                baseline_atr_pct = 2.0 # Referans volatilite (%2)
+                # 1. Volatilite ve Rejim Parametrelerini Hesapla
+                params = self.position_sizer.calculate_params_from_atr(symbol, atr_value, price, balance, regime)
                 
-                # Volatilite Çarpanı: Referans / Mevcut
-                # Örn: ATR %4 (Çok oynak) -> 2/4 = 0.5 (Yarıya indir)
-                # Örn: ATR %1 (Sakin) -> 2/1 = 2.0 (İki katına çıkar)
-                vol_scalar = baseline_atr_pct / atr_pct
+                target_leverage = params['leverage']
+                position_cost = params['position_cost_usdt']
                 
-                # Çarpanı sınırla (0.5x ile 1.5x arası)
-                # Aşırı volatil coinlerde %50'den aşağı düşme, çok sakinlerde %150'den yukarı çıkma
-                vol_scalar = max(0.5, min(1.5, vol_scalar))
+                # 2. Kaldıracı Ayarla (Sadece Futures ve Canlı ise)
+                if self.is_live and not self.is_tr and settings.TRADING_MODE == 'futures':
+                    try:
+                        # Mevcut kaldıracı kontrol etmek pahalı olabilir, direkt set ediyoruz
+                        log(f"⚙️ Kaldıraç Ayarlanıyor ({symbol}): {target_leverage}x (Volatilite: %{params['volatility_pct']:.2f})")
+                        await asyncio.to_thread(self.exchange_spot.set_leverage, target_leverage, symbol)
+                    except Exception as e:
+                        log(f"⚠️ Kaldıraç ayarlama hatası: {e}")
                 
-                old_size = target_position_size
-                target_position_size *= vol_scalar
+                # 3. Miktarı Hesapla (Notional = Cost * Leverage)
+                # Not: Binance Futures için 'quantity' genellikle coin cinsindendir (BTC).
+                # Cost (Margin) = (Quantity * Price) / Leverage
+                # Quantity = (Cost * Leverage) / Price
                 
-                log(f"📉 Volatilite Ayarı ({symbol}): ATR=%{atr_pct:.2f} | Çarpan={vol_scalar:.2f} | Boyut: {old_size:.2f} -> {target_position_size:.2f}")
+                target_position_size_usdt = position_cost * target_leverage
+                
+                # Güvenlik: Risk Skoruna göre ölçekle (Opsiyonel ama iyi bir pratik)
+                confidence_factor = max(0.2, min(1.0, risk_score / 10.0))
+                target_position_size_usdt *= confidence_factor
+                
+                log(f"⚖️ Pozisyon Hesaplama (Phase 2): Bakiye={balance:.2f} | Risk={params['risk_level']} | Kaldıraç={target_leverage}x | Hedef Notional={target_position_size_usdt:.2f}")
+
+            else:
+                # Fallback: Eski Mantık (ATR yoksa)
+                base_pct = settings.MAX_POSITION_PCT / 100.0
+                confidence_factor = max(0.2, min(1.0, risk_score / 10.0))
+                target_position_size_usdt = balance * base_pct * confidence_factor # Bu notional mı margin mi? Eski kodda margin gibi kullanılıyordu (Lev=1 varsayımı ile)
+                if not self.is_tr and settings.TRADING_MODE == 'futures':
+                     # Eğer futures ise ve ATR yoksa varsayılan kaldıraçla notional hesapla
+                     target_position_size_usdt *= settings.LEVERAGE 
+                
+                log(f"⚖️ Pozisyon Hesaplama (Fallback): Bakiye={balance:.2f} | Baz=%{base_pct*100} | Hedef={target_position_size_usdt:.2f}")
+
             
             # Minimum İşlem Tutarı Kontrolü
             min_trade_val = self.min_trade_amount
             
             # Eğer hesaplanan tutar min limitin altındaysa ve bakiye yetiyorsa yükselt
-            if target_position_size < min_trade_val:
+            if target_position_size_usdt < min_trade_val:
                 # Bakiyemiz min tutarı karşılıyor mu? (Komisyon payı ile)
-                if balance >= (min_trade_val * 1.02): 
-                    target_position_size = min_trade_val * 1.05 # Biraz üstüne çık (Garanti olsun)
-                    # log(f"⚠️ Hesaplanan tutar min limite yükseltildi: {target_position_size:.2f}")
+                # Not: Futures için margin kontrolü gerekir. Margin = Notional / Leverage
+                required_margin = min_trade_val / (target_leverage if 'target_leverage' in locals() else settings.LEVERAGE)
+                
+                if balance >= (required_margin * 1.05): 
+                    target_position_size_usdt = min_trade_val * 1.05
             
-            # Güvenlik: Asla bakiyenin %98'ini geçme (komisyon için)
-            # Not: %95 çok fazla kesinti yapıyor, küçük bakiyelerde işlem açtırmıyor.
-            max_safe_balance = balance * 0.98
-            if target_position_size > max_safe_balance:
-                target_position_size = max_safe_balance
+            # Güvenlik: Asla toplam bakiyeden (kaldıraçlı) fazla işlem açma
+            # Max Notional = Balance * Leverage * 0.98
+            current_leverage = target_leverage if 'target_leverage' in locals() else settings.LEVERAGE
+            max_safe_notional = balance * current_leverage * 0.98
             
-            # Son kontrol: Eğer hala min limitin altındaysa işlem yapma (Bakiye yetersizdir)
-            if target_position_size < min_trade_val:
-                # log(f"📉 Hedef tutar ({target_position_size:.2f}) min limitin ({min_trade_val}) altında. İşlem pas geçiliyor.")
+            if target_position_size_usdt > max_safe_notional:
+                target_position_size_usdt = max_safe_notional
+            
+            # Son kontrol
+            if target_position_size_usdt < min_trade_val:
                 return 0.0
             
-            log(f"⚖️ Pozisyon Hesaplama: Bakiye={balance:.2f} | Baz=%{base_pct*100} | Skor={risk_score} | Hedef={target_position_size:.2f}")
-            
-            quantity = target_position_size / price
+            quantity = target_position_size_usdt / price
             
             # Filtreleri uygula (stepSize, minQty)
             if self.is_live and self.exchange_spot:
@@ -581,16 +618,26 @@ class BinanceExecutor:
                                 log("✋ Swap yapılamadı. Uygun aday bulunamadı.")
                     
                     # --- SMART SWAP LOGIC END ---
-
+                    
+                    # Phase 3 Update: Pass Regime Info
                     atr_val = float(sig.details.get('ATR', 0.0))
-                    qty = await self.calculate_quantity(symbol, price, 'BUY', risk_score=score, atr_value=atr_val)
+                    regime = sig.details.get('regime', 'NEUTRAL')
+                    qty = await self.calculate_quantity(symbol, price, 'BUY', risk_score=score, atr_value=atr_val, regime=regime)
                     if qty > 0:
                         await self.execute_buy(symbol, qty, price, features=sig.details)
                         
-            elif action == "EXIT":
+            elif action == "EXIT" or action == "PARTIAL_EXIT":
                 if current_pos:
                     qty = current_pos['quantity']
-                    await self.execute_sell(symbol, qty, price, current_pos)
+                    is_partial = False
+                    
+                    if action == "PARTIAL_EXIT":
+                        is_partial = True
+                        qty_pct = sig.details.get('qty_pct', 0.5)
+                        qty = qty * qty_pct
+                        log(f"🌗 Kısmi Çıkış Sinyali: %{qty_pct*100} oranında satış.")
+                        
+                    await self.execute_sell(symbol, qty, price, current_pos, is_partial=is_partial)
 
     async def execute_buy(self, symbol: str, quantity: float, price: float, features: dict = None) -> bool:
         """Alım emri"""
@@ -697,6 +744,15 @@ class BinanceExecutor:
                 log(f"🛑 ATR Stop-Loss Ayarlandı: {initial_stop_loss:.4f} (ATR: {atr_value:.4f})")
 
         # Kağıt işlem / Takip
+        cost = price * quantity
+        if not self.is_live:
+             if self.paper_balance >= cost:
+                 self.paper_balance -= cost
+                 log(f"🧪 Sanal Bakiye Güncellendi: {self.paper_balance:.2f} (-{cost:.2f})")
+             else:
+                 log(f"⚠️ Sanal Bakiye Yetersiz: {self.paper_balance:.2f} < {cost:.2f}")
+                 return False
+
         self.paper_positions[symbol] = {
             'entry_price': price,
             'quantity': quantity,
@@ -870,6 +926,11 @@ class BinanceExecutor:
         if symbol in self.paper_positions:
             del self.paper_positions[symbol]
             
+        if not self.is_live:
+            revenue = price * quantity
+            self.paper_balance += revenue
+            log(f"🧪 Sanal Bakiye Güncellendi: {self.paper_balance:.2f} (+{revenue:.2f})")
+
         # Sipariş Geçmişine Ekle
         order_record = {
             'timestamp': time.time(),
@@ -890,45 +951,34 @@ class BinanceExecutor:
         log(f"📝 Pozisyon kapatıldı: {symbol} @ {price} | PnL: %{pnl_pct:.2f}")
         return True
 
-    def update_atr_trailing_stop(self, symbol: str, current_price: float, current_atr: float) -> bool:
+    def check_risk_conditions(self, symbol: str, current_price: float, df: pd.DataFrame = None) -> dict:
         """
-        ATR Trailing Stop güncellemesi yapar.
-        Returns: True (Stop Patladı, SAT), False (Devam)
+        StopLossManager üzerinden risk kontrollerini yapar.
+        Dönüş: {'action': 'CLOSE'|'PARTIAL_CLOSE'|'HOLD', 'reason': str, ...}
         """
         if symbol not in self.paper_positions:
-            return False
+            return {'action': 'HOLD'}
             
-        pos = self.paper_positions[symbol]
+        position = self.paper_positions[symbol]
+        current_time = datetime.now()
         
-        # Eğer eski pozisyonlarda stop_loss yoksa başlat
-        if 'stop_loss' not in pos:
-            pos['stop_loss'] = current_price - (current_atr * 3.0)
-            pos['atr_value'] = current_atr
-            log(f"🛡️ ATR Trailing Stop Başlatıldı ({symbol}): SL={pos['stop_loss']:.4f}")
-            self.save_positions()
-            return False
-            
-        # Mevcut stop seviyesi
-        current_sl = pos['stop_loss']
+        # StopLossManager kontrolü
+        result = self.stop_loss_manager.check_exit_conditions(position, current_price, current_time, df)
         
-        # Yeni potansiyel stop seviyesi (Fiyat arttıkça yukarı çek)
-        # SuperTrend mantığı: Eğer fiyat arttıysa, stop'u yukarı çek.
-        # Stop seviyesi ASLA aşağı inmez.
-        new_sl = current_price - (current_atr * 3.0)
-        
-        if new_sl > current_sl:
-            pos['stop_loss'] = new_sl
-            pos['atr_value'] = current_atr # ATR'yi de güncelle
-            # Logu çok sık atmamak için sadece %1 değişimde atabiliriz ama şimdilik her güncellemede atalım
-            # log(f"🛡️ Trailing Stop Güncellendi ({symbol}): {current_sl:.4f} -> {new_sl:.4f}")
+        # Eğer stop fiyatı güncellendiyse kaydet
+        if 'new_stop_price' in result:
+            position['stop_loss'] = result['new_stop_price']
+            # log(f"🛡️ Stop Loss Güncellendi ({symbol}): {result['new_stop_price']:.4f}")
             self.save_positions()
             
-        # Stop Kontrolü
-        if current_price < pos['stop_loss']:
-            log(f"🛑 TRAILING STOP TETİKLENDİ ({symbol}): Fiyat {current_price} < SL {pos['stop_loss']:.4f}")
-            return True
-            
+        return result
+
+    def update_atr_trailing_stop(self, symbol: str, current_price: float, current_atr: float) -> bool:
+        """
+        LEGACY: Artık check_risk_conditions kullanılıyor, ancak geriye dönük uyumluluk için bırakıldı.
+        """
         return False
+
 
     async def place_limit_order(self, symbol: str, side: str, price: float, quantity: float) -> Optional[Dict]:
         """Limit emir gönder (Grid Trading için)"""

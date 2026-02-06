@@ -7,6 +7,10 @@ from src.utils.logger import logger
 from src.ml.ensemble_manager import EnsembleManager
 from src.market_structure.orderbook_analyzer import OrderBookAnalyzer
 from src.market_structure.volume_profile import VolumeProfileAnalyzer
+from src.analysis.market_regime import MarketRegimeDetector
+from src.strategies.funding_aware_strategy import FundingAwareStrategy
+from src.collectors.funding_rate_loader import FundingRateLoader
+from src.strategies.strategy_manager import StrategyManager
 
 class TradeSignal(BaseModel):
     symbol: str
@@ -18,7 +22,7 @@ class TradeSignal(BaseModel):
     details: Dict
 
 class MarketAnalyzer:
-    def __init__(self):
+    def __init__(self, funding_loader: Optional[FundingRateLoader] = None):
         # Spot Strategy Parameters
         self.rsi_period = 14
         self.rsi_overbought = 70
@@ -32,6 +36,16 @@ class MarketAnalyzer:
         self.orderbook_analyzer = OrderBookAnalyzer()
         # Volume Profile Analyzer
         self.vp_analyzer = VolumeProfileAnalyzer()
+        # Market Regime Detector
+        self.regime_detector = MarketRegimeDetector()
+        
+        # Strategy Manager (Multi-Strategy Framework)
+        self.strategy_manager = StrategyManager()
+        
+        # Funding Strategy
+        self.funding_strategy = None
+        if funding_loader:
+            self.funding_strategy = FundingAwareStrategy(funding_loader)
 
     def calculate_indicators(self, candles: List[List]) -> pd.DataFrame:
         """
@@ -306,20 +320,24 @@ class MarketAnalyzer:
         w_oversold = weights.get("oversold_bounce", 1.0)
         w_sentiment = weights.get("sentiment", 0.5) # Weight for sentiment impact
         
-        # Adjust weights based on Market Regime
-        if market_regime:
-            if market_regime['trend'] == 'UP':
-                w_trend *= 1.2
-                w_cross *= 1.2
-                w_oversold *= 0.8 # Don't bet against the trend too much
-            elif market_regime['trend'] == 'SIDEWAYS':
-                w_trend *= 0.8
-                w_oversold *= 1.5 # Range trading is better here
-        
         df = self.calculate_indicators(candles)
         if df.empty:
             return None
             
+        # --- Market Regime Detection (Phase 3) ---
+        regime_data = self.regime_detector.detect_regime(df)
+        detected_regime = regime_data['regime'] # TRENDING, RANGING, NEUTRAL
+        is_no_trade = regime_data['is_no_trade_zone']
+        
+        # Adjust weights based on Detected Market Regime
+        if detected_regime == 'TRENDING':
+            w_trend *= 1.2
+            w_cross *= 1.2
+            w_oversold *= 0.8 # Don't bet against the trend too much
+        elif detected_regime == 'RANGING':
+            w_trend *= 0.8
+            w_oversold *= 1.5 # Range trading is better here
+
         # Use the last COMPLETED candle for analysis (index -2) to avoid repainting
         # Index -1 is the current (open) candle.
         last_row = df.iloc[-2]
@@ -363,85 +381,14 @@ class MarketAnalyzer:
         score = 0.0
         primary_strategy = "unknown"
         
-        # --- Dynamic Indicator Scoring ---
-        # Calculate raw signals (1: Bullish, -1: Bearish, 0: Neutral)
-        ind_signals = {}
+        # --- Multi-Strategy Framework (Phase 5) ---
+        strategy_result = self.strategy_manager.analyze_all(df, symbol)
         
-        # 1. RSI (Mean Reversion)
-        if rsi < 30: ind_signals['rsi'] = 1
-        elif rsi > 70: ind_signals['rsi'] = -1
-        else: ind_signals['rsi'] = 0
-            
-        # 2. MACD (Trend)
-        if macd > macd_signal: ind_signals['macd'] = 1
-        else: ind_signals['macd'] = -1
-            
-        # 3. SuperTrend (Trend)
-        ind_signals['super_trend'] = int(st_direction)
-        
-        # 4. SMA Trend (Trend)
-        if sma_short > sma_long: ind_signals['sma_trend'] = 1
-        else: ind_signals['sma_trend'] = -1
-            
-        # 5. Bollinger Bands (Mean Reversion)
-        if close < bb_lower: ind_signals['bollinger'] = 1
-        elif close > bb_upper: ind_signals['bollinger'] = -1
-        else: ind_signals['bollinger'] = 0
-            
-        # 6. Stoch RSI (Momentum)
-        if stoch_rsi < 0.2: ind_signals['stoch_rsi'] = 1
-        elif stoch_rsi > 0.8: ind_signals['stoch_rsi'] = -1
-        else: ind_signals['stoch_rsi'] = 0
-
-        # 7. CCI (Momentum)
-        if cci < -100: ind_signals['cci'] = 1
-        elif cci > 100: ind_signals['cci'] = -1
-        else: ind_signals['cci'] = 0
-
-        # 8. ADX (Trend Strength)
-        if adx > 25: # Strong Trend
-            if plus_di > minus_di: ind_signals['adx'] = 1
-            else: ind_signals['adx'] = -1
-        else:
-            ind_signals['adx'] = 0
-            
-        # 9. MFI (Volume-weighted RSI)
-        if mfi < 20: ind_signals['mfi'] = 1
-        elif mfi > 80: ind_signals['mfi'] = -1
-        else: ind_signals['mfi'] = 0
-        
-        # 10. Patterns (Price Action)
-        # Patterns are rare but high probability. We only assign 1 (Bullish) or 0 (Neutral/Bearish logic simplified)
-        if is_bullish_engulfing or is_hammer:
-            ind_signals['patterns'] = 1
-        else:
-            ind_signals['patterns'] = 0
-            
-        # 11. VWAP (Fair Value Analysis)
-        # If Price < VWAP -> Undervalued (Bullish/Cheap)
-        # If Price > VWAP -> Overvalued (Bearish/Expensive)
-        if vwap > 0:
-            if close < vwap:
-                # But careful, if it's TOO far below, it might be crashing.
-                # Ideally we want it slightly below or crossing up.
-                # For simplicity: Cheap is good.
-                ind_signals['vwap'] = 1
-            else:
-                ind_signals['vwap'] = -1
-        else:
-            ind_signals['vwap'] = 0
-        
-        # Calculate Weighted Indicator Score
-        # We sum (Signal * Weight). Since weights can be large (up to 5.0), we normalize or scale.
-        # Let's say each indicator contributes +/- 1.0 * Weight to the final score.
-        indicator_score = 0.0
-        for ind, signal in ind_signals.items():
-            weight = indicator_weights.get(ind, 1.0)
-            indicator_score += signal * weight
-            
-        # Add Indicator Score to Base Score (Scaled down slightly to not overpower logic)
-        # Assuming average weight is 1.0, 6 indicators -> +/- 6 points max.
-        score += indicator_score * 0.5 
+        # Base Action & Score from Strategy Manager
+        action = strategy_result['action']
+        score = strategy_result['weighted_score']
+        primary_strategy = strategy_result.get('primary_strategy', 'unknown')
+        vote_ratio = strategy_result.get('vote_ratio', 0.0)
 
         # --- ML Ensemble Score ---
         # Get probability from Ensemble Models (RandomForest, XGBoost, LightGBM)
@@ -478,44 +425,8 @@ class MarketAnalyzer:
         
         # ENTRY LOGIC (Only if not blocked)
         if not is_blocked:
-            # 1. Trend Following (Golden Cross)
-            if sma_short > sma_long:
-                score += 5.0 * w_trend
-                primary_strategy = "trend_following"
-                
-                # VWAP Logic for Trend
-                if vwap > 0:
-                    if close < vwap:
-                        score += 1.0 # Buy the dip in uptrend
-                    elif close > vwap * 1.05:
-                        score -= 1.0 # Extended
-                
-                if rsi < current_rsi_limit:
-                    score += 3.0 # Strong Trend, not overbought
-                    if golden_cross:
-                        action = "ENTRY"
-                        score += 10.0 * w_cross # Boost
-                        primary_strategy = "golden_cross"
-                        
-                        # Boost score if Volume is supporting (Volume > Average)
-                        if vol_ratio > 1.2:
-                            score += 2.0
-                else:
-                    score -= 2.0 # Overbought, caution
-            
-            # SuperTrend Confirmation (New)
-            if st_direction == 1:
-                score += 2.0
-            else:
-                score -= 2.0
-
-            # 2. Oversold Bounce (RSI < 30) - Catch the bottom
-            if rsi < 30:
-                action = "ENTRY"
-                # If it was already entry from Golden Cross, we keep the higher score or combine?
-                score = max(score, 9.0 * w_oversold + (indicator_score * 0.5)) 
-                if score >= 9.0 * w_oversold:
-                    primary_strategy = "oversold_bounce"
+            # If Strategy Manager says ENTRY, we consider it.
+            # But we can also check for strong Sentiment/Funding/ML to boost confidence.
             
             # 3. Sentiment Impact
             if sentiment_score != 0:
@@ -523,10 +434,33 @@ class MarketAnalyzer:
                 sentiment_impact = sentiment_score * 5.0 * w_sentiment
                 score += sentiment_impact
                 
-                # If sentiment is very negative, it can veto a weak buy signal
-                if sentiment_score < -0.5 and score < 8.0:
+                # If sentiment is very negative, it can veto a buy signal
+                if sentiment_score < -0.5 and action == "ENTRY":
                     action = "HOLD"
                     primary_strategy = "blocked_by_sentiment"
+                    
+            # --- Phase 4: Funding Rate Logic ---
+            if self.funding_strategy:
+                funding_analysis = self.funding_strategy.analyze_funding(symbol)
+                f_score = funding_analysis.get('score_boost', 0.0)
+                f_action = funding_analysis.get('action', 'NEUTRAL')
+                f_reason = funding_analysis.get('reason', '')
+                
+                score += f_score
+                
+                if f_action == 'IGNORE_LONG':
+                    action = "HOLD"
+                    primary_strategy = "blocked_by_negative_funding"
+                    logger.log(f"🚫 {symbol} blocked by Negative Funding: {funding_analysis['funding_rate_pct']:.4f}%")
+                elif f_action in ['BOOST_LONG', 'AGGRESSIVE_LONG']:
+                    # Ensure we don't flip a HOLD to ENTRY just by funding, unless score is high enough
+                    pass
+
+        # --- Phase 3: No-Trade Zone Block ---
+        if is_no_trade and action == "ENTRY":
+            action = "HOLD"
+            primary_strategy = "blocked_by_no_trade_zone"
+            logger.log(f"🚫 {symbol} blocked by No-Trade Zone (Regime: {detected_regime})")
         
         # EXIT LOGIC (Always allowed)
         elif sma_short < sma_long:
@@ -541,7 +475,7 @@ class MarketAnalyzer:
         # Save snapshot if significant score or random sample (1%)
         if abs(score) > 5.0 or np.random.random() < 0.01:
             self.ensemble.save_snapshot(df, symbol)
-
+            
         return TradeSignal(
             symbol=symbol,
             action=action,
@@ -558,8 +492,12 @@ class MarketAnalyzer:
                 "atr": float(last_row.get('ATR', 0.0)),
                 "ATR": float(last_row.get('ATR', 0.0)), # Capitalized for consistency
                 "close": float(close),
-                "ml_prob": float(ml_prob),
-                "indicators": ind_signals,
+                "ml_prob": float(ml_prob) if 'ml_prob' in locals() else 0.0,
+                "indicators": strategy_result.get('strategy_details', {}),
+                "regime": detected_regime,
+                "is_no_trade_zone": is_no_trade,
+                "primary_strategy": primary_strategy,
+                "bb_width": float(regime_data.get('bb_width', 0.0)),
                 "price_history": df['close'].astype(float).tail(50).tolist() # Last 50 candles for correlation
             }
         )

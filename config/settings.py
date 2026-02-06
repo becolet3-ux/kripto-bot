@@ -7,13 +7,13 @@ class Settings(BaseSettings):
     BINANCE_SECRET_KEY: Optional[str] = None
     
     # Bot Parameters
-    # Trading Pairs (Binance TR uses _TRY pairs)
+    # Trading Pairs (Global uses /USDT pairs)
     SYMBOLS: List[str] = [
-        'BTC_TRY',
-        'ETH_TRY',
-        'SOL_TRY',
-        'AVAX_TRY',
-        'PEPE_TRY'
+        'BTC/USDT',
+        'ETH/USDT',
+        'SOL/USDT',
+        'AVAX/USDT',
+        'PEPE/USDT'
     ]
 
     # Timeframe for analysis
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     
     # Mode
     TRADING_MODE: str = 'spot' # 'spot' or 'futures'
-    IS_TR_BINANCE: bool = False # Overridden by env
+    IS_TR_BINANCE: bool = False # Set to False for Global
 
     # Futures Settings
     LEVERAGE: int = 1
@@ -38,8 +38,27 @@ class Settings(BaseSettings):
     STOP_LOSS_PCT: float = 5.0   # %5 Stop Loss
     TAKE_PROFIT_PCT: float = 10.0 # %10 Take Profit
     
-    # Advanced Risk
-    TRAILING_STOP_PCT: float = 2.0 # %2 Trailing Stop (Activates after profit)
+    # Advanced Risk (Phase 1)
+    TRAILING_STOP_ATR_MULTIPLIER: float = 2.0
+    PARTIAL_TAKE_PROFIT_PCT: float = 4.0  # %4 Profit -> Take 50%
+    PARTIAL_EXIT_RATIO: float = 0.5       # Close 50%
+    TRAILING_STOP_TIGHT_MULTIPLIER: float = 1.5 # After partial exit
+    TIME_BASED_EXIT_HOURS: int = 24
+    MAX_HOLD_TIME_HOURS: int = 48
+    
+    # Advanced Risk (Phase 2 - Volatility Sizing)
+    VOLATILITY_LOW_THRESHOLD: float = 2.0   # <%2 Low
+    VOLATILITY_HIGH_THRESHOLD: float = 4.0  # >%4 High
+    
+    POS_SIZE_LOW_VOL_PCT: float = 35.0      # %35 Portfolio for Low Vol
+    POS_SIZE_MED_VOL_PCT: float = 25.0      # %25 Portfolio for Med Vol
+    POS_SIZE_HIGH_VOL_PCT: float = 15.0     # %15 Portfolio for High Vol
+    
+    LEVERAGE_LOW_VOL: int = 3
+    LEVERAGE_MED_VOL: int = 2
+    LEVERAGE_HIGH_VOL: int = 1
+    
+    TRAILING_STOP_PCT: float = 2.0 # Legacy fixed % trailing stop
     DCA_ENABLED: bool = True
     DCA_MAX_STEPS: int = 2
     DCA_STEP_SCALE: float = 1.5 # Multiplier for next DCA step amount
@@ -64,7 +83,8 @@ class Settings(BaseSettings):
 
     # Dev Mode
     USE_MOCK_DATA: bool = False # Set to False to use real API
-    LIVE_TRADING: bool = True   # Set to True to enable real orders
+    LIVE_TRADING: bool = False   # Set to True to enable real orders
+    PAPER_TRADING_BALANCE: float = 10000.0 # Virtual balance (USDT) for paper trading
     SLEEP_INTERVAL: int = 10    # Sleep time between scans in seconds
 
     class Config:

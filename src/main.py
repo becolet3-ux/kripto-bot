@@ -2,6 +2,7 @@ import asyncio
 import sys
 import os
 import time
+import pandas as pd
 from typing import List
 import urllib3
 
@@ -13,7 +14,8 @@ sys.path.append(os.getcwd())
 
 from config.settings import settings
 from src.collectors.binance_loader import BinanceDataLoader
-from src.collectors.binance_tr_client import BinanceTRClient
+# from src.collectors.binance_tr_client import BinanceTRClient
+from src.collectors.funding_rate_loader import FundingRateLoader
 from src.strategies.analyzer import MarketAnalyzer, TradeSignal
 from src.execution.executor import BinanceExecutor
 from src.sentiment.analyzer import SentimentAnalyzer
@@ -27,7 +29,8 @@ async def run_bot():
     log(f"Monitoring Symbols: {settings.SYMBOLS}")
     
     loader = BinanceDataLoader()
-    analyzer = MarketAnalyzer()
+    funding_loader = FundingRateLoader()
+    analyzer = MarketAnalyzer(funding_loader=funding_loader)
     
     sentiment_analyzer = SentimentAnalyzer(
         twitter_api_key=settings.TWITTER_API_KEY,
@@ -41,6 +44,8 @@ async def run_bot():
     opportunity_manager = OpportunityManager()
     
     await loader.initialize()
+    if not settings.IS_TR_BINANCE:
+        await funding_loader.initialize()
 
     # Initialize Executor with the exchange client from loader
     exchange_client = None
@@ -50,24 +55,24 @@ async def run_bot():
     executor = BinanceExecutor(exchange_client=exchange_client, is_tr=settings.IS_TR_BINANCE)
 
 
-    # Dynamic Symbol Loading for Binance TR
-    if settings.LIVE_TRADING and settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
-        log("🔄 Fetching ALL Active Pairs from Binance TR...")
-        try:
-             # We can access the underlying client. Since it's sync, we can run it in thread.
-             if hasattr(loader, 'exchange') and isinstance(loader.exchange, BinanceTRClient):
-                 # Fetch up to 1000 symbols (effectively all active pairs)
-                 top_symbols = await asyncio.to_thread(loader.exchange.get_top_symbols, limit=1000)
-                 if top_symbols:
-                     settings.SYMBOLS = top_symbols
-                     log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (ALL)")
-                 else:
-                     log("⚠️ Could not fetch top symbols, using default list.")
-        except Exception as e:
-             log(f"⚠️ Failed to update symbols: {e}")
+    # Dynamic Symbol Loading for Binance TR (DISABLED)
+    # if settings.LIVE_TRADING and settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
+    #     log("🔄 Fetching ALL Active Pairs from Binance TR...")
+    #     try:
+    #          # We can access the underlying client. Since it's sync, we can run it in thread.
+    #          if hasattr(loader, 'exchange') and isinstance(loader.exchange, BinanceTRClient):
+    #              # Fetch up to 1000 symbols (effectively all active pairs)
+    #              top_symbols = await asyncio.to_thread(loader.exchange.get_top_symbols, limit=1000)
+    #              if top_symbols:
+    #                  settings.SYMBOLS = top_symbols
+    #                  log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (ALL)")
+    #              else:
+    #                  log("⚠️ Could not fetch top symbols, using default list.")
+    #     except Exception as e:
+    #          log(f"⚠️ Failed to update symbols: {e}")
 
     # Dynamic Symbol Loading for Binance Global (Futures/Spot)
-    elif settings.LIVE_TRADING and not settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
+    if settings.LIVE_TRADING and not settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
         log("🔄 Fetching Active Pairs from Binance Global...")
         try:
              if hasattr(loader, 'exchange'):
@@ -119,6 +124,10 @@ async def run_bot():
                 break
 
             log("\n--- Scanning Market ---")
+            
+            # 0. Update Funding Rates (Phase 4)
+            if not settings.IS_TR_BINANCE:
+                await funding_loader.update_funding_rates()
             
             # 1. Market Regime Analysis (Global Trend)
             market_regime = None
@@ -311,70 +320,41 @@ async def run_bot():
                     else:
                         signal = None
                     
-                    # 2. Risk Management Override (Stop Loss / Take Profit / ATR Trailing)
+                    # 2. Risk Management Override (Phase 1: StopLossManager Integration)
                     if symbol in executor.paper_positions:
-                        # Handle new dict format
-                        pos_data = executor.paper_positions[symbol]
-                        entry_price = 0.0
-                        if isinstance(pos_data, dict):
-                             entry_price = pos_data.get('entry_price', pos_data.get('price', 0.0))
-                        else:
-                             entry_price = pos_data
+                        # Prepare data for ATR calculation
+                        df_candles = None
+                        if candles:
+                             try:
+                                 df_candles = pd.DataFrame(candles, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                                 for c in ['open', 'high', 'low', 'close', 'volume']:
+                                     df_candles[c] = df_candles[c].astype(float)
+                             except Exception as e:
+                                 log(f"⚠️ Risk Data Prep Error ({symbol}): {e}")
                         
-                        current_price = float(candles[-1][4]) # Close price
-                        pnl_pct = ((current_price - entry_price) / entry_price) * 100
+                        # Check Risk Conditions via Executor -> StopLossManager
+                        risk_check = executor.check_risk_conditions(symbol, current_price, df_candles)
+                        action = risk_check.get('action')
                         
-                        # --- ATR Trailing Stop Check ---
-                        atr_value = 0.0
-                        if pre_signal and 'ATR' in pre_signal.details:
-                            atr_value = float(pre_signal.details['ATR'])
+                        if action in ['CLOSE', 'PARTIAL_CLOSE']:
+                            reason = risk_check.get('reason', 'RISK_EXIT')
+                            log(f"🛡️ Risk Exit Triggered [{symbol}]: {action} - {reason}")
                             
-                            # Trailing Stop Güncelle / Kontrol Et
-                            should_exit_trailing = executor.update_atr_trailing_stop(symbol, current_price, atr_value)
+                            signal_action = "EXIT" if action == 'CLOSE' else "PARTIAL_EXIT"
+                            score = -100.0 if action == 'CLOSE' else 100.0 # Partial profit is positive
                             
-                            if should_exit_trailing:
-                                log(f"🛡️ ATR TRAILING STOP TRIGGERED [{symbol}]")
-                                signal = TradeSignal(
-                                    symbol=symbol,
-                                    action="EXIT",
-                                    direction="LONG",
-                                    score=-100.0,
-                                    estimated_yield=pnl_pct,
-                                    timestamp=int(time.time() * 1000),
-                                    details={"reason": "ATR_TRAILING_STOP", "close": current_price}
-                                )
-                        
-                        # Stop Loss Check (Fixed % Backup)
-                        risk_adj = executor.brain.get_dynamic_risk_adjustment(symbol)
-                        dynamic_sl = settings.STOP_LOSS_PCT * risk_adj['sl_multiplier']
-                        dynamic_tp = settings.TAKE_PROFIT_PCT * risk_adj['tp_multiplier']
-                        
-                        # Sadece Trailing Stop tetiklenmediyse Fixed Stop'a bak
-                        if not signal and pnl_pct <= -dynamic_sl:
-                            # from src.strategies.analyzer import TradeSignal # Import here to avoid circular dependency if needed
-                            log(f"🛡️ STOP LOSS TRIGGERED [{symbol}] (Dynamic {risk_adj['regime']}): PnL %{pnl_pct:.2f} <= -%{dynamic_sl:.2f}")
                             signal = TradeSignal(
                                 symbol=symbol,
-                                action="EXIT",
+                                action=signal_action,
                                 direction="LONG",
-                                score=-100.0,
-                                estimated_yield=pnl_pct,
+                                score=score,
+                                estimated_yield=0.0, # Will be calculated by executor
                                 timestamp=int(time.time() * 1000),
-                                details={"rsi": 0, "sma_short": 0, "sma_long": 0, "close": current_price, "reason": "STOP_LOSS"}
-                            )
-                        
-                        # Take Profit Check
-                        elif pnl_pct >= dynamic_tp:
-                            # from src.strategies.analyzer import TradeSignal
-                            log(f"💰 TAKE PROFIT TRIGGERED [{symbol}] (Dynamic {risk_adj['regime']}): PnL %{pnl_pct:.2f} >= %{dynamic_tp:.2f}")
-                            signal = TradeSignal(
-                                symbol=symbol,
-                                action="EXIT",
-                                direction="LONG",
-                                score=100.0,
-                                estimated_yield=pnl_pct,
-                                timestamp=int(time.time() * 1000),
-                                details={"rsi": 0, "sma_short": 0, "sma_long": 0, "close": current_price, "reason": "TAKE_PROFIT"}
+                                details={
+                                    "reason": reason, 
+                                    "close": current_price,
+                                    "qty_pct": risk_check.get('qty_pct', 1.0)
+                                }
                             )
 
                     # 3. Execution
