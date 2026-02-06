@@ -1,21 +1,31 @@
+version: '3.8'
+
 services:
-  bot:
+  # ---------------------------------------------------------------------------
+  # PAPER TRADING (SIMULATION) MODE
+  # ---------------------------------------------------------------------------
+  bot-paper:
     build: .
-    container_name: kripto-bot-core
+    container_name: kripto-bot-paper
     restart: unless-stopped
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./.env:/app/.env
+    environment:
+      - LIVE_TRADING=false
+      - STATE_FILE=data/bot_state_paper.json
+      - STATS_FILE=data/bot_stats_paper.json
+      - LOG_FILE=data/bot_activity_paper.log
     command: python src/main.py
     deploy:
       resources:
         limits:
           memory: 1G
 
-  dashboard:
+  dashboard-paper:
     build: .
-    container_name: kripto-bot-dashboard
+    container_name: kripto-bot-dashboard-paper
     restart: unless-stopped
     ports:
       - "8501:8501"
@@ -23,6 +33,48 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./.env:/app/.env
+    environment:
+      - STATE_FILE=data/bot_state_paper.json
+      - LOG_FILE=data/bot_activity_paper.log
     command: streamlit run src/dashboard.py --server.port 8501 --server.address 0.0.0.0
     depends_on:
-      - bot
+      - bot-paper
+
+  # ---------------------------------------------------------------------------
+  # LIVE TRADING MODE
+  # ---------------------------------------------------------------------------
+  bot-live:
+    build: .
+    container_name: kripto-bot-live
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    environment:
+      - LIVE_TRADING=true
+      - STATE_FILE=data/bot_state_live.json
+      - STATS_FILE=data/bot_stats_live.json
+      - LOG_FILE=data/bot_activity_live.log
+    command: python src/main.py
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  dashboard-live:
+    build: .
+    container_name: kripto-bot-dashboard-live
+    restart: unless-stopped
+    ports:
+      - "8502:8501"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    environment:
+      - STATE_FILE=data/bot_state_live.json
+      - LOG_FILE=data/bot_activity_live.log
+    command: streamlit run src/dashboard.py --server.port 8501 --server.address 0.0.0.0
+    depends_on:
+      - bot-live

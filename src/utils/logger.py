@@ -101,7 +101,7 @@ class BotLogger:
             self.send_telegram_alert(message)
 
 # Global Logger Instance
-logger = BotLogger()
+logger = BotLogger(log_file=settings.LOG_FILE)
 
 def log(message):
     logger.log(message)

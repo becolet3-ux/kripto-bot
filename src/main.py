@@ -94,14 +94,11 @@ async def run_bot():
                          active_symbols.append(symbol)
                  
                  if active_symbols:
-                     # Limit to top 200 for performance (20s scan time)
-                     # User asked for "everything", but full scan (400+) takes ~40s. Let's do 200.
-                     # Or let's make it configurable or just 300.
-                     # Let's try to get a good coverage.
-                     settings.SYMBOLS = active_symbols[:300]
-                     log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
-                 else:
-                     log("⚠️ No active symbols found, using default list.")
+                        # Limit to top 400 for broad market coverage
+                        settings.SYMBOLS = active_symbols[:400]
+                        log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
+                    else:
+                        log("⚠️ No active symbols found, using default list.")
         except Exception as e:
              log(f"⚠️ Failed to update symbols: {e}")
 

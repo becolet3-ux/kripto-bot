@@ -67,6 +67,9 @@ class Settings(BaseSettings):
     
     # Files
     EMERGENCY_STOP_FILE: str = "data/emergency_stop.flag"
+    STATE_FILE: str = "data/bot_state.json"
+    STATS_FILE: str = "data/bot_stats.json"
+    LOG_FILE: str = "data/bot_activity.log"
     
     # Alerting
     TELEGRAM_BOT_TOKEN: Optional[str] = None

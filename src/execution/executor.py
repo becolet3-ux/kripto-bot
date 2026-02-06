@@ -19,7 +19,7 @@ class BinanceExecutor:
         self.exchange_spot = exchange_client
         self.is_tr = is_tr
         self.is_live = settings.LIVE_TRADING
-        self.state_manager = StateManager()
+        self.state_manager = StateManager(filepath=settings.STATE_FILE, stats_filepath=settings.STATS_FILE)
         self.brain = BotBrain()
         
         # State yükle

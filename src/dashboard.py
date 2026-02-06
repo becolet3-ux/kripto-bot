@@ -21,9 +21,9 @@ st.set_page_config(
 )
 
 # Constants
-STATE_FILE = "data/bot_state.json"
+STATE_FILE = os.getenv("STATE_FILE", "data/bot_state.json")
 LEARNING_FILE = "data/learning_data.json"
-LOG_FILE = "data/bot_activity.log"
+LOG_FILE = os.getenv("LOG_FILE", "data/bot_activity.log")
 
 @st.cache_resource
 def get_exchange():
