@@ -35,6 +35,7 @@ class BinanceDataLoader:
                     'apiKey': api_key,
                     'secret': secret_key,
                     'enableRateLimit': True,
+                    'userAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                     'verify': False, # Disable SSL verification
                     'timeout': 30000,
                     'options': {
@@ -59,6 +60,7 @@ class BinanceDataLoader:
                     # Re-init as public (no keys)
                     self.exchange = ccxt.binance({
                         'enableRateLimit': True,
+                        'userAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                         'verify': False, # Disable SSL verification
                         'timeout': 60000, # Increase timeout for large exchangeInfo
                         'options': {'defaultType': 'spot'}
