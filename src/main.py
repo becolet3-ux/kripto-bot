@@ -94,11 +94,11 @@ async def run_bot():
                          active_symbols.append(symbol)
                  
                  if active_symbols:
-                        # Limit to top 400 for broad market coverage
-                        settings.SYMBOLS = active_symbols[:400]
-                        log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
-                    else:
-                        log("⚠️ No active symbols found, using default list.")
+                     # Limit to top 400 for broad market coverage
+                     settings.SYMBOLS = active_symbols[:400]
+                     log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
+                 else:
+                     log("⚠️ No active symbols found, using default list.")
         except Exception as e:
              log(f"⚠️ Failed to update symbols: {e}")
 
