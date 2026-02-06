@@ -70,6 +70,9 @@ class BinanceExecutor:
         self.min_trade_amount = 6.0 # USDT (Binance min usually $5)
             
         log(f"Executor başlatıldı. Mod: {'CANLI' if self.is_live else 'KAĞIT'} | Min İşlem: {self.min_trade_amount} USDT")
+        
+        # Initial state save to ensure mode is correctly recorded
+        self.save_positions()
 
     def save_positions(self):
         """Pozisyonları state dosyasına kaydet"""
