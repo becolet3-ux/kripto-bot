@@ -75,32 +75,32 @@ async def run_bot():
     if not settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
         log("🔄 Fetching Active Pairs from Binance Global...")
         try:
-             if hasattr(loader, 'exchange'):
-                 # Ensure markets are loaded
+            if hasattr(loader, 'exchange'):
+                # Ensure markets are loaded
                 if not loader.exchange.markets:
                     await asyncio.wait_for(asyncio.to_thread(loader.exchange.load_markets), timeout=30.0)
                 
                 # Filter symbols: USDT pairs only
-                 quote_currency = 'USDT'
-                 
-                 # Fetch tickers to sort by volume (get top 100 liquid pairs to avoid junk)
+                quote_currency = 'USDT'
+                
+                # Fetch tickers to sort by volume (get top 100 liquid pairs to avoid junk)
                 tickers = await asyncio.wait_for(asyncio.to_thread(loader.exchange.fetch_tickers), timeout=30.0)
                 
                 active_symbols = []
-                 sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
-                 
-                 for symbol, ticker in sorted_tickers:
-                     if symbol.endswith(f'/{quote_currency}') and loader.exchange.markets[symbol]['active']:
-                         active_symbols.append(symbol)
-                 
-                 if active_symbols:
-                     # Limit to top 400 for broad market coverage
-                     settings.SYMBOLS = active_symbols[:400]
-                     log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
-                 else:
-                     log("⚠️ No active symbols found, using default list.")
+                sorted_tickers = sorted(tickers.items(), key=lambda x: x[1].get('quoteVolume', 0), reverse=True)
+                
+                for symbol, ticker in sorted_tickers:
+                    if symbol.endswith(f'/{quote_currency}') and loader.exchange.markets[symbol]['active']:
+                        active_symbols.append(symbol)
+                
+                if active_symbols:
+                    # Limit to top 400 for broad market coverage
+                    settings.SYMBOLS = active_symbols[:400]
+                    log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
+                else:
+                    log("⚠️ No active symbols found, using default list.")
         except Exception as e:
-             log(f"⚠️ Failed to update symbols: {e}")
+            log(f"⚠️ Failed to update symbols: {e}")
 
     await executor.initialize()
     
