@@ -85,13 +85,21 @@ async def run_bot():
             if hasattr(loader, 'exchange'):
                 # Ensure markets are loaded
                 if not loader.exchange.markets:
-                    await asyncio.wait_for(asyncio.to_thread(loader.exchange.load_markets), timeout=30.0)
+                    log("⏳ Loading markets...")
+                    await asyncio.wait_for(asyncio.to_thread(loader.exchange.load_markets), timeout=60.0)
                 
+                # Test connection with single ticker first
+                log("🔍 Testing connection with BTC/USDT...")
+                await asyncio.wait_for(asyncio.to_thread(loader.exchange.fetch_ticker, 'BTC/USDT'), timeout=10.0)
+                log("✅ Connection verified.")
+
                 # Filter symbols: USDT pairs only
                 quote_currency = 'USDT'
                 
                 # Fetch tickers to sort by volume (get top 100 liquid pairs to avoid junk)
-                tickers = await asyncio.wait_for(asyncio.to_thread(loader.exchange.fetch_tickers), timeout=30.0)
+                log("📊 Fetching ALL tickers for volume analysis (this may take a moment)...")
+                # Increase timeout for full ticker fetch as it can be heavy (20MB+ data)
+                tickers = await asyncio.wait_for(asyncio.to_thread(loader.exchange.fetch_tickers), timeout=60.0)
                 log(f"DEBUG: Fetched {len(tickers)} tickers. Sample: {list(tickers.keys())[:5]}")
                 
                 active_symbols = []
