@@ -562,8 +562,9 @@ class BinanceExecutor:
                     free_balance = await self.get_free_balance(base_asset)
                     min_trade_val = self.min_trade_amount
                     
-                    if free_balance < min_trade_val and latest_scores:
-                        log(f"📉 Yetersiz Bakiye ({free_balance:.2f} {base_asset}). Swap fırsatı aranıyor...")
+                    if (free_balance < min_trade_val or len(self.paper_positions) >= settings.MAX_OPEN_POSITIONS) and latest_scores:
+                        reason = "Yetersiz Bakiye" if free_balance < min_trade_val else "Pozisyon Sınırı"
+                        log(f"📉 {reason} ({len(self.paper_positions)}/{settings.MAX_OPEN_POSITIONS}). Swap fırsatı aranıyor...")
                         
                         worst_symbol = None
                         worst_score = 999.0
@@ -619,6 +620,11 @@ class BinanceExecutor:
                     
                     # --- SMART SWAP LOGIC END ---
                     
+                    # Final Limit Check
+                    if len(self.paper_positions) >= settings.MAX_OPEN_POSITIONS:
+                        log(f"🛑 Maksimum pozisyon sınırı ({settings.MAX_OPEN_POSITIONS}) dolu. Yeni işlem yapılmıyor.")
+                        continue
+
                     # Phase 3 Update: Pass Regime Info
                     atr_val = float(sig.details.get('ATR', 0.0))
                     regime = sig.details.get('regime', 'NEUTRAL')

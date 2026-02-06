@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     # Risk
     MAX_POSITION_SIZE_USD: float = 1.0  # Deprecated in favor of PCT
     MAX_POSITION_PCT: float = 20.0 # %20 of portfolio per trade
+    MAX_OPEN_POSITIONS: int = 4    # Maximum 4 open positions
     STOP_LOSS_PCT: float = 5.0   # %5 Stop Loss
     TAKE_PROFIT_PCT: float = 10.0 # %10 Take Profit
     
