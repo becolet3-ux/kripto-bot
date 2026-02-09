@@ -1,0 +1,1 @@
+ssh -i "kripto-bot.pem" -o ConnectTimeout=5 -o StrictHostKeyChecking=no ubuntu@63.180.55.81 "echo 'Server is UP'"

@@ -43,11 +43,11 @@ class FundingAwareStrategy:
             impact['score_boost'] = 1.0
             impact['reason'] = 'Positive Funding (>0.05%) - Trend Support'
             
-        elif rate_pct < -0.05:
-            # Negative Funding (Bearish Sentiment)
+        elif rate_pct < 0.0:
+            # Negative Funding (Bearish Sentiment) - ZERO TOLERANCE
             # "Long sinyallerini ignore et"
             impact['action'] = 'IGNORE_LONG'
             impact['score_boost'] = -10.0 # Heavy penalty
-            impact['reason'] = 'Negative Funding (<-0.05%) - Bearish Pressure'
+            impact['reason'] = 'Negative Funding (<0.0%) - Bearish Pressure'
             
         return impact

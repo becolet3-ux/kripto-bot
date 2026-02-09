@@ -116,6 +116,9 @@ class BinanceDataLoader:
             }
 
     async def get_ohlcv(self, symbol: str, timeframe: str = '1h', limit: int = 100, use_cache: bool = True) -> List[List]:
+        # DEBUG LOG
+        print(f"DEBUG: get_ohlcv {symbol} Mock={self.mock}")
+        
         if self.mock:
             # Generate mock OHLCV
             now = int(time.time() * 1000)
@@ -148,12 +151,15 @@ class BinanceDataLoader:
             # Circuit Breaker Wrapping
             # We run circuit_breaker.call inside the thread to handle sync exceptions properly
             def _fetch():
-                return self.circuit_breaker.call(self.exchange.fetch_ohlcv, symbol, timeframe, limit)
+                return self.circuit_breaker.call(self.exchange.fetch_ohlcv, symbol, timeframe, limit=limit)
             
             data = await asyncio.to_thread(_fetch)
             
             # Update Cache
             if data:
+                last_ts = data[-1][0]
+                readable_ts = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last_ts/1000))
+                print(f"DEBUG: {symbol} Last Candle Time: {readable_ts} | Close: {data[-1][4]}")
                 self._cache[cache_key] = (data, time.time())
             return data
         except Exception as e:

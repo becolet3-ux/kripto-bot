@@ -1,0 +1,322 @@
+{
+    "paper_positions": {},
+    "wallet_assets": {},
+    "total_balance": 10000.0,
+    "is_live": false,
+    "commentary": {
+        "market_regime": {
+            "trend": "DOWN",
+            "volatility": "LOW"
+        },
+        "active_strategy": "Trend Piyasas\u0131 (DOWN) - Spot Strateji Aktif \ud83d\ude80",
+        "top_opportunities": [],
+        "portfolio_analysis": {},
+        "last_updated": 1770351707.5837266,
+        "brain_plan": null,
+        "brain_plan_history": [
+            {
+                "timestamp": 1770330748.3559253,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770331180.6497984,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770331612.378266,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770332043.1993663,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770332476.688755,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770332917.0424106,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770333365.4523287,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770333804.366496,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770334242.3513346,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770334677.306363,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770335109.670651,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770335542.0615616,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770335993.5029647,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770336428.9450974,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770336863.6366878,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770337305.7260957,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770337739.1550407,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770338185.9564342,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770338617.897762,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770339060.6206825,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770339500.0567255,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770339938.159829,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770340372.0782244,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770340809.711546,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770341252.484983,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770341687.9790733,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770342123.196712,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770342559.6318572,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770342998.9104047,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770343433.152843,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770343873.9496388,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770344311.320446,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770344748.6506732,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770345184.841524,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770345617.372238,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770346187.9879425,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770346548.3955753,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770346848.732717,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770347159.0633893,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770347513.5275276,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770347817.2025146,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770348120.784486,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770348431.8508286,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770348735.5182202,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770349233.1633933,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770350383.2144113,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770350688.0332808,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770350999.4373245,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770351300.396205,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770351606.2372227,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            }
+        ]
+    },
+    "last_updated": 1770351707.5837364,
+    "order_history": [],
+    "paper_balance": 10000.0
+}

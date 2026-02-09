@@ -1,0 +1,76 @@
+{
+    "paper_positions": {},
+    "wallet_assets": {},
+    "total_balance": 10000.0,
+    "is_live": false,
+    "order_history": [],
+    "paper_balance": 10000.0,
+    "last_updated": 1770388998.0556145,
+    "commentary": {
+        "market_regime": {
+            "trend": "SIDEWAYS",
+            "volatility": "LOW"
+        },
+        "active_strategy": "Yatay Piyasa (Grid Trading Aktif) \ud83d\udd78\ufe0f",
+        "top_opportunities": [],
+        "portfolio_analysis": {},
+        "last_updated": 1770386393.0629468,
+        "brain_plan": null,
+        "brain_plan_history": [
+            {
+                "timestamp": 1770356272.466121,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770356575.9159722,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770357613.2327871,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770358246.8693557,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770360253.6155317,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770375873.0380847,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770381503.6220188,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770381886.904041,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770386393.1429002,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            }
+        ]
+    }
+}

@@ -8,7 +8,19 @@ from datetime import datetime
 import logging
 
 # ML Libraries
-from sklearn.ensemble import RandomForestClassifier
+try:
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score, precision_score, classification_report
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    RandomForestClassifier = None
+    train_test_split = None
+    accuracy_score = None
+    precision_score = None
+    classification_report = None
+    SKLEARN_AVAILABLE = False
+
 try:
     from xgboost import XGBClassifier
 except ImportError:
@@ -18,9 +30,6 @@ try:
 except ImportError:
     LGBMClassifier = None
 
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, classification_report
-
 logger = logging.getLogger("EnsembleManager")
 
 class EnsembleManager:
@@ -29,9 +38,11 @@ class EnsembleManager:
         if not os.path.exists(self.models_dir):
             os.makedirs(self.models_dir)
             
-        self.models = {
-            'rf': RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
-        }
+        self.models = {}
+        if SKLEARN_AVAILABLE:
+            self.models['rf'] = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
+        else:
+            logger.warning("sklearn not found. ML models disabled.")
         
         if XGBClassifier:
             self.models['xgb'] = XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42, eval_metric='logloss')

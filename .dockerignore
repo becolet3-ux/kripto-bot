@@ -1,0 +1,10 @@
+data/
+logs/
+.git
+__pycache__
+*.pyc
+.env
+kripto-bot-eu.pem
+kripto-bot.pem
+local_backup_data/
+.venv/

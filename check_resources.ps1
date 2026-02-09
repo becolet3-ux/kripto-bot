@@ -1,0 +1,1 @@
+ssh -i "kripto-bot.pem" -o StrictHostKeyChecking=no ubuntu@63.180.55.81 "free -h && echo '---' && uptime && echo '---' && top -b -n 1 | head -n 20"

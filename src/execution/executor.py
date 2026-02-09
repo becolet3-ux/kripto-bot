@@ -11,7 +11,7 @@ from src.utils.state_manager import StateManager
 from src.learning.brain import BotBrain
 from src.strategies.analyzer import TradeSignal
 from src.execution.stop_loss_manager import StopLossManager
-from src.execution.position_sizer import DynamicPositionSizer
+from src.risk.position_sizer import PositionSizer
 from config.settings import settings
 
 class BinanceExecutor:
@@ -49,6 +49,18 @@ class BinanceExecutor:
         # Paper Trading Balance
         self.paper_balance = self.full_state.get('paper_balance', settings.PAPER_TRADING_BALANCE)
         
+        # Initialize commentary if missing
+        if 'commentary' not in self.full_state:
+            self.full_state['commentary'] = {
+                "market_regime": {"trend": "ANALYZING", "volatility": "LOW"},
+                "active_strategy": "Başlatılıyor...",
+                "top_opportunities": [],
+                "portfolio_analysis": {},
+                "last_updated": time.time(),
+                "brain_plan": None,
+                "brain_plan_history": []
+            }
+        
         self.stats = self.state_manager.load_stats()
         self.initialize_daily_stats()
         
@@ -63,13 +75,18 @@ class BinanceExecutor:
         self.stop_loss_manager = StopLossManager()
         
         # Position Sizer (Phase 2 Integration)
-        self.position_sizer = DynamicPositionSizer()
+        self.position_sizer = PositionSizer()
         
         # Min Trade Amount Configuration
         # Global / USDT Mode
-        self.min_trade_amount = 6.0 # USDT (Binance min usually $5)
+        if self.is_tr:
+             self.min_trade_amount = 40.0 # TRY
+        else:
+             # Increase to 10.0 to prevent NOTIONAL filter failures (Code -1013)
+             # Binance often enforces 10 USDT min notional for API orders
+             self.min_trade_amount = 10.0 # USDT
             
-        log(f"Executor başlatıldı. Mod: {'CANLI' if self.is_live else 'KAĞIT'} | Min İşlem: {self.min_trade_amount} USDT")
+        log(f"Executor başlatıldı. Mod: {'CANLI' if self.is_live else 'KAĞIT'} | Min İşlem: {self.min_trade_amount} {'TRY' if self.is_tr else 'USDT'}")
         
         # Initial state save to ensure mode is correctly recorded
         self.save_positions()
@@ -80,6 +97,10 @@ class BinanceExecutor:
         self.full_state['order_history'] = self.order_history
         self.full_state['is_live'] = self.is_live
         self.full_state['paper_balance'] = self.paper_balance
+        
+        # Save MTF Stats if available
+        if hasattr(self, 'mtf_stats'):
+            self.full_state['mtf_stats'] = self.mtf_stats
         
         # Update total balance for dashboard if not live
         if not self.is_live:
@@ -93,6 +114,12 @@ class BinanceExecutor:
     def update_commentary(self, commentary: Dict[str, Any]):
         """Bot yorumlarını state dosyasına kaydet"""
         self.full_state['commentary'] = commentary
+        self.state_manager.save_state(self.full_state)
+
+    def update_mtf_stats(self, stats: Dict):
+        """Update Multi-Timeframe Stats"""
+        self.mtf_stats = stats
+        self.full_state['mtf_stats'] = stats
         self.state_manager.save_state(self.full_state)
 
     async def initialize(self):
@@ -124,15 +151,332 @@ class BinanceExecutor:
                  log(f"⚠️ Kaldıraç ayarlama hatası: {e}")
 
         if self.is_live:
-             await self.sync_wallet_balances()
+             await self.sync_wallet()
 
-    async def sync_wallet_balances(self):
-        """Gerçek cüzdan bakiyelerini state'e senkronize et"""
-        if not self.is_live or not self.exchange_spot:
-            log(f"DEBUG: Skipping wallet sync. Live: {self.is_live}, Client: {self.exchange_spot}")
+
+
+    async def redeem_flexible_savings(self):
+        """
+        Redeems all assets from Binance Flexible Earn (Simple Earn) to Spot Wallet.
+        This allows the bot to access funds hidden in 'Earn' wallets.
+        """
+        try:
+            # Check if API method exists (SAPI support)
+            if not hasattr(self.exchange_spot, 'sapi_get_simple_earn_flexible_position'):
+                return
+
+            # log("🏦 Checking Flexible Earn positions to redeem...")
+            
+            # 1. Get Positions
+            # GET /sapi/v1/simple-earn/flexible/position
+            positions = await asyncio.to_thread(
+                self.exchange_spot.sapi_get_simple_earn_flexible_position,
+                {'size': 100}
+            )
+            
+            rows = positions.get('rows', []) if isinstance(positions, dict) else positions
+            
+            if not rows:
+                return
+
+            redeemed_count = 0
+            for pos in rows:
+                asset = pos.get('asset')
+                amount = float(pos.get('totalAmount', 0.0))
+                product_id = pos.get('productId')
+                
+                # Filter small amounts (dust in earn)? No, redeem everything to clean up.
+                if amount <= 0: continue
+                
+                log(f"🏦 Redeeming {asset} (Amount: {amount}) from Earn to Spot...")
+                
+                try:
+                    # POST /sapi/v1/simple-earn/flexible/redeem
+                    # API Error -1102 said 'amount' was missing, so we use 'amount' instead of 'redeemAmount'
+                    await asyncio.to_thread(
+                        self.exchange_spot.sapi_post_simple_earn_flexible_redeem,
+                        {
+                            'productId': product_id,
+                            'amount': amount, 
+                            'destAccount': 'SPOT' 
+                        }
+                    )
+                    redeemed_count += 1
+                    log(f"✅ Successfully redeemed {asset}.")
+                except Exception as e:
+                    log(f"❌ Failed to redeem {asset}: {e}")
+            
+            if redeemed_count > 0:
+                log(f"🏦 Redeemed {redeemed_count} assets from Earn. Waiting for balance update...")
+                await asyncio.sleep(2) # Wait for transfer to process
+                
+        except Exception as e:
+            # Use debug log for errors to avoid spamming if user has no Earn access
+            # log(f"DEBUG: Earn Redemption Error: {e}")
+            pass
+
+    async def transfer_funding_to_spot(self):
+        """
+        Transfers all assets from Funding Wallet to Spot Wallet.
+        """
+        try:
+            # 1. Get Funding Balance
+            funding_balance = await asyncio.to_thread(self.exchange_spot.fetch_balance, {'type': 'funding'})
+            total = funding_balance.get('total', {})
+            
+            transferred_count = 0
+            for asset, amount in total.items():
+                if amount > 0:
+                    log(f"💰 Found {asset} ({amount}) in Funding Wallet. Transferring to Spot...")
+                    try:
+                        # POST /sapi/v1/asset/transfer
+                        # type: FUNDING_MAIN
+                        await asyncio.to_thread(
+                            self.exchange_spot.sapi_post_asset_transfer,
+                            {
+                                'type': 'FUNDING_MAIN',
+                                'asset': asset,
+                                'amount': amount
+                            }
+                        )
+                        transferred_count += 1
+                        log(f"✅ Transferred {asset} to Spot.")
+                    except Exception as e:
+                        log(f"❌ Failed to transfer {asset}: {e}")
+            
+            if transferred_count > 0:
+                await asyncio.sleep(1)
+            else:
+                log("💰 Funding Wallet check complete. No assets to transfer.")
+
+        except Exception as e:
+            log(f"⚠️ Funding check failed: {e}")
+            pass
+
+    async def convert_dust_to_bnb(self):
+        """
+        Binance Global: Convert small balances (dust) to BNB.
+        Scans for assets < 10 USDT and converts them.
+        """
+        if self.is_tr:
+            log("⚠️ Binance TR does not support Dust-to-BNB conversion via API.")
             return
 
         try:
+            log("🧹 Scanning for dust assets to convert to BNB...")
+            
+            # 1. Get Balances
+            balance_data = await asyncio.to_thread(self.exchange_spot.fetch_balance)
+            balances = balance_data.get('total', {})
+            
+            # 2. Get Tickers for Valuation
+            tickers = await asyncio.to_thread(self.exchange_spot.fetch_tickers)
+            
+            dust_candidates = []
+            
+            for asset, amount in balances.items():
+                if asset in ['USDT', 'BNB', 'TRY', 'USDC', 'FDUSD']: continue # Skip bases
+                if amount <= 0: continue
+                
+                # Symbol check
+                symbol = f"{asset}/USDT"
+                price = 0.0
+                
+                if symbol in tickers:
+                    price = float(tickers[symbol]['last'])
+                else:
+                    # Maybe it has no USDT pair (e.g. BTC pair only)
+                    # Skip for safety or check BTC value
+                    # log(f"⚠️ Dust Check: No USDT pair for {asset}")
+                    continue
+                    
+                value_usdt = amount * price
+                log(f"🔍 Dust Check: {asset} Amount: {amount} Value: ${value_usdt:.2f}")
+                
+                # Criteria: Value < 10 USDT (Min Trade) and > 0.1 USDT (To avoid zero value)
+                if 0.1 < value_usdt < 10.0:
+                    dust_candidates.append(asset)
+                    log(f"🧹 Dust Candidate Found: {asset} (${value_usdt:.2f})")
+            
+            if not dust_candidates:
+                log("🧹 No dust assets found to convert.")
+                return
+
+            log(f"🧹 Found {len(dust_candidates)} dust assets: {dust_candidates}")
+            
+            # 3. Call API
+            # Binance API expects 'asset': ['BTC', 'ETH']
+            response = await asyncio.to_thread(
+                self.exchange_spot.sapi_post_asset_dust,
+                {'asset': dust_candidates}
+            )
+            
+            log(f"✅ Dust-to-BNB Conversion Result: {response}")
+            
+        except Exception as e:
+            log(f"❌ Dust conversion failed: {e}")
+
+    async def _import_wallet_to_positions(self, wallet_assets: dict):
+        """
+        Cüzdandaki varlıkları (bot tarafından alınmamış olsa bile) pozisyonlara ekler.
+        Ayrıca cüzdanda olmayan (satılmış/sıfırlanmış) varlıkları bot hafızasından siler.
+        """
+        try:
+            # 1. Cleanup: Cüzdanda artık olmayan varlıkları hafızadan sil
+            to_remove = []
+            for symbol in list(self.paper_positions.keys()):
+                # Sembol isminden varlık kodunu çıkar
+                asset = None
+                if self.is_tr:
+                    if symbol.endswith('_TRY'):
+                        asset = symbol.replace('_TRY', '')
+                else:
+                    # Global: 'BAT/USDT' -> 'BAT'
+                    if '/' in symbol:
+                        asset = symbol.split('/')[0]
+                
+                if asset:
+                    # Eğer varlık cüzdan listesinde yoksa (bakiye 0 ise wallet_assets'e girmez)
+                    # VEYA cüzdan listesinde var ama toplam bakiye çok düşükse (dust)
+                    if asset not in wallet_assets:
+                        to_remove.append(symbol)
+                    elif wallet_assets[asset]['total'] <= 0: # Should be covered by 'not in' but safe check
+                        to_remove.append(symbol)
+            
+            for sym in to_remove:
+                del self.paper_positions[sym]
+                log(f"🧹 Cüzdandan silinen varlık bot hafızasından kaldırıldı: {sym}")
+
+            # 2. Import: Cüzdanda olup botta olmayanları ekle
+            for asset, data in wallet_assets.items():
+                if asset == 'TRY': continue
+                if not self.is_tr and asset == 'USDT': continue # Global için USDT ana para
+                
+                # Sembol ismini oluştur
+                symbol = ""
+                if self.is_tr:
+                    symbol = f"{asset}_TRY"
+                else:
+                    symbol = f"{asset}/USDT"
+                
+                # Bu varlık zaten pozisyonlarımızda var mı?
+                if symbol in self.paper_positions:
+                    # Mevcut miktarı güncelle (Senkronizasyon)
+                    current_qty = self.paper_positions[symbol].get('quantity', 0.0)
+                    wallet_qty = float(data.get('total', 0.0))
+                    
+                    # Eğer fark %1'den büyükse güncelle
+                    if abs(current_qty - wallet_qty) > (wallet_qty * 0.01) and wallet_qty > 0:
+                        self.paper_positions[symbol]['quantity'] = wallet_qty
+                        log(f"🔄 Bakiye Senkronize Edildi ({symbol}): {current_qty:.4f} -> {wallet_qty:.4f}")
+                    continue
+                
+                # Bu varlık işlem yaptığımız semboller listesinde mi?
+                # Eğer listede yoksa bile cüzdanda varsa eklemeliyiz ki satabilelim (Sniper Mode için)
+                # Ancak fiyatını bulmamız lazım.
+                
+                free_amount = float(data.get('free', 0.0)) + float(data.get('locked', 0.0))
+                if free_amount <= 0: continue
+
+                # Güncel fiyatı al (Değer kontrolü ve entry_price için)
+                current_price = 0.0
+                try:
+                    # Mevcut ticker varsa kullan, yoksa fetch
+                    # Ticker fetch maliyetli olabilir, bu yüzden sadece gerektiğinde
+                    ticker = await asyncio.to_thread(self.exchange_spot.fetch_ticker, symbol)
+                    current_price = float(ticker['last'])
+                except:
+                    # Ticker bulunamadıysa (örn delist olmuş veya yanlış pair), geç
+                    continue 
+
+                if current_price <= 0: continue
+
+                # Minimum değer kontrolü (Global için min_trade_amount, TR için 10 TRY)
+                total_value = free_amount * current_price
+                threshold = 10.0 if self.is_tr else 1.0 # 1$ altı dust sayılabilir ama satılabilirse alalım
+                
+                if total_value < threshold:
+                    continue
+
+                # Pozisyonu ekle
+                log(f"🎒 Cüzdanda mevcut varlık tespit edildi: {symbol} ({free_amount} adet, ~{total_value:.2f} {('TRY' if self.is_tr else 'USDT')}). Bota dahil ediliyor.")
+                self.paper_positions[symbol] = {
+                    'entry_price': current_price, # Maliyeti bilmediğimiz için güncel fiyatı baz alıyoruz
+                    'quantity': free_amount,
+                    'timestamp': time.time(),
+                    'highest_price': current_price,
+                    'is_imported': True # Sonradan eklendiğini belirtmek için flag
+                }
+
+        except Exception as e:
+            log(f"⚠️ Varlık import hatası: {e}")
+
+    def initialize_daily_stats(self):
+        """Günlük istatistikleri başlattır/sıfırla"""
+        if 'daily_realized_pnl' not in self.stats:
+            self.stats['daily_realized_pnl'] = 0.0
+        if 'daily_trade_count' not in self.stats:
+            self.stats['daily_trade_count'] = 0
+        if 'total_pnl_pct' not in self.stats:
+            self.stats['total_pnl_pct'] = 0.0
+        if 'total_trades' not in self.stats:
+            self.stats['total_trades'] = 0
+        if 'win_rate' not in self.stats:
+            self.stats['win_rate'] = 0.0
+
+    async def get_free_balance(self, asset: str = 'TRY') -> float:
+        """Kullanılabilir (Free) bakiyeyi getir"""
+        try:
+            if not self.is_live:
+                # Paper trading için sanal bakiyeyi kullan
+                if asset in ['TRY', 'USDT']: # Quote currency
+                     return self.paper_balance
+                return 0.0
+
+            if self.is_tr:
+                if not self.exchange_spot: return 0.0
+                
+                # Cache veya senkron çağrı ile bakiye
+                # Performans için state'deki son wallet_assets'i kullanabiliriz
+                # Ama anlık kontrol için API çağrısı daha güvenli
+                balance_data = await asyncio.to_thread(self.exchange_spot.get_account_info)
+                
+                balances = []
+                if isinstance(balance_data, dict):
+                    data = balance_data.get('data', balance_data)
+                    if isinstance(data, dict):
+                        balances = data.get('accountAssets', data.get('balances', []))
+                    elif isinstance(data, list):
+                        balances = data
+                elif isinstance(balance_data, list):
+                    balances = balance_data
+
+                for b in balances:
+                    if b.get('asset') == asset:
+                        return float(b.get('free', 0.0))
+                return 0.0
+            else:
+                if not self.exchange_spot: return 0.0
+                balance = await asyncio.to_thread(self.exchange_spot.fetch_balance)
+                return float(balance.get('free', {}).get('USDT' if asset == 'TRY' else asset, 0.0))
+
+        except Exception as e:
+            log(f"⚠️ Free Bakiye hatası: {e}")
+            return 0.0
+
+    async def sync_wallet(self):
+        """Gerçek cüzdan bakiyelerini state'e senkronize et (Auto-Redeem dahil)"""
+        if not self.is_live or not self.exchange_spot:
+            # log(f"DEBUG: Skipping wallet sync. Live: {self.is_live}, Client: {self.exchange_spot}")
+            return
+
+        try:
+            # --- Auto-Redeem from Earn (Flexible Savings) if Global ---
+            # This ensures hidden assets (like AVAX in Earn) are moved to Spot for trading
+            if not self.is_tr:
+                await self.redeem_flexible_savings()
+                await self.transfer_funding_to_spot()
+
             # Binance TR senkron çağrı
             if self.is_tr:
                 # BinanceTRClient uses get_account_info
@@ -199,117 +543,10 @@ class BinanceExecutor:
                 await self._import_wallet_to_positions(wallet_assets)
 
             self.save_positions()
-            log(f"💰 Cüzdan Senkronize: {len(wallet_assets)} varlık bulundu. Bakiye: {total_try_balance:.2f}")
+            # log(f"💰 Cüzdan Senkronize: {len(wallet_assets)} varlık bulundu. Varlıklar: {list(wallet_assets.keys())}. Bakiye: {total_try_balance:.2f}")
 
         except Exception as e:
             log(f"⚠️ Cüzdan senkronizasyon hatası: {e}")
-
-    async def _import_wallet_to_positions(self, wallet_assets: dict):
-        """
-        Cüzdandaki varlıkları (bot tarafından alınmamış olsa bile) pozisyonlara ekler.
-        Böylece bot bu varlıkları da yönetebilir (Satış sinyali gelirse satabilir).
-        """
-        try:
-            for asset, data in wallet_assets.items():
-                if asset == 'TRY': continue
-                
-                # Sembol ismini oluştur (örn: AVAX -> AVAX_TRY)
-                symbol = f"{asset}_TRY"
-                
-                # Bu varlık zaten pozisyonlarımızda var mı?
-                if symbol in self.paper_positions:
-                    continue
-                
-                # Bu varlık işlem yaptığımız semboller listesinde mi?
-                # (settings.SYMBOLS listesine erişim gerekebilir, şimdilik main'den gelen listeyi varsayalım veya tümünü alalım)
-                # Güvenlik için sadece bilinen sembolleri ekle
-                # Ancak settings modülü import edilmiş durumda
-                if hasattr(settings, 'SYMBOLS') and symbol not in settings.SYMBOLS:
-                     continue
-
-                free_amount = data.get('free', 0.0)
-                if free_amount <= 0: continue
-
-                # Güncel fiyatı al (Değer kontrolü ve entry_price için)
-                current_price = 0.0
-                try:
-                    ticker = await asyncio.to_thread(self.exchange_spot.fetch_ticker, symbol)
-                    current_price = float(ticker['last'])
-                except:
-                    continue # Fiyat alınamazsa atla
-
-                if current_price <= 0: continue
-
-                # Minimum değer kontrolü (Örn: 50 TRY altı "dust" sayılır, işlem yapılamaz)
-                total_value = free_amount * current_price
-                if total_value < 50.0:
-                    continue
-
-                # Pozisyonu ekle
-                log(f"🎒 Cüzdanda mevcut varlık tespit edildi: {symbol} ({free_amount} adet, ~{total_value:.2f} TRY). Bota dahil ediliyor.")
-                self.paper_positions[symbol] = {
-                    'entry_price': current_price, # Maliyeti bilmediğimiz için güncel fiyatı baz alıyoruz
-                    'quantity': free_amount,
-                    'timestamp': time.time(),
-                    'highest_price': current_price,
-                    'is_imported': True # Sonradan eklendiğini belirtmek için flag
-                }
-
-        except Exception as e:
-            log(f"⚠️ Varlık import hatası: {e}")
-
-    def initialize_daily_stats(self):
-        """Günlük istatistikleri başlattır/sıfırla"""
-        if 'daily_realized_pnl' not in self.stats:
-            self.stats['daily_realized_pnl'] = 0.0
-        if 'daily_trade_count' not in self.stats:
-            self.stats['daily_trade_count'] = 0
-        if 'total_pnl_pct' not in self.stats:
-            self.stats['total_pnl_pct'] = 0.0
-        if 'total_trades' not in self.stats:
-            self.stats['total_trades'] = 0
-        if 'win_rate' not in self.stats:
-            self.stats['win_rate'] = 0.0
-
-    async def get_free_balance(self, asset: str = 'TRY') -> float:
-        """Kullanılabilir (Free) bakiyeyi getir"""
-        try:
-            if not self.is_live:
-                # Paper trading için sanal bakiyeyi kullan
-                if asset in ['TRY', 'USDT']: # Quote currency
-                     return self.paper_balance
-                return 0.0
-
-            if self.is_tr:
-                if not self.exchange_spot: return 0.0
-                
-                # Cache veya senkron çağrı ile bakiye
-                # Performans için state'deki son wallet_assets'i kullanabiliriz
-                # Ama anlık kontrol için API çağrısı daha güvenli
-                balance_data = await asyncio.to_thread(self.exchange_spot.get_account_info)
-                
-                balances = []
-                if isinstance(balance_data, dict):
-                    data = balance_data.get('data', balance_data)
-                    if isinstance(data, dict):
-                        balances = data.get('accountAssets', data.get('balances', []))
-                    elif isinstance(data, list):
-                        balances = data
-                elif isinstance(balance_data, list):
-                    balances = balance_data
-
-                for b in balances:
-                    if b.get('asset') == asset:
-                        return float(b.get('free', 0.0))
-                return 0.0
-            else:
-                if not self.exchange_spot: return 0.0
-                balance = await asyncio.to_thread(self.exchange_spot.fetch_balance)
-                return float(balance.get('free', {}).get('USDT' if asset == 'TRY' else asset, 0.0))
-
-        except Exception as e:
-            log(f"⚠️ Free Bakiye hatası: {e}")
-            return 0.0
 
     async def get_total_balance(self) -> float:
         """Toplam bakiyeyi hesapla (USDT/TRY)"""
@@ -361,19 +598,70 @@ class BinanceExecutor:
                 if not self.exchange_spot:
                     return 0.0
                 balance = await asyncio.to_thread(self.exchange_spot.fetch_balance)
-                return float(balance.get('total', {}).get('USDT', 0.0))
+                usdt_total = float(balance.get('total', {}).get('USDT', 0.0))
+                
+                # Add value of other assets in paper_positions
+                # Since sync_wallet should populate paper_positions, we can trust it roughly
+                # Or we can iterate balance['total'] again?
+                # Using paper_positions is faster and uses cached prices
+                
+                other_assets_value = 0.0
+                for sym, pos in self.paper_positions.items():
+                    # Calculate value (qty * price)
+                    # We use entry_price or highest_price as estimate if current price unknown
+                    # Ideally we have current price from main loop but executor doesn't have it easily here
+                    est_price = pos.get('entry_price', 0.0)
+                    qty = pos.get('quantity', 0.0)
+                    other_assets_value += qty * est_price
+                
+                return usdt_total + other_assets_value
+
         except Exception as e:
             log(f"⚠️ Bakiye hesaplama hatası: {e}")
             return 0.0
 
-    async def calculate_quantity(self, symbol: str, price: float, side: str, risk_score: float = 10.0, atr_value: float = 0.0, regime: str = 'NEUTRAL') -> float:
-        """İşlem miktarını hesapla (Dinamik Risk Yönetimi + Volatilite Bazlı + Market Rejimi - Phase 3)"""
+    async def calculate_quantity(self, symbol: str, price: float, side: str, risk_score: float = 10.0, atr_value: float = 0.0, regime: str = 'NEUTRAL', force_all_in: bool = False) -> float:
+        """
+        İşlem miktarını hesapla (Dinamik Risk Yönetimi + Volatilite Bazlı + Market Rejimi - Phase 3)
+        force_all_in: Eğer True ise, bakiyenin tamamı (%98'i) ile işlem açılır (Sniper Mode).
+        """
         try:
-            balance = await self.get_total_balance()
-            if balance <= 0:
+            total_balance = await self.get_total_balance()
+            
+            # Base Asset (USDT/TRY) Free Balance
+            base_asset = 'TRY' if self.is_tr else 'USDT'
+            free_balance = await self.get_free_balance(base_asset)
+
+            if total_balance <= 0:
                 return 0.0
                 
+            # --- SNIPER MODE (ALL-IN) ---
+            if force_all_in:
+                # Tüm bakiyeyi kullan (Komisyon payı için %2 bırak)
+                current_leverage = settings.LEVERAGE if (not self.is_tr and settings.TRADING_MODE == 'futures') else 1.0
+                
+                # Futures ise Kaldıraç Ayarla
+                if self.is_live and not self.is_tr and settings.TRADING_MODE == 'futures':
+                    try:
+                        log(f"⚙️ Sniper Modu: Kaldıraç Ayarlanıyor ({symbol}): {current_leverage}x")
+                        await asyncio.to_thread(self.exchange_spot.set_leverage, current_leverage, symbol)
+                    except Exception as e:
+                        log(f"⚠️ Kaldıraç ayarlama hatası: {e}")
+                
+                # FIX: Use FREE balance for All-In, not Total Equity
+                # This prevents "Insufficient Balance" errors if equity is locked in other positions/dust
+                target_position_size_usdt = free_balance * current_leverage * 0.98
+                
+                log(f"🎯 SNIPER MODU: Tüm serbest bakiye kullanılıyor! Hedef Notional={target_position_size_usdt:.2f} (Free={free_balance:.2f}, Total={total_balance:.2f})")
+                
+                # Miktar hesapla ve dön
+                quantity = target_position_size_usdt / price
+                return quantity
+
             # Phase 2 & 3: Volatility & Regime Based Position Sizing
+            # Use Total Equity (total_balance) for risk calculations
+            balance = total_balance 
+            
             if atr_value > 0 and price > 0:
                 # 1. Volatilite ve Rejim Parametrelerini Hesapla
                 params = self.position_sizer.calculate_params_from_atr(symbol, atr_value, price, balance, regime)
@@ -401,7 +689,7 @@ class BinanceExecutor:
                 confidence_factor = max(0.2, min(1.0, risk_score / 10.0))
                 target_position_size_usdt *= confidence_factor
                 
-                log(f"⚖️ Pozisyon Hesaplama (Phase 2): Bakiye={balance:.2f} | Risk={params['risk_level']} | Kaldıraç={target_leverage}x | Hedef Notional={target_position_size_usdt:.2f}")
+                log(f"⚖️ Pozisyon Hesaplama (Phase 2): Bakiye={balance:.2f} (Free: {free_balance:.2f}) | Risk={params['risk_level']} | Kaldıraç={target_leverage}x | Hedef Notional={target_position_size_usdt:.2f}")
 
             else:
                 # Fallback: Eski Mantık (ATR yoksa)
@@ -412,7 +700,7 @@ class BinanceExecutor:
                      # Eğer futures ise ve ATR yoksa varsayılan kaldıraçla notional hesapla
                      target_position_size_usdt *= settings.LEVERAGE 
                 
-                log(f"⚖️ Pozisyon Hesaplama (Fallback): Bakiye={balance:.2f} | Baz=%{base_pct*100} | Hedef={target_position_size_usdt:.2f}")
+                log(f"⚖️ Pozisyon Hesaplama (Fallback): Bakiye={balance:.2f} (Free: {free_balance:.2f}) | Baz=%{base_pct*100} | Hedef={target_position_size_usdt:.2f}")
 
             
             # Minimum İşlem Tutarı Kontrolü
@@ -424,19 +712,30 @@ class BinanceExecutor:
                 # Not: Futures için margin kontrolü gerekir. Margin = Notional / Leverage
                 required_margin = min_trade_val / (target_leverage if 'target_leverage' in locals() else settings.LEVERAGE)
                 
-                if balance >= (required_margin * 1.05): 
+                # FIX: Check FREE BALANCE (not Total Equity) to ensure we can actually open this trade
+                # If free balance is low, do NOT bump up the size.
+                if free_balance >= (required_margin * 1.05): 
                     target_position_size_usdt = min_trade_val * 1.05
             
             # Güvenlik: Asla toplam bakiyeden (kaldıraçlı) fazla işlem açma
             # Max Notional = Balance * Leverage * 0.98
             current_leverage = target_leverage if 'target_leverage' in locals() else settings.LEVERAGE
-            max_safe_notional = balance * current_leverage * 0.98
+            max_safe_notional_equity = balance * current_leverage * 0.98
+            
+            # Phase 3 FIX: Ayrıca mevcut kullanılabilir bakiyeyi de kontrol et (Total Equity'e güvenme)
+            # Free Balance * Leverage * 0.98
+            max_safe_notional_free = free_balance * current_leverage * 0.98
+            
+            # En kısıtlayıcı olanı seç
+            max_safe_notional = min(max_safe_notional_equity, max_safe_notional_free)
             
             if target_position_size_usdt > max_safe_notional:
+                log(f"📉 Bakiye Koruması: Tutar {target_position_size_usdt:.2f} -> {max_safe_notional:.2f} olarak sınırlandı (Free: {free_balance:.2f})")
                 target_position_size_usdt = max_safe_notional
             
             # Son kontrol
             if target_position_size_usdt < min_trade_val:
+                log(f"⚠️ Yetersiz Bakiye: {target_position_size_usdt:.2f} < {min_trade_val}. İşlem iptal.")
                 return 0.0
             
             quantity = target_position_size_usdt / price
@@ -484,10 +783,15 @@ class BinanceExecutor:
                             filters = {f['filterType']: f for f in s['filters']}
                             lot_size = filters.get('LOT_SIZE', {})
                             price_filter = filters.get('PRICE_FILTER', {})
+                            min_notional_filter = filters.get('MIN_NOTIONAL', {})
+                            if not min_notional_filter:
+                                min_notional_filter = filters.get('NOTIONAL', {})
+                                
                             return {
                                 'stepSize': lot_size.get('stepSize', '1.0'),
                                 'minQty': lot_size.get('minQty', '0.0'),
-                                'tickSize': price_filter.get('tickSize', '0.01')
+                                'tickSize': price_filter.get('tickSize', '0.01'),
+                                'minNotional': min_notional_filter.get('minNotional', '10.0')
                             }
             else:
                 # Global / CCXT
@@ -501,7 +805,8 @@ class BinanceExecutor:
                         return {
                             'stepSize': str(market['precision'].get('amount', 1.0)),
                             'minQty': str(market['limits']['amount'].get('min', 0.0)),
-                            'tickSize': str(market['precision'].get('price', 0.01))
+                            'tickSize': str(market['precision'].get('price', 0.01)),
+                            'minNotional': str(market['limits']['cost'].get('min', 5.0))
                         }
             return None
         except Exception as e:
@@ -559,14 +864,29 @@ class BinanceExecutor:
                     # Score varsa kullan, yoksa varsayılan 10 (maksimum)
                     score = sig.score if hasattr(sig, 'score') else 10.0
                     
+                    # Force All-In (Sniper Mode)
+                    force_all_in = sig.details.get('force_all_in', False) if sig.details else False
+                    
+                    if force_all_in:
+                        qty = await self.calculate_quantity(symbol, price, 'BUY', risk_score=score, atr_value=sig.details.get('atr', 0), force_all_in=True)
+                        if qty > 0:
+                             log(f"🎯 Sniper Girişi: {symbol} için Tüm Bakiye Kullanılıyor.")
+                             await self.execute_buy(symbol, qty, price)
+                        return # Diğer kontrolleri atla
+
                     # --- SMART SWAP LOGIC START ---
                     # Yetersiz bakiye durumunda düşük puanlı varlığı satıp buna geçme kontrolü
                     base_asset = 'TRY' if self.is_tr else 'USDT'
                     free_balance = await self.get_free_balance(base_asset)
+                    total_balance = await self.get_total_balance()
                     min_trade_val = self.min_trade_amount
                     
-                    if (free_balance < min_trade_val or len(self.paper_positions) >= settings.MAX_OPEN_POSITIONS) and latest_scores:
-                        reason = "Yetersiz Bakiye" if free_balance < min_trade_val else "Pozisyon Sınırı"
+                    # Eğer boşta kalan bakiye, portföyün %5'inden azsa (yeni pozisyon açılamaz) veya pozisyon sayısı dolduysa
+                    # Not: Normalde %15-35 arası pozisyon açıyoruz, %5 altı bakiye "yetersiz" sayılır.
+                    low_balance_threshold = max(min_trade_val * 2, total_balance * 0.05)
+                    
+                    if (free_balance < low_balance_threshold or len(self.paper_positions) >= settings.MAX_OPEN_POSITIONS) and latest_scores:
+                        reason = "Yetersiz Bakiye" if free_balance < low_balance_threshold else "Pozisyon Sınırı"
                         log(f"📉 {reason} ({len(self.paper_positions)}/{settings.MAX_OPEN_POSITIONS}). Swap fırsatı aranıyor...")
                         
                         worst_symbol = None
@@ -581,16 +901,19 @@ class BinanceExecutor:
                             current_score = latest_scores.get(pos_sym)
                             
                             # Eğer güncel skor yoksa, bu sembol henüz taranmamış olabilir.
-                            # Varsayılan olarak yüksek ver ki yanlışlıkla satmayalım
+                            # Varsayılan olarak çok düşük ver ki hacim listesinden düşenler satılsın
                             if current_score is None:
-                                continue
+                                current_score = -10.0
+                                log(f"⚠️ {pos_sym} güncel tarama listesinde yok. Skor -10.0 varsayılıyor.")
+                            
+                            log(f"🔍 Swap Aday Kontrolü: {pos_sym} Skor: {current_score:.1f}")
                                 
                             if current_score < worst_score:
                                 worst_score = current_score
                                 worst_symbol = pos_sym
                         
-                        # Swap Kararı: Yeni aday, en kötüden %20 daha iyiyse
-                        if worst_symbol and score > (worst_score * 1.2):
+                        # Swap Kararı: Yeni aday, en kötüden %5 daha iyiyse (daha agresif swap)
+                        if worst_symbol and score > (worst_score * 1.05):
                             log(f"♻️ SWAP FIRSATI: {worst_symbol} (Skor: {worst_score:.1f}) -> {symbol} (Skor: {score:.1f})")
                             log(f"🚀 {worst_symbol} satılıyor ve bakiye {symbol} için kullanılacak.")
                             
@@ -610,6 +933,17 @@ class BinanceExecutor:
                                 
                                 # Eğer satış başarısızsa alımı yapma!
                                 if not sell_success:
+                                    # DUST CHECK FOR SWAP
+                                    est_value = pos_data['quantity'] * current_sell_price
+                                    if 0.0 < est_value < 10.0 and not self.is_tr:
+                                        log(f"🧹 Swap başarısız (Dust): {worst_symbol} (${est_value:.2f}) -> BNB Convert ediliyor.")
+                                        await self.convert_dust_to_bnb()
+                                        # Remove from memory so it doesn't block future trades/swaps
+                                        if worst_symbol in self.paper_positions:
+                                            del self.paper_positions[worst_symbol]
+                                            self.save_positions()
+                                        log(f"🗑️ {worst_symbol} hafızadan silindi (Dust Convert sonrası).")
+                                        
                                     log(f"🛑 Satış başarısız olduğu için Swap iptal edildi: {worst_symbol}")
                                     continue
                                 
@@ -709,26 +1043,120 @@ class BinanceExecutor:
                     # Precision Adjustment
                     qty_to_send = quantity
                     info = await self.get_symbol_info(symbol)
+
+                    # Min Notional Check & Adjustment (Dynamic from Exchange Info)
+                    min_notional = 5.0
+                    if info:
+                         min_notional = float(info.get('minNotional', 5.0))
+                    
+                    # Log Min Notional Info
+                    log(f"ℹ️ {symbol} Min Notional Check: Limit={min_notional} | Order Value={qty_to_send * price:.2f}")
+
+                    if (qty_to_send * price) < min_notional:
+                         # BUMP LOGIC WITH SAFETY CHECK
+                         base_asset = 'USDT' # Global default
+                         # Performance: Cache this or accept slight delay? Safety first.
+                         try:
+                             check_balance = await self.get_free_balance(base_asset)
+                             check_leverage = settings.LEVERAGE if (not self.is_tr and settings.TRADING_MODE == 'futures') else 1.0
+                             max_afford_notional = check_balance * check_leverage * 0.98
+                             
+                             required_bump_notional = min_notional * 1.05
+                             
+                             if max_afford_notional < required_bump_notional:
+                                 log(f"⚠️ Min Notional ({min_notional}) için bakiye yetersiz. (Max: {max_afford_notional:.2f}). İşlem iptal.")
+                                 return False
+                             
+                             log(f"⚠️ Min Notional Altında: {qty_to_send * price:.2f} < {min_notional}. Miktar artırılıyor (+%5)...")
+                             qty_to_send = required_bump_notional / price
+                             
+                         except Exception as e:
+                             log(f"⚠️ Balance check error during bump: {e}")
+                             # Fallback: Try bumping anyway and let retry logic handle if fails
+                             qty_to_send = (min_notional * 1.05) / price
+
                     if info:
                         step_size = float(info.get('stepSize', '1.0'))
                         if step_size > 0:
-                            steps = int(quantity / step_size)
+                            # 1. Rounding down first (Standard)
+                            steps = int(qty_to_send / step_size)
                             qty_to_send = steps * step_size
+                            
+                            # 2. Check if rounding down caused it to fall below minNotional
+                            if (qty_to_send * price) < min_notional:
+                                log(f"⚠️ Yuvarlama sonrası Min Notional Altı: {qty_to_send * price:.2f} < {min_notional}. Bir adım yukarı yuvarlanıyor...")
+                                steps += 1
+                                qty_to_send = steps * step_size
+
+                            # 3. Apply string formatting for precision
                             precision = int(round(-math.log10(step_size))) if step_size < 1 else 0
                             if precision > 0:
                                 qty_to_send = float("{:.{p}f}".format(qty_to_send, p=precision))
                             else:
                                 qty_to_send = int(qty_to_send)
                         else:
-                            qty_to_send = int(quantity)
+                            qty_to_send = int(qty_to_send)
 
                     log(f"🛒 Global Alış Emri: {symbol} - Miktar: {qty_to_send}")
-                    order = await asyncio.to_thread(
-                        self.exchange_spot.create_market_buy_order,
-                        symbol,
-                        qty_to_send
-                    )
-                    log(f"✅ Global ALIŞ Başarılı: {order.get('id')}")
+                    try:
+                        order = await asyncio.to_thread(
+                            self.exchange_spot.create_market_buy_order,
+                            symbol,
+                            qty_to_send
+                        )
+                        log(f"✅ Global ALIŞ Başarılı: {order.get('id')}")
+                    except Exception as e:
+                        # RETRY LOGIC FOR INSUFFICIENT BALANCE
+                        err_msg = str(e)
+                        if 'Insufficient balance' in err_msg or 'Account has insufficient balance' in err_msg or '-2010' in err_msg:
+                            log(f"⚠️ Yetersiz Bakiye Hatası alındı. Miktar güncellenip tekrar deneniyor... (Hata: {err_msg[:50]}...)")
+                            
+                            # 1. Get Fresh Free Balance
+                            base_asset = 'USDT' # Global default
+                            free_balance = await self.get_free_balance(base_asset)
+                            
+                            # 2. Calculate Max Safe Quantity (98% of free balance)
+                            # Assuming Leverage 1x for retry to be safe, or use current leverage if futures
+                            current_leverage = settings.LEVERAGE if (not self.is_tr and settings.TRADING_MODE == 'futures') else 1.0
+                            new_notional = free_balance * current_leverage * 0.98
+                            
+                            # Min Notional Check for Retry
+                            min_notional_retry = 5.0
+                            if info:
+                                min_notional_retry = float(info.get('minNotional', 5.0))
+
+                            if new_notional < min_notional_retry:
+                                log(f"❌ Retry İptal: Güncel bakiye ({free_balance:.2f} {base_asset}) min notional ({min_notional_retry}) karşılanamıyor.")
+                                return False
+                            
+                            new_qty = new_notional / price
+                            
+                            # 3. Re-apply Precision
+                            qty_to_send = new_qty
+                            if info:
+                                step_size = float(info.get('stepSize', '1.0'))
+                                if step_size > 0:
+                                    steps = int(new_qty / step_size)
+                                    qty_to_send = steps * step_size
+                                    precision = int(round(-math.log10(step_size))) if step_size < 1 else 0
+                                    if precision > 0:
+                                        qty_to_send = float("{:.{p}f}".format(qty_to_send, p=precision))
+                                    else:
+                                        qty_to_send = int(qty_to_send)
+                                else:
+                                    qty_to_send = int(new_qty)
+                            
+                            log(f"🛒 Global Alış Emri (RETRY): {symbol} - Yeni Miktar: {qty_to_send}")
+                            
+                            # 4. Retry Order
+                            order = await asyncio.to_thread(
+                                self.exchange_spot.create_market_buy_order,
+                                symbol,
+                                qty_to_send
+                            )
+                            log(f"✅ Global ALIŞ Başarılı (Retry): {order.get('id')}")
+                        else:
+                            raise e # Re-raise other errors
 
             except Exception as e:
                 log(f"❌ Canlı ALIŞ Hatası: {e}")
@@ -791,9 +1219,47 @@ class BinanceExecutor:
         log(f"📝 Pozisyon açıldı: {symbol} @ {price}")
         return True
 
-    async def execute_sell(self, symbol: str, quantity: float, price: float, position: dict) -> bool:
+    async def execute_sell(self, symbol: str, quantity: float, price: float, position: dict, is_partial: bool = False) -> bool:
         """Satış emri"""
+        
+        # Safety: If price is 0, try to fetch it
+        if price <= 0.0 and self.exchange_spot:
+             try:
+                 ticker = await asyncio.to_thread(self.exchange_spot.fetch_ticker, symbol)
+                 price = float(ticker['last'])
+                 log(f"⚠️ Fiyat 0.0 geldi, güncel fiyat çekildi: {price}")
+             except Exception as e:
+                 log(f"❌ Fiyat çekme hatası: {e}")
+
         log(f"🔴 SATIŞ Sinyali: {symbol} - Fiyat: {price}")
+
+        # Live Mode: Check Actual Balance First to prevent 'Insufficient Balance' errors
+        if self.is_live:
+            try:
+                # Parse asset name
+                asset = None
+                if self.is_tr:
+                    if symbol.endswith('_TRY'): asset = symbol.replace('_TRY', '')
+                else:
+                    if '/' in symbol: asset = symbol.split('/')[0]
+                
+                if asset:
+                    actual_balance = await self.get_free_balance(asset)
+                    
+                    # Eger elimizdeki miktar, satmak istedigimizden azsa, gercek bakiyeyi kullan
+                    if actual_balance < quantity:
+                        # Eger fark cok kucukse (rounding) veya buyukse (sync hatasi), yine de gercegi kullanmak zorundayiz
+                        # Cunku olmayan parayi satamayiz.
+                        if actual_balance > 0:
+                            log(f"⚠️ Satış Öncesi Bakiye Düzeltmesi: {asset} Hedef={quantity:.6f} -> Mevcut={actual_balance:.6f}")
+                            quantity = actual_balance
+                        else:
+                             log(f"⚠️ Kritik: {asset} bakiyesi 0 görünüyor! Satış iptal edilebilir.")
+                             # Miktari 0 yaparsak asagida min notional'a takilir ve iptal olur, bu dogru davranis.
+                             quantity = 0.0
+
+            except Exception as e:
+                log(f"⚠️ Satış öncesi bakiye kontrolü hatası: {e}")
         
         # Min Notional Check
         notional_value = price * quantity
@@ -931,9 +1397,22 @@ class BinanceExecutor:
             wins = (self.stats.get('win_rate', 0) * (self.stats['total_trades'] - 1))
             self.stats['win_rate'] = wins / self.stats['total_trades']
             
-        # Pozisyonu sil
+        # Pozisyonu sil veya güncelle
         if symbol in self.paper_positions:
-            del self.paper_positions[symbol]
+            if is_partial:
+                # Kısmi satışta miktarı güncelle
+                current_qty = self.paper_positions[symbol]['quantity']
+                remaining_qty = current_qty - quantity
+                
+                # Hassasiyet hatalarını önlemek için çok küçük miktarları sıfır kabul et
+                if remaining_qty < (self.min_trade_amount / price / 10): 
+                    del self.paper_positions[symbol]
+                    log(f"⚠️ Kısmi satış sonrası miktar ({remaining_qty:.6f}) önemsiz, pozisyon tamamen kapatıldı: {symbol}")
+                else:
+                    self.paper_positions[symbol]['quantity'] = remaining_qty
+                    log(f"📉 Kısmi Satış Sonrası Kalan Miktar ({symbol}): {remaining_qty:.6f}")
+            else:
+                del self.paper_positions[symbol]
             
         if not self.is_live:
             revenue = price * quantity
@@ -944,7 +1423,7 @@ class BinanceExecutor:
         order_record = {
             'timestamp': time.time(),
             'symbol': symbol,
-            'action': 'SELL',
+            'action': 'PARTIAL_SELL' if is_partial else 'SELL',
             'price': price,
             'quantity': quantity,
             'pnl_pct': pnl_pct,

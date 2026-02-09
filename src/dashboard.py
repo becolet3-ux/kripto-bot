@@ -94,6 +94,19 @@ is_live = False
 if state:
     is_live = state.get('is_live', False)
 
+# Debug Info in Sidebar
+with st.sidebar.expander("🔍 Debug Info", expanded=False):
+    st.write(f"**Last Load:** {datetime.now().strftime('%H:%M:%S')}")
+    if state:
+        st.write(f"**State Keys:** {list(state.keys())}")
+        com = state.get('commentary', {})
+        if com:
+            st.write(f"**Commentary Keys:** {list(com.keys())}")
+        else:
+            st.error("Commentary is empty or missing!")
+    else:
+        st.error("State is None (File Load Failed)")
+
 mode_title = "CANLI İŞLEM (LIVE TRADING)" if is_live else "Paper Trading (Simülasyon)"
 icon = "🔥" if is_live else "🧪"
 

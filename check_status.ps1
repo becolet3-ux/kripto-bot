@@ -1,4 +1,6 @@
-echo "=== LIVE BOT LOGS ==="
-ssh -i kripto-bot.pem -o StrictHostKeyChecking=no ubuntu@63.180.55.81 "sudo docker logs kripto-bot-live --tail 200"
-echo "`n=== PAPER BOT LOGS ==="
-ssh -i kripto-bot.pem -o StrictHostKeyChecking=no ubuntu@63.180.55.81 "sudo docker logs kripto-bot-paper --tail 200"
+$Key = "C:\Users\emdam\Documents\trae_projects\kripto-bot\kripto-bot-eu.pem"
+$IP = "3.67.98.132"
+$User = "ubuntu"
+
+Write-Host "Checking Bot Status..."
+ssh -i $Key -o StrictHostKeyChecking=no $User@$IP "cd kripto-bot && sudo docker-compose ps && echo '--- LOGS ---' && sudo docker-compose logs --tail=100 bot-paper"

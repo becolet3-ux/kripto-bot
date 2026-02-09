@@ -1,147 +1,227 @@
-from typing import Dict, List
+import ccxt
 import pandas as pd
-import numpy as np
+import talib as ta
+from typing import Dict, Optional, Any
+from src.utils.logger import logger
+from src.collectors.binance_tr_client import BinanceTRClient
 
-class MultiTimeframeAnalyzer:
-    """Çoklu zaman dilimi analizi"""
-    
-    TIMEFRAMES = {
-        '15m': {'weight': 0.2, 'description': 'Short-term momentum'},
-        '1h': {'weight': 0.4, 'description': 'Primary trend'},
-        '4h': {'weight': 0.3, 'description': 'Medium-term confirmation'},
-        '1d': {'weight': 0.1, 'description': 'Long-term bias'}
-    }
-    
-    def analyze(self, symbol: str, loader) -> Dict:
-        """Tüm timeframe'lerde analiz yap"""
-        
-        signals = {}
-        weighted_score = 0
-        
-        for tf, config in self.TIMEFRAMES.items():
-            # Veri çek
-            # loader expects symbol and interval
-            try:
-                data = loader.fetch_ohlcv(symbol, interval=tf, limit=100)
-            except Exception as e:
-                print(f"Error fetching data for {symbol} {tf}: {e}")
-                continue
-            
-            if data is None or len(data) < 50:
-                continue
-                
-            # Convert list of lists to DataFrame if necessary
-            # Assuming loader returns list of lists [timestamp, open, high, low, close, volume]
-            # or it might return a DataFrame. Let's assume list of lists based on other files.
-            if isinstance(data, list):
-                df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-                df['close'] = df['close'].astype(float)
+def fetch_data(symbol: str, timeframe: str, exchange: Any, limit: int = 100) -> Optional[pd.DataFrame]:
+    """
+    Fetches OHLCV data compatible with both CCXT and BinanceTRClient.
+    """
+    try:
+        if isinstance(exchange, BinanceTRClient):
+            # BinanceTRClient returns dict with 'data' list of lists
+            # Format: [ [time, open, high, low, close, vol, ...], ... ]
+            resp = exchange.get_klines(symbol, interval=timeframe, limit=limit)
+            if resp.get('code') == 0 and 'data' in resp:
+                ohlcv = resp['data']
             else:
-                df = data
-            
-            # Teknik analiz
-            signal = self.analyze_timeframe(df, tf)
-            signals[tf] = signal
-            
-            # Ağırlıklı skor
-            weighted_score += signal['score'] * config['weight']
-        
-        return {
-            'symbol': symbol,
-            'overall_score': weighted_score,
-            'timeframe_signals': signals,
-            'alignment': self.check_alignment(signals),
-            'recommendation': self.get_recommendation(weighted_score, signals)
-        }
-    
-    def analyze_timeframe(self, data: pd.DataFrame, timeframe: str) -> Dict:
-        """Tek bir timeframe analizi"""
-        
-        # İndikatörler
-        sma7 = data['close'].rolling(7).mean().iloc[-1]
-        sma25 = data['close'].rolling(25).mean().iloc[-1]
-        rsi = self.calculate_rsi(data['close'], 14).iloc[-1]
-        macd = self.calculate_macd(data['close'])
-        
-        score = 0
-        reasons = []
-        
-        # Trend analizi
-        if sma7 > sma25:
-            score += 3
-            reasons.append(f"Uptrend ({timeframe})")
+                logger.log(f"❌ Error fetching data from BinanceTR for {symbol}: {resp}")
+                return None
         else:
-            score -= 2
-            reasons.append(f"Downtrend ({timeframe})")
+            # CCXT Exchange
+            if hasattr(exchange, 'fetch_ohlcv'):
+                ohlcv = exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
+            else:
+                logger.log(f"❌ Unknown exchange type: {type(exchange)}")
+                return None
+                
+        if not ohlcv or len(ohlcv) < 50: # Need enough data for indicators
+            return None
+            
+        # Standardize columns
+        # CCXT: [timestamp, open, high, low, close, volume]
+        # BinanceTR (Global API): [time, open, high, low, close, volume, close_time, quote_vol, trades, ...]
         
-        # Momentum
-        if 30 < rsi < 70:
-            score += 2
-            reasons.append(f"Healthy momentum ({timeframe})")
-        elif rsi < 30:
-            score += 1
-            reasons.append(f"Oversold ({timeframe})")
-        elif rsi > 70:
-            score -= 2
-            reasons.append(f"Overbought ({timeframe})")
+        df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'] + (['extra']* (len(ohlcv[0])-6) if len(ohlcv[0]) > 6 else []))
         
-        # MACD
-        if macd['histogram'].iloc[-1] > 0:
-            score += 1
-        
+        # Ensure numeric types
+        for col in ['open', 'high', 'low', 'close', 'volume']:
+            df[col] = df[col].astype(float)
+            
+        return df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
+
+    except Exception as e:
+        logger.log(f"❌ Exception fetching data for {symbol} {timeframe}: {e}")
+        return None
+
+def analyze_single_timeframe(symbol: str, timeframe: str, exchange: Any) -> Dict:
+    """
+    Analyzes a single timeframe using technical indicators.
+    
+    Args:
+        symbol (str): Trading pair (e.g., 'BTC/USDT')
+        timeframe (str): Timeframe (e.g., '15m', '1h', '4h')
+        exchange (Any): CCXT exchange instance or BinanceTRClient
+    
+    Returns:
+        dict: Analysis results
+    """
+    
+    # 1. Fetch Data
+    df = fetch_data(symbol, timeframe, exchange)
+    if df is None:
         return {
-            'timeframe': timeframe,
-            'score': max(0, min(10, score)),  # 0-10 arası normalize et
-            'trend': 'UP' if sma7 > sma25 else 'DOWN',
-            'rsi': float(rsi),
-            'reasons': reasons
+            'direction': 'NEUTRAL',
+            'trend_strength': 'WEAK',
+            'indicators': {},
+            'confidence': 0.0,
+            'error': 'Insufficient Data'
         }
     
-    def check_alignment(self, signals: Dict) -> Dict:
-        """Timeframe uyumunu kontrol et"""
+    # 2. Indicators
+    try:
+        # --- Trend (EMA Cross) ---
+        df['ema_20'] = ta.EMA(df['close'], timeperiod=20)
+        df['ema_50'] = ta.EMA(df['close'], timeperiod=50)
         
-        trends = [s['trend'] for s in signals.values()]
-        up_count = trends.count('UP')
-        total = len(trends)
+        ema_20 = df['ema_20'].iloc[-1]
+        ema_50 = df['ema_50'].iloc[-1]
         
-        alignment_pct = (up_count / total) * 100 if total > 0 else 0
+        ema_cross = 'BULLISH' if ema_20 > ema_50 else 'BEARISH'
+        
+        # --- Momentum (RSI) ---
+        df['rsi'] = ta.RSI(df['close'], timeperiod=14)
+        rsi_val = df['rsi'].iloc[-1]
+        rsi_signal = 'BULLISH' if rsi_val > 50 else 'BEARISH'
+        
+        # --- MACD ---
+        macd, signal, hist = ta.MACD(df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
+        hist_val = hist.iloc[-1]
+        macd_signal = 'BULLISH' if hist_val > 0 else 'BEARISH'
+        
+        # --- ADX (Trend Strength) ---
+        df['adx'] = ta.ADX(df['high'], df['low'], df['close'], timeperiod=14)
+        adx_val = df['adx'].iloc[-1]
+        trend_strength = 'STRONG' if adx_val > 25 else 'WEAK'
+        
+        # 3. Voting System
+        bullish_votes = sum([
+            ema_cross == 'BULLISH',
+            rsi_signal == 'BULLISH',
+            macd_signal == 'BULLISH'
+        ])
+        
+        bearish_votes = 3 - bullish_votes
+        
+        # 4. Decision
+        direction = 'NEUTRAL'
+        
+        if bullish_votes >= 2 and trend_strength == 'STRONG':
+            direction = 'LONG'
+        elif bearish_votes >= 2 and trend_strength == 'STRONG':
+            direction = 'SHORT'
+        elif trend_strength == 'WEAK':
+             # Even if votes align, weak trend might mean ranging
+             # But let's follow the prompt logic: "else: direction = NEUTRAL"
+             # The prompt logic says:
+             # if bullish_votes >= 2 and trend_strength == 'STRONG': LONG
+             # elif bearish_votes >= 2 and trend_strength == 'STRONG': SHORT
+             # else: NEUTRAL
+             direction = 'NEUTRAL'
+             
+        # Optional: Allow Entry in Weak Trend if all 3 indicators agree?
+        # Prompt says strict check on STRONG trend. sticking to prompt.
         
         return {
-            'aligned': alignment_pct >= 75 or alignment_pct <= 25,
-            'alignment_pct': alignment_pct,
-            'direction': 'UP' if alignment_pct >= 75 else 'DOWN' if alignment_pct <= 25 else 'MIXED'
+            'direction': direction,
+            'trend_strength': trend_strength,
+            'indicators': {
+                'ema_cross': ema_cross,
+                'rsi': rsi_val,
+                'macd_hist': hist_val,
+                'adx': adx_val
+            },
+            'confidence': bullish_votes / 3.0 if direction == 'LONG' else (bearish_votes / 3.0 if direction == 'SHORT' else 0.0)
         }
+        
+    except Exception as e:
+        logger.log(f"❌ Analysis error for {symbol} {timeframe}: {e}")
+        return {
+            'direction': 'NEUTRAL',
+            'trend_strength': 'WEAK',
+            'indicators': {},
+            'confidence': 0.0,
+            'error': str(e)
+        }
+
+def multi_timeframe_analyzer(symbol: str, exchange: Any) -> Dict:
+    """
+    Analyzes 3 timeframes (15m, 1h, 4h) and generates a consensus.
+    """
+    # 1. Analyze Timeframes
+    tf_15m = analyze_single_timeframe(symbol, '15m', exchange)
+    tf_1h = analyze_single_timeframe(symbol, '1h', exchange)
+    tf_4h = analyze_single_timeframe(symbol, '4h', exchange)
     
-    def get_recommendation(self, overall_score: float, signals: Dict) -> str:
-        """Öneri ver"""
+    # 2. Weights (Conceptually used for importance, but logic is rule-based below)
+    # 4h is most important (Trend)
+    # 1h is intermediate
+    # 15m is entry trigger
+    
+    # 3. Consensus Logic
+    directions = [tf_15m['direction'], tf_1h['direction'], tf_4h['direction']]
+    
+    # Scenario 1: PERFECT ALIGNMENT (Ideal)
+    # All non-neutral and same direction
+    if len(set(directions)) == 1 and directions[0] != 'NEUTRAL':
+        return {
+            'consensus': True,
+            'direction': directions[0],
+            'confidence_multiplier': 1.30, # %30 bonus
+            'timeframes': {
+                '15m': tf_15m,
+                '1h': tf_1h,
+                '4h': tf_4h
+            },
+            'blocking_reason': None,
+            'analysis_summary': f"Perfect alignment - All timeframes {directions[0]}"
+        }
         
-        alignment = self.check_alignment(signals)
+    # Scenario 2: 15m and 1h align, but 4h is OPPOSITE (DANGEROUS)
+    # If 4h is NEUTRAL, it's not "Opposite", just weak.
+    # Opposite means LONG vs SHORT.
+    if tf_15m['direction'] == tf_1h['direction'] and tf_15m['direction'] != 'NEUTRAL':
+        if tf_4h['direction'] != 'NEUTRAL' and tf_4h['direction'] != tf_15m['direction']:
+            return {
+                'consensus': False,
+                'direction': 'NEUTRAL',
+                'confidence_multiplier': 0.0,
+                'timeframes': {
+                    '15m': tf_15m,
+                    '1h': tf_1h,
+                    '4h': tf_4h
+                },
+                'blocking_reason': f"4H counter-trend detected. 15m/1h={tf_15m['direction']} but 4h={tf_4h['direction']}",
+                'analysis_summary': "Major timeframe divergence - BLOCKED"
+            }
+            
+    # Scenario 3: 4h and 1h align, 15m is different (Acceptable Noise)
+    if tf_4h['direction'] == tf_1h['direction'] and tf_4h['direction'] != 'NEUTRAL':
+        return {
+            'consensus': True,
+            'direction': tf_4h['direction'],
+            'confidence_multiplier': 1.15, # %15 bonus
+            'timeframes': {
+                '15m': tf_15m,
+                '1h': tf_1h,
+                '4h': tf_4h
+            },
+            'blocking_reason': None,
+            'analysis_summary': f"Strong alignment (4h+1h) - 15m noise ignored. Direction: {tf_4h['direction']}"
+        }
         
-        if overall_score >= 7 and alignment['aligned'] and alignment['direction'] == 'UP':
-            return "STRONG_BUY"
-        elif overall_score >= 5 and alignment['direction'] == 'UP':
-            return "BUY"
-        elif overall_score <= 3 and alignment['aligned'] and alignment['direction'] == 'DOWN':
-            return "STRONG_SELL"
-        elif overall_score <= 4:
-            return "SELL"
-        else:
-            return "HOLD"
-
-    def calculate_rsi(self, series: pd.Series, period: int = 14) -> pd.Series:
-        """RSI hesapla"""
-        delta = series.diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-        
-        rs = gain / loss
-        return 100 - (100 / (1 + rs))
-
-    def calculate_macd(self, series: pd.Series) -> pd.DataFrame:
-        """MACD hesapla"""
-        exp12 = series.ewm(span=12, adjust=False).mean()
-        exp26 = series.ewm(span=26, adjust=False).mean()
-        macd = exp12 - exp26
-        signal = macd.ewm(span=9, adjust=False).mean()
-        histogram = macd - signal
-        return pd.DataFrame({'macd': macd, 'signal': signal, 'histogram': histogram})
+    # Scenario 4: No Consensus / Mixed / Too Neutral
+    return {
+        'consensus': False,
+        'direction': 'NEUTRAL',
+        'confidence_multiplier': 0.0,
+        'timeframes': {
+            '15m': tf_15m,
+            '1h': tf_1h,
+            '4h': tf_4h
+        },
+        'blocking_reason': "No clear consensus across timeframes",
+        'analysis_summary': f"Mixed signals: 15m={tf_15m['direction']}, 1h={tf_1h['direction']}, 4h={tf_4h['direction']}"
+    }

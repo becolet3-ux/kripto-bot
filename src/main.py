@@ -22,6 +22,107 @@ from src.strategies.grid_trading import GridTrading
 from src.strategies.opportunity_manager import OpportunityManager
 from src.utils.logger import log
 
+async def update_dashboard_commentary(executor, opportunity_manager, market_regime, all_market_signals, current_prices_map, latest_scores=None):
+    """
+    Dashboard için yorumları ve durumu günceller.
+    """
+    try:
+        # 1. Top Opportunities
+        sorted_signals = sorted([s for s in all_market_signals if s.action == 'ENTRY'], key=lambda x: x.score, reverse=True)
+        top_opps = []
+        for s in sorted_signals[:5]:
+            top_opps.append({
+                "symbol": s.symbol,
+                "score": s.score,
+                "price": s.details.get('close', 0),
+                "reason": "Yüksek Skorlu Sinyal"
+            })
+
+        # 2. Portfolio Commentary
+        portfolio_comments = {}
+        for sym, pos in executor.paper_positions.items():
+            # Handle new/old dict structure safely
+            p_entry = 0.0
+            p_qty = 0.0
+            if isinstance(pos, dict):
+                p_entry = pos.get('entry_price', pos.get('price', 0))
+                p_qty = pos.get('quantity', 0)
+            else:
+                # Fallback if pos is just a number
+                p_entry = float(pos)
+
+            p_current = current_prices_map.get(sym, p_entry)
+            # Avoid division by zero
+            p_pnl = ((p_current - p_entry) / p_entry) * 100 if p_entry > 0 else 0.0
+            
+            comment = f"Maliyet: {p_entry:.4f}. "
+            if p_pnl > 0:
+                comment += f"Kar: %{p_pnl:.2f} 🟢"
+            else:
+                comment += f"Zarar: %{p_pnl:.2f} 🔴"
+            
+            portfolio_comments[sym] = {
+                "pnl_pct": p_pnl,
+                "comment": comment,
+                "value": p_qty * p_current
+            }
+
+        # 3. Strategy Status
+        strategy_status = "Bilinmiyor"
+        if market_regime:
+            if market_regime['trend'] == 'SIDEWAYS':
+                strategy_status = "Yatay Piyasa (Grid Trading Aktif) 🕸️"
+            else:
+                strategy_status = f"Trend Piyasası ({market_regime['trend']}) - Spot Strateji Aktif 🚀"
+
+        commentary = {
+            "market_regime": market_regime,
+            "active_strategy": strategy_status,
+            "top_opportunities": top_opps,
+            "portfolio_analysis": portfolio_comments,
+            "last_updated": time.time(),
+            "brain_plan": None
+        }
+
+        # --- 4. Brain Plan Log (Why/Why Not Swap) ---
+        # Mevcut brain_plan geçmişini koru
+        existing_commentary = executor.full_state.get('commentary', {})
+        plan_history = existing_commentary.get('brain_plan_history', [])
+
+        # Portföy boş olsa bile durum analizi yap
+        plan_analysis = opportunity_manager.analyze_swap_status(
+            executor.paper_positions,
+            all_market_signals,
+            score_cache=latest_scores
+        )
+        
+        # Sadece durum değiştiyse veya son logdan bu yana 5 dakika geçtiyse kaydet
+        should_log = True
+        if plan_history:
+            last_log = plan_history[-1]
+            time_diff = time.time() - last_log['timestamp']
+            if last_log['reason'] == plan_analysis['reason'] and time_diff < 300:
+                should_log = False
+        
+        if should_log:
+            new_log = {
+                "timestamp": time.time(),
+                "action": plan_analysis['action'],
+                "reason": plan_analysis['reason'],
+                "details": plan_analysis.get('details', {})
+            }
+            plan_history.append(new_log)
+            # Keep last 50 entries
+            if len(plan_history) > 50:
+                plan_history = plan_history[-50:]
+        
+        commentary['brain_plan_history'] = plan_history
+        
+        executor.update_commentary(commentary)
+
+    except Exception as e:
+        log(f"⚠️ Failed to generate commentary: {e}")
+
 async def run_bot():
     log(f"Starting Crypto Bot (Mock Mode: {settings.USE_MOCK_DATA})")
     log(f"Live Trading: {settings.LIVE_TRADING}")
@@ -127,6 +228,16 @@ async def run_bot():
 
     await executor.initialize()
     
+    # Initial Dashboard Update (Empty) to prevent "Collecting Data" stuck
+    await update_dashboard_commentary(
+        executor, 
+        opportunity_manager, 
+        {"trend": "ANALYZING", "volatility": "LOW"}, 
+        [], 
+        {},
+        latest_scores={}
+    )
+    
     # Scores cache for swap logic
     latest_scores = {}
 
@@ -136,7 +247,9 @@ async def run_bot():
              log("🚨 EMERGENCY STOP FLAG DETECTED! Stopping bot...")
              return
 
+        loop_count = 0
         while True:
+            loop_count += 1
             # Emergency Flag Check (In Loop)
             if os.path.exists(settings.EMERGENCY_STOP_FILE):
                  log("🚨 EMERGENCY STOP TRIGGERED! Shutting down immediately.")
@@ -148,6 +261,14 @@ async def run_bot():
                 break
 
             log("\n--- Scanning Market ---")
+            
+            # Sync Wallet First!
+            await executor.sync_wallet()
+
+            # Periodic Dust Cleanup (Every 20 loops ~ 10-20 mins)
+            if loop_count % 20 == 0:
+                 if not settings.IS_TR_BINANCE:
+                     await executor.convert_dust_to_bnb()
             
             # 0. Update Funding Rates (Phase 4)
             if not settings.IS_TR_BINANCE:
@@ -184,6 +305,17 @@ async def run_bot():
                 # Progress indicator every 20 symbols
                 if (i + 1) % 20 == 0:
                     log(f"⏳ Scanned {i + 1}/{len(settings.SYMBOLS)} symbols...")
+                
+                # Update Dashboard Commentary periodically (Every 50 symbols)
+                if (i + 1) % 50 == 0:
+                    await update_dashboard_commentary(
+                        executor, 
+                        opportunity_manager, 
+                        market_regime, 
+                        all_market_signals, 
+                        current_prices_map,
+                        latest_scores
+                    )
 
                 # Use get_ohlcv for Spot Strategy
                 # Timeframe changed to 1h for better trend following
@@ -196,7 +328,7 @@ async def run_bot():
                     
                     # --- Sentiment Analysis ---
                     sentiment_score = 0.0
-                    if settings.SENTIMENT_ENABLED and sentiment_analyzer:
+                    if settings.SENTIMENT_ENABLED and not settings.DISABLE_SENTIMENT_ANALYSIS and sentiment_analyzer:
                         try:
                             sentiment_score = 0.0
                         except Exception:
@@ -247,7 +379,7 @@ async def run_bot():
                             await grid_trader.check_grid_status(symbol, current_price, executor)
 
                     # 0. Safety Check (Brain)
-                    pre_signal = analyzer.analyze_spot(symbol, candles)
+                    pre_signal = analyzer.analyze_spot(symbol, candles, exchange=loader.exchange)
                     
                     if pre_signal:
                         volatility = pre_signal.details.get('volatility', 0)
@@ -299,15 +431,19 @@ async def run_bot():
                                 if candles_4h:
                                     regime_4h = analyzer.analyze_market_regime(candles_4h)
                                     # Filter: Don't buy if 4h Trend is DOWN (Major downtrend)
+                                    # UNLESS it is a High Score Override
                                     if regime_4h['trend'] == 'DOWN':
-                                        log(f"📉 Filtered {symbol}: 1h Buy Signal but 4h Trend is DOWN.")
-                                        executor.brain.record_ghost_trade(
-                                            symbol, 
-                                            current_price, 
-                                            "Multi-TF Filter: 4h Trend DOWN", 
-                                            signal.score
-                                        )
-                                        signal = None
+                                        if hasattr(signal, 'primary_strategy') and signal.primary_strategy == "high_score_override":
+                                            log(f"🚀 {symbol}: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.")
+                                        else:
+                                            log(f"📉 Filtered {symbol}: 1h Buy Signal but 4h Trend is DOWN.")
+                                            executor.brain.record_ghost_trade(
+                                                symbol, 
+                                                current_price, 
+                                                "Multi-TF Filter: 4h Trend DOWN", 
+                                                signal.score
+                                            )
+                                            signal = None
                                     else:
                                         log(f"✅ Multi-TF Confirmed {symbol}: 4h Trend is {regime_4h['trend']}")
                             except Exception as e:
@@ -396,107 +532,149 @@ async def run_bot():
                     executor.brain.update_ghost_trades(current_prices_map)
                 
                 # --- Commentary Generation (Dashboard) ---
-                try:
-                    # 1. Top Opportunities
+                await update_dashboard_commentary(
+                    executor, 
+                    opportunity_manager, 
+                    market_regime, 
+                    all_market_signals, 
+                    current_prices_map
+                )
+                
+                # --- LOW BALANCE RECOVERY MODE (< $50) ---
+                # Kullanıcı isteği: Toplam varlık < $50 ise tek varlığa düş ve en iyisini al
+                total_equity = await executor.get_total_balance()
+                log(f"DEBUG: Total Equity Check: ${total_equity:.2f} (Positions: {len(executor.paper_positions)})")
+                LOW_BALANCE_THRESHOLD = 100.0 # Increased to 100 to ensure trigger
+                
+                if total_equity < LOW_BALANCE_THRESHOLD and settings.LIVE_TRADING:
+                    log(f"⚠️ Düşük Bakiye Modu Aktif (${total_equity:.2f} < ${LOW_BALANCE_THRESHOLD}). Sniper Modu Devrede!")
+                    
+                    # 1. En iyi sinyali bul (ENTRY olanlardan)
                     sorted_signals = sorted([s for s in all_market_signals if s.action == 'ENTRY'], key=lambda x: x.score, reverse=True)
-                    top_opps = []
-                    for s in sorted_signals[:5]:
-                        top_opps.append({
-                            "symbol": s.symbol,
-                            "score": s.score,
-                            "price": s.details.get('close', 0),
-                            "reason": "Yüksek Skorlu Sinyal"
-                        })
-
-                    # 2. Portfolio Commentary
-                    portfolio_comments = {}
-                    for sym, pos in executor.paper_positions.items():
-                        # Handle new/old dict structure safely
-                        p_entry = 0.0
-                        p_qty = 0.0
-                        if isinstance(pos, dict):
-                            p_entry = pos.get('entry_price', pos.get('price', 0))
-                            p_qty = pos.get('quantity', 0)
-                        else:
-                            # Fallback if pos is just a number (unlikely but safe)
-                            p_entry = float(pos)
-
-                        p_current = current_prices_map.get(sym, p_entry)
-                        # Avoid division by zero
-                        p_pnl = ((p_current - p_entry) / p_entry) * 100 if p_entry > 0 else 0.0
+                    best_signal = sorted_signals[0] if sorted_signals else None
+                    
+                    # 2. Mevcut Pozisyonları Yönet (Tek bir en iyiye düşür)
+                    current_positions = list(executor.paper_positions.keys())
+                    
+                    for symbol in current_positions:
+                        should_sell = False
                         
-                        comment = f"Maliyet: {p_entry:.4f}. "
-                        if p_pnl > 0:
-                            comment += f"Kar: %{p_pnl:.2f} 🟢"
-                        else:
-                            comment += f"Zarar: %{p_pnl:.2f} 🔴"
+                        # Durum A: En iyi sinyal var ama elimizdeki o değil -> Sat (Swap için yer aç)
+                        if best_signal and symbol != best_signal.symbol:
+                            should_sell = True
+                            log(f"📉 Sniper Modu: {symbol} satılıyor. (Daha iyi fırsat: {best_signal.symbol})")
                         
-                        portfolio_comments[sym] = {
-                            "pnl_pct": p_pnl,
-                            "comment": comment,
-                            "value": p_qty * p_current
-                        }
+                        # Durum B: En iyi sinyal yok ama elimizde pozisyon var -> 
+                        # Eğer çoklu pozisyon varsa ve bu en iyisi değilse sat. 
+                        # Veya hiç sinyal yoksa nakite geçmek isteyebiliriz? 
+                        # Şimdilik: Sadece daha iyi fırsat varsa veya çoklu pozisyon varsa satalım.
+                        elif len(current_positions) > 1:
+                            # Birden fazla ise, sadece en iyisini (veya rastgele birini) tutmak yerine
+                            # Hepsini satıp yeniden en iyisini almak daha temiz.
+                            should_sell = True
+                            log(f"📉 Sniper Modu: Portföy tekilleştiriliyor. {symbol} satılıyor.")
+                            
+                        if should_sell:
+                            # FIX: Get current price for correct valuation
+                            price = current_prices_map.get(symbol, 0.0)
+                            if price == 0.0:
+                                # Try to fallback to position entry price or 0
+                                price = executor.paper_positions.get(symbol, {}).get('entry_price', 0.0)
+                            
+                            # FIX: Check for Dust (< 6.0 USDT) and convert directly
+                            pos_qty = executor.paper_positions.get(symbol, {}).get('quantity', 0.0)
+                            value_est = pos_qty * price
+                            
+                            # If value is small but > 0, try dust conversion immediately
+                            if 0.0 < value_est < 6.0 and not settings.IS_TR_BINANCE:
+                                log(f"🧹 Sniper Modu: {symbol} (Değer: ${value_est:.2f}) Dust Convert'e yönlendiriliyor.")
+                                await executor.convert_dust_to_bnb()
+                                # Wait for sync
+                                await asyncio.sleep(1.0)
+                                continue
 
-                    # 3. Strategy Status
-                    strategy_status = "Bilinmiyor"
-                    if market_regime:
-                        if market_regime['trend'] == 'SIDEWAYS':
-                            strategy_status = "Yatay Piyasa (Grid Trading Aktif) 🕸️"
-                        else:
-                            strategy_status = f"Trend Piyasası ({market_regime['trend']}) - Spot Strateji Aktif 🚀"
+                            # Satış Sinyali Oluştur
+                            sell_signal = TradeSignal(
+                                symbol=symbol,
+                                action="EXIT",
+                                direction="LONG",
+                                score=-10.0, # Acil Satış
+                                estimated_yield=0.0,
+                                timestamp=int(time.time() * 1000),
+                                details={
+                                    "reason": "SNIPER_MODE_LIQUIDATION",
+                                    "close": price  # Pass price to avoid 0.0 in executor
+                                }
+                            )
+                            await executor.execute_strategy(sell_signal)
+                            # Bakiye güncellemesi için kısa bekleme
+                            await asyncio.sleep(1.0)
 
-                    commentary = {
-                        "market_regime": market_regime,
-                        "active_strategy": strategy_status,
-                        "top_opportunities": top_opps,
-                        "portfolio_analysis": portfolio_comments,
-                        "last_updated": time.time(),
-                        "brain_plan": None
-                    }
-
-                    # --- 4. Brain Plan Log (Why/Why Not Swap) ---
-                    # Mevcut brain_plan geçmişini koru
-                    existing_commentary = executor.full_state.get('commentary', {})
-                    plan_history = existing_commentary.get('brain_plan_history', [])
-
-                    # Portföy boş olsa bile durum analizi yap
-                    plan_analysis = opportunity_manager.analyze_swap_status(
-                        executor.paper_positions,
-                        all_market_signals
-                    )
+                    # 2.5. Dust Temizliği (BNB Convert) ve Likidasyon
+                    # Satılamayan (Min limit altı) bakiyeleri BNB'ye çevir
+                    if not settings.IS_TR_BINANCE:
+                         log("🧹 Sniper Modu: Dust Temizliği Başlatılıyor...")
+                         await executor.convert_dust_to_bnb()
+                         # Cüzdanı tekrar senkronize et ki yeni BNB/USDT bakiyesi görünsün
+                         await executor.sync_wallet_balances()
+                         
+                         # CRITICAL: Dust convert sonrası biriken BNB'yi satmayı dene (Eğer hedef BNB değilse)
+                         # Bu adım, 3.70$ BNB + 1.50$ Dust -> 5.20$ BNB -> USDT dönüşümünü sağlar.
+                         if best_signal and not best_signal.symbol.startswith('BNB'):
+                             # BNB/USDT var mı kontrol et
+                             if 'BNB/USDT' in executor.paper_positions:
+                                 log("🧹 Sniper Modu: Biriken BNB bakiyesi USDT'ye çevriliyor...")
+                                 bnb_sell_signal = TradeSignal(
+                                     symbol='BNB/USDT',
+                                     action="EXIT",
+                                     direction="LONG",
+                                     score=-10.0,
+                                     estimated_yield=0.0,
+                                     timestamp=int(time.time() * 1000),
+                                     details={"reason": "SNIPER_MODE_BNB_LIQUIDATION"}
+                                 )
+                                 await executor.execute_strategy(bnb_sell_signal)
+                                 await asyncio.sleep(1.0)
+                                 await executor.sync_wallet_balances()
+                         
+                    # 3. Alım Yap (Tek Atış)
+                    # Eğer elimiz boşaldıysa (veya sadece hedef varlık kaldıysa) ve en iyi sinyal varsa -> FULL GİR
+                    # Not: Dust convert sonrası elimizde BNB olabilir. Eğer hedef BNB değilse ve BNB satılabiliyorsa satılmalıydı.
+                    # Ama BNB dust convert'ten geldiği için muhtemelen satılamaz.
+                    # Bu durumda elimizdeki BNB'yi "boş" sayıp kalan USDT ile girebiliriz.
                     
-                    # Sadece durum değiştiyse veya son logdan bu yana 5 dakika geçtiyse kaydet
-                    # (Log kirliliğini önlemek için)
-                    should_log = True
-                    if plan_history:
-                        last_log = plan_history[-1]
-                        time_diff = time.time() - last_log['timestamp']
-                        if last_log['reason'] == plan_analysis['reason'] and time_diff < 300:
-                            should_log = False
-                    
-                    if should_log:
-                        new_log = {
-                            "timestamp": time.time(),
-                            "action": plan_analysis['action'],
-                            "reason": plan_analysis['reason'],
-                            "details": plan_analysis.get('details', {})
-                        }
-                        plan_history.append(new_log)
-                        # Keep last 50 entries
-                        if len(plan_history) > 50:
-                            plan_history = plan_history[-50:]
-                    
-                    commentary['brain_plan_history'] = plan_history
-                    
-                    executor.update_commentary(commentary)
+                    # paper_positions'da sadece hedef varlık varsa veya hiç yoksa
+                    can_buy = False
+                    if len(executor.paper_positions) == 0:
+                        can_buy = True
+                    elif len(executor.paper_positions) == 1 and best_signal and best_signal.symbol in executor.paper_positions:
+                        # Zaten hedef varlıktayız, belki ekleme yapabiliriz? 
+                        # Ama Sniper modu "Tek Coin" diyor. Zaten ondaysak işlem yapmaya gerek yok.
+                        can_buy = False 
+                        log(f"🎯 Zaten hedef varlıktayız: {best_signal.symbol}")
+                    else:
+                        # Belki elimizde sadece BNB kaldı (Convert sonrası)
+                        # Eğer hedef BNB değilse, BNB harici USDT ile girebiliriz.
+                        # Executor bakiyeyi kontrol edip alacak.
+                        can_buy = True
 
-                except Exception as e:
-                    log(f"⚠️ Failed to generate commentary: {e}")
+                    if can_buy and best_signal:
+                        log(f"🎯 Sniper Modu: {best_signal.symbol} için tam bakiye ile giriş yapılıyor!")
+                        
+                        # Force All-In Flag
+                        if best_signal.details is None: best_signal.details = {}
+                        best_signal.details['force_all_in'] = True
+                        
+                        await executor.execute_strategy(best_signal)
+                        
+                        # Döngüyü burada kes (başka işlem yapma)
+                        all_market_signals = [] 
 
                 # --- Opportunity Cost Management (Swap Logic) ---
                 # Eğer alım yapılmadıysa veya bakiye kısıtlıysa takas fırsatlarını kontrol et
                 # Not: Bakiye kontrolünü Executor içinde yapmak daha doğru ama şimdilik sinyal bazlı bakalım
-                if executor.paper_positions and all_market_signals:
+                # Sniper Modu aktifse burayı atla (zaten yukarıda hallettik)
+                elif executor.paper_positions and all_market_signals:
                     swap_opp = opportunity_manager.check_for_swap_opportunity(
                         executor.paper_positions, 
                         all_market_signals
@@ -526,6 +704,11 @@ async def run_bot():
                 # Her döngü sonunda cüzdanı güncelle
                 if settings.LIVE_TRADING:
                      await executor.sync_wallet_balances()
+                
+                # Update MTF Stats
+                if hasattr(analyzer.strategy_manager, 'stats'):
+                    executor.update_mtf_stats(analyzer.strategy_manager.stats)
+
             else:
                 log("⚠️ Warning: No market data fetched. Check connection.")
                 

@@ -1,0 +1,101 @@
+{
+    "paper_positions": {},
+    "wallet_assets": {},
+    "total_balance": 0.0,
+    "is_live": true,
+    "order_history": [],
+    "paper_balance": 10000.0,
+    "last_updated": 1770388999.590232,
+    "commentary": {
+        "market_regime": {
+            "trend": "DOWN",
+            "volatility": "LOW"
+        },
+        "active_strategy": "Trend Piyasas\u0131 (DOWN) - Spot Strateji Aktif \ud83d\ude80",
+        "top_opportunities": [
+            {
+                "symbol": "BAT/USDT:USDT",
+                "score": 6.8,
+                "price": 0.2371,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "BERA/USDT:USDT",
+                "score": 3.8,
+                "price": 7.904,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "EDU/USDT:USDT",
+                "score": 3.5999999999999996,
+                "price": 1.1975,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "ETHFI/USDT:USDT",
+                "score": 2.8,
+                "price": 5.898,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "NEAR/USDT:USDT",
+                "score": 1.9000000000000004,
+                "price": 0.5577,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            }
+        ],
+        "portfolio_analysis": {},
+        "last_updated": 1770385030.2670934,
+        "brain_plan": null,
+        "brain_plan_history": [
+            {
+                "timestamp": 1770356293.329457,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770356604.005904,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770357814.340018,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770358239.4852672,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770359449.3328009,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770360222.550619,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770375506.1464918,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            },
+            {
+                "timestamp": 1770385030.3570118,
+                "action": "WAIT",
+                "reason": "Portf\u00f6y bo\u015f, yeni f\u0131rsatlar aran\u0131yor.",
+                "details": {}
+            }
+        ]
+    }
+}

@@ -21,8 +21,8 @@ class OpportunityManager:
        VE (Yeni Fırsat Portföy ile Aşırı Korele Değilse) -> Değişim (Swap) önerir.
     """
     
-    def __init__(self, min_score_diff: float = 20.0, min_hold_time: int = 3600):
-        self.min_score_diff = min_score_diff  # Değişim için gereken minimum puan farkı (komisyonu kurtarmak için)
+    def __init__(self, min_score_diff: float = 5.0, min_hold_time: int = 3600):
+        self.min_score_diff = min_score_diff  # Değişim için gereken minimum puan farkı (Düşürüldü: 20 -> 5)
         self.min_hold_time = min_hold_time    # Bir coini en az ne kadar tutmalıyız? (Whipsaw önlemek için)
         self.portfolio_optimizer = PortfolioOptimizer(correlation_threshold=0.80) # %80 üzeri korelasyon riskli
 
@@ -142,7 +142,7 @@ class OpportunityManager:
                 
         return None
 
-    def analyze_swap_status(self, portfolio: Dict, market_signals: List[TradeSignal]) -> Dict:
+    def analyze_swap_status(self, portfolio: Dict, market_signals: List[TradeSignal], score_cache: Dict[str, float] = None) -> Dict:
         """
         Detaylı swap analizi durumu döndürür (Raporlama için).
         """
@@ -155,10 +155,13 @@ class OpportunityManager:
         # 1. Portföy Analizi
         portfolio_scores = []
         signal_map = {s.symbol: s for s in market_signals}
+        score_cache = score_cache or {}
         
         for symbol, data in portfolio.items():
             signal = signal_map.get(symbol)
-            score = signal.score if signal else 0
+            # Use cached score if current signal is missing (prevent Score 0 during partial scans)
+            score = signal.score if signal else score_cache.get(symbol, 0)
+            
             # Hold time check
             hold_time = current_time - data.get('timestamp', 0)
             is_locked = hold_time < self.min_hold_time

@@ -1,8 +1,10 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import pandas as pd
+from config.settings import settings
 from src.strategies.breakout_strategy import BreakoutStrategy
 from src.strategies.mean_reversion_strategy import MeanReversionStrategy
 from src.strategies.momentum_strategy import MomentumStrategy
+from src.strategies.multi_timeframe import multi_timeframe_analyzer
 from src.utils.logger import logger
 
 class StrategyManager:
@@ -17,11 +19,16 @@ class StrategyManager:
         ]
         
         # Voting Threshold (e.g., 0.6 means 60% of total weight must agree)
-        self.consensus_threshold = 0.6
+        self.consensus_threshold = settings.CONSENSUS_THRESHOLD
 
-    def analyze_all(self, df: pd.DataFrame, symbol: str) -> Dict[str, Any]:
+    def analyze_all(self, df: pd.DataFrame, symbol: str, exchange: Any = None) -> Dict[str, Any]:
         """
         Runs all strategies and aggregates the results.
+        
+        Args:
+            df (pd.DataFrame): Candle data for the primary timeframe (usually 1h or 15m)
+            symbol (str): Trading pair symbol
+            exchange (Any, optional): Exchange client for fetching MTF data. Defaults to None.
         """
         results = []
         total_weight = 0.0
@@ -44,6 +51,10 @@ class StrategyManager:
                 entry_votes += w
                 weighted_score += res['score'] * w # Weighted average of scores? Or additive?
                 # Let's keep it simple: Additive weighted score for sorting
+        
+        # Normalize Weighted Score
+        if entry_votes > 0:
+            weighted_score = weighted_score / entry_votes
             
         # Normalize Entry Votes
         # If total_weight is 1.0, entry_votes is the fraction.
@@ -63,10 +74,44 @@ class StrategyManager:
                     best_s_score = res['score']
                     primary_strategy = res['strategy']
         
-        # If we have a single strong strategy (high score) but not consensus, 
-        # maybe we should still allow it? 
-        # The prompt says: "Total: 0.7 > 0.66 threshold -> BUY"
-        # So strict consensus is required.
+        # --- Multi-Timeframe Confirmation (MTF) ---
+        mtf_result = {}
+        
+        # Stats tracking
+        self.stats = getattr(self, 'stats', {'mtf_checks': 0, 'mtf_consensus': 0, 'mtf_blocks': 0})
+
+        if final_action == "ENTRY" and exchange:
+            try:
+                self.stats['mtf_checks'] += 1
+                # 3-Layer Confirmation (15m, 1h, 4h)
+                mtf_result = multi_timeframe_analyzer(symbol, exchange)
+                
+                # Check for Blocking Condition (e.g., 4H Counter-Trend)
+                if not mtf_result.get('consensus', True):
+                    final_action = "HOLD"
+                    primary_strategy = "blocked_by_mtf"
+                    self.stats['mtf_blocks'] += 1
+                    logger.log(f"DEBUG: 🚫 {symbol} MTF Block: {mtf_result.get('blocking_reason', 'No consensus')}")
+                
+                # Check for Consensus Bonus
+                elif mtf_result.get('consensus'):
+                    self.stats['mtf_consensus'] += 1
+                    bonus = mtf_result.get('confidence_multiplier', 1.0)
+                    if bonus > 1.0:
+                        old_score = weighted_score
+                        weighted_score *= bonus
+                        logger.log(f"DEBUG: ✨ {symbol} MTF Consensus! Score: {old_score:.2f} -> {weighted_score:.2f}")
+                        
+                        # YENİ: Final skor kontrolü
+                        if weighted_score < 0.60:
+                            final_action = "HOLD"
+                            primary_strategy = "mtf_score_too_low"
+                            logger.log(f"DEBUG: ⚠️ {symbol} MTF bonus sonrası bile yetersiz: {weighted_score:.2f}")
+                        
+                details['mtf_analysis'] = mtf_result
+                
+            except Exception as e:
+                logger.log(f"❌ MTF Analysis failed for {symbol}: {e}")
         
         return {
             "action": final_action,

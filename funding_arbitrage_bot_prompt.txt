@@ -1,0 +1,98 @@
+Funding Rate + Arbitrage Hybrid Bot - Detaylı Prompt ve Mimari
+
+1) Amaç
+Bu sistem, kripto borsalarında funding rate farkları ve spot-perpetual fiyat farklarını analiz ederek otomatik arbitraj fırsatlarını tespit eden ve risk kontrollü şekilde işlem açan otonom bir algoritmik trading botudur.
+
+2) Genel Mimari
+- Data Collector (WebSocket + REST)
+- Market Analyzer
+- Strategy Engine (Funding + Arbitrage Hybrid)
+- Risk Manager
+- Execution Engine
+- Portfolio Manager
+- Monitoring & Logging
+- AI Optimization Layer (opsiyonel)
+
+3) Veri Kaynakları
+- Binance, Bybit, OKX, KuCoin API
+- Funding Rate API
+- Order Book (Level 2)
+- Ticker Price
+- Volatility Metrics
+
+4) Algoritma Mantığı
+
+4.1 Funding Rate Analizi
+- Her borsa için funding rate çekilir.
+- Ortalama funding rate hesaplanır.
+- Sapma tespiti yapılır.
+
+Formül:
+Funding_Score = (Current_FR - Avg_FR) / StdDev_FR
+
+4.2 Arbitrage Analizi
+- Spot vs Perpetual fiyat farkı hesaplanır.
+- Borsalar arası fiyat farkı analiz edilir.
+
+Arbitrage_Score = (Price_A - Price_B) / Price_B
+
+4.3 Hybrid Signal Üretimi
+Final_Score = w1 * Funding_Score + w2 * Arbitrage_Score - w3 * Risk_Score
+
+Eşik değer:
+if Final_Score > Threshold:
+    Trade_Signal = True
+
+5) Risk Yönetimi
+- Max drawdown kontrolü
+- Position sizing (Kelly / Fixed Fractional)
+- Volatility filtreleri
+- Spread & slippage hesaplama
+
+6) İşlem Stratejisi
+- Long/Short hedge
+- Delta-neutral pozisyon
+- Multi-exchange execution
+
+7) Pseudo Code
+
+while True:
+    market_data = collect_data()
+    funding_score = calc_funding_score(market_data)
+    arb_score = calc_arbitrage_score(market_data)
+    risk_score = calc_risk(market_data)
+    
+    final_score = funding_score * w1 + arb_score * w2 - risk_score * w3
+    
+    if final_score > threshold:
+        execute_trade()
+
+8) Teknoloji Stack
+- Python / Node.js
+- Redis / Kafka
+- PostgreSQL
+- Docker
+- WebSocket API
+- FastAPI
+
+9) Gelişim Yol Haritası
+- MVP
+- Multi-exchange
+- AI optimization
+- Auto capital allocation
+
+10) Pasif Gelir Modeli
+- Funding income
+- Arbitrage profit
+- Compounding strategy
+
+11) Güvenlik
+- API key encryption
+- Rate limit control
+- Fail-safe mechanisms
+
+12) Gelişmiş Özellikler
+- Reinforcement learning
+- Anomaly detection
+- Auto parameter tuning
+

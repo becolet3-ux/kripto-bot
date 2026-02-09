@@ -29,13 +29,14 @@ class Settings(BaseSettings):
     MARGIN_TYPE: str = 'ISOLATED' # 'ISOLATED' or 'CROSS'
 
     # Thresholds
+    CONSENSUS_THRESHOLD: float = 0.60 # Voting Consensus Threshold (0.60 = 60%)
     FUNDING_Z_SCORE_THRESHOLD: float = 2.0
     ARBITRAGE_SPREAD_THRESHOLD: float = 0.01  # 1%
     
     # Risk
     MAX_POSITION_SIZE_USD: float = 1.0  # Deprecated in favor of PCT
     MAX_POSITION_PCT: float = 20.0 # %20 of portfolio per trade
-    MAX_OPEN_POSITIONS: int = 4    # Maximum 4 open positions
+    MAX_OPEN_POSITIONS: int = 10    # Maximum 10 open positions (was 4)
     STOP_LOSS_PCT: float = 5.0   # %5 Stop Loss
     TAKE_PROFIT_PCT: float = 10.0 # %10 Take Profit
     
@@ -93,6 +94,7 @@ class Settings(BaseSettings):
     
     # Feature Flags
     SENTIMENT_ENABLED: bool = False
+    DISABLE_SENTIMENT_ANALYSIS: bool = True
 
     class Config:
         env_file = ".env"

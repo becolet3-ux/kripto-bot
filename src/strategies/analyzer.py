@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any
 from pydantic import BaseModel
 from config.settings import settings
 from src.utils.logger import logger
@@ -20,6 +20,7 @@ class TradeSignal(BaseModel):
     estimated_yield: float
     timestamp: int
     details: Dict
+    primary_strategy: Optional[str] = None
 
 class MarketAnalyzer:
     def __init__(self, funding_loader: Optional[FundingRateLoader] = None):
@@ -121,8 +122,8 @@ class MarketAnalyzer:
         
         # Iterative calculation for SuperTrend (requires loop as it depends on previous values)
         # Note: Vectorizing this fully is hard, using a fast loop
-        st_upper = df['ST_Upper_Basic'].values
-        st_lower = df['ST_Lower_Basic'].values
+        st_upper = df['ST_Upper_Basic'].values.copy()
+        st_lower = df['ST_Lower_Basic'].values.copy()
         close = df['close'].values
         st = np.zeros(len(df))
         direction = np.zeros(len(df))
@@ -300,7 +301,8 @@ class MarketAnalyzer:
                      indicator_weights: Dict[str, float] = None, 
                      market_regime: Dict = None, 
                      sentiment_score: float = 0.0,
-                     order_book: Optional[Dict] = None) -> Optional[TradeSignal]:
+                     order_book: Optional[Dict] = None,
+                     exchange: Any = None) -> Optional[TradeSignal]:
         """
         Spot Strategy: Trend Following + RSI + Volume/Volatility Checks + Sentiment + Indicator Consensus
         """
@@ -334,7 +336,11 @@ class MarketAnalyzer:
             w_trend *= 1.2
             w_cross *= 1.2
             w_oversold *= 0.8 # Don't bet against the trend too much
-        elif detected_regime == 'RANGING':
+        elif detected_regime == 'RANGING' or detected_regime == 'SIDEWAYS':
+            # User Request: Reduce trade frequency by 50% in Sideways/Ranging market
+            if np.random.random() < 0.5:
+                 return None
+            
             w_trend *= 0.8
             w_oversold *= 1.5 # Range trading is better here
 
@@ -382,7 +388,7 @@ class MarketAnalyzer:
         primary_strategy = "unknown"
         
         # --- Multi-Strategy Framework (Phase 5) ---
-        strategy_result = self.strategy_manager.analyze_all(df, symbol)
+        strategy_result = self.strategy_manager.analyze_all(df, symbol, exchange=exchange)
         
         # Base Action & Score from Strategy Manager
         action = strategy_result['action']
@@ -420,11 +426,38 @@ class MarketAnalyzer:
         if vp_score != 0:
              logger.log(f"{symbol} VP Score: {vp_score} | Reason: {vp_reason}")
 
+        # --- Trend Alignment Safety Check (User Request) ---
+        # "Düşen Bıçak" (Falling Knife) kontrolü: 
+        # Eğer ana trend aşağıysa (SMA ve SuperTrend Negatif), puanı düşür.
+        # Bu, WIF gibi sürekli düşen coinlerin "ucuz" görünüp alınmasını zorlaştırır.
+        trend_penalty = 0.0
+        trend_bonus = 0.0
+        
+        if close < sma_long and st_direction == -1:
+            # Güçlü Düşüş Trendi (Heavy Downtrend)
+            trend_penalty = -3.0
+            score += trend_penalty
+            logger.log(f"⚠️ {symbol} Strong Downtrend (Falling Knife Risk). Penalty: {trend_penalty}")
+            
+        elif close < sma_long:
+            # Zayıf Düşüş (Weak Downtrend)
+            trend_penalty = -1.5
+            score += trend_penalty
+            
+        elif close > sma_long and st_direction == 1:
+            # Güçlü Yükseliş Trendi (Strong Uptrend) -> Safe Bet
+            trend_bonus = +1.5
+            score += trend_bonus
+            # logger.log(f"✅ {symbol} Strong Uptrend Bonus: +{trend_bonus}")
+
         # Dynamic RSI Threshold
         current_rsi_limit = self.rsi_overbought + rsi_modifier
         
         # ENTRY LOGIC (Only if not blocked)
         if not is_blocked:
+            # High Score Override moved to end (Final Override)
+            pass
+
             # If Strategy Manager says ENTRY, we consider it.
             # But we can also check for strong Sentiment/Funding/ML to boost confidence.
             
@@ -471,6 +504,16 @@ class MarketAnalyzer:
             if st_direction == -1: # SuperTrend Bearish
                 score -= 5.0
 
+        # FINAL OVERRIDE: High Score (Score >= 2.5)
+        # This overrides 'is_blocked' (e.g. Breakouts from Low Volatility)
+        # and overrides 'HOLD' from weak consensus.
+        if score >= 2.5 and action != "ENTRY":
+            if sentiment_score >= -0.2:
+                action = "ENTRY"
+                primary_strategy = "high_score_override"
+                is_blocked = False
+                logger.log(f"🚀 {symbol} Entry triggered by High Score ({score:.2f}) - Override")
+
         # Data Collection for ML
         # Save snapshot if significant score or random sample (1%)
         if abs(score) > 5.0 or np.random.random() < 0.01:
@@ -499,7 +542,8 @@ class MarketAnalyzer:
                 "primary_strategy": primary_strategy,
                 "bb_width": float(regime_data.get('bb_width', 0.0)),
                 "price_history": df['close'].astype(float).tail(50).tolist() # Last 50 candles for correlation
-            }
+            },
+            primary_strategy=primary_strategy
         )
 
     def analyze(self, market_data: Dict) -> Optional[TradeSignal]:
