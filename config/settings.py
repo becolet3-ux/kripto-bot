@@ -85,6 +85,9 @@ class Settings(BaseSettings):
     # Emergency & Limits
     MAX_DAILY_LOSS_PCT: float = 5.0  # Günlük maksimum %5 zarar
     EMERGENCY_SHUTDOWN_ENABLED: bool = True
+    
+    # Sniper Mode Risk
+    SNIPER_MAX_RISK_PCT: float = 98.0 # %98 of free balance for All-In
 
     # Dev Mode
     USE_MOCK_DATA: bool = False # Set to False to use real API

@@ -337,9 +337,9 @@ class MarketAnalyzer:
             w_cross *= 1.2
             w_oversold *= 0.8 # Don't bet against the trend too much
         elif detected_regime == 'RANGING' or detected_regime == 'SIDEWAYS':
-            # User Request: Reduce trade frequency by 50% in Sideways/Ranging market
-            if np.random.random() < 0.5:
-                 return None
+            # User Request: Reduce trade frequency by 50% in Sideways/Ranging market - DISABLED
+            # if np.random.random() < 0.5:
+            #      return None
             
             w_trend *= 0.8
             w_oversold *= 1.5 # Range trading is better here

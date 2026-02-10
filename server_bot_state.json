@@ -1,0 +1,600 @@
+{
+    "paper_positions": {
+        "KITE/USDT": {
+            "entry_price": 0.1681,
+            "quantity": 62.5,
+            "timestamp": 1770604530.2699614,
+            "highest_price": 0.1681,
+            "stop_loss": 0.15586,
+            "atr_value": 0.004080000000000003,
+            "features": {
+                "rsi": 65.92920353982305,
+                "macd": 0.003471299468164629,
+                "super_trend": NaN,
+                "st_direction": 1,
+                "vwap": 0.15759553858530975,
+                "atr": 0.004080000000000003,
+                "ATR": 0.004080000000000003,
+                "close": 0.1681,
+                "ml_prob": 0.5,
+                "indicators": {
+                    "BREAKOUT": {
+                        "strategy": "BREAKOUT",
+                        "action": "HOLD",
+                        "score": 0.0,
+                        "details": {
+                            "bb_width": 0.09535233318423178,
+                            "vol_ratio": 0.9286021219525097,
+                            "was_squeezed": false,
+                            "breakout": false
+                        }
+                    },
+                    "MEAN_REVERSION": {
+                        "strategy": "MEAN_REVERSION",
+                        "action": "HOLD",
+                        "score": 0.0,
+                        "details": {
+                            "rsi": 65.92920353982305,
+                            "hist_bottoming": false,
+                            "touched_lower": false
+                        }
+                    },
+                    "MOMENTUM": {
+                        "strategy": "MOMENTUM",
+                        "action": "ENTRY",
+                        "score": 8.0,
+                        "details": {
+                            "adx": 54.72260568235404,
+                            "st_bullish": true,
+                            "macd_cross": true
+                        }
+                    }
+                },
+                "regime": "NEUTRAL",
+                "is_no_trade_zone": false,
+                "primary_strategy": "high_score_override",
+                "bb_width": 0.08465304027803498,
+                "price_history": [
+                    0.1527,
+                    0.1562,
+                    0.1543,
+                    0.1514,
+                    0.1494,
+                    0.1478,
+                    0.1434,
+                    0.1457,
+                    0.1451,
+                    0.1441,
+                    0.1438,
+                    0.1447,
+                    0.1449,
+                    0.1432,
+                    0.1451,
+                    0.149,
+                    0.1479,
+                    0.148,
+                    0.148,
+                    0.1491,
+                    0.1486,
+                    0.1487,
+                    0.1472,
+                    0.1488,
+                    0.1483,
+                    0.1508,
+                    0.1502,
+                    0.1513,
+                    0.1527,
+                    0.1535,
+                    0.1553,
+                    0.1569,
+                    0.1582,
+                    0.1573,
+                    0.1609,
+                    0.1636,
+                    0.165,
+                    0.163,
+                    0.1646,
+                    0.162,
+                    0.1638,
+                    0.1648,
+                    0.1648,
+                    0.1648,
+                    0.1622,
+                    0.1617,
+                    0.1635,
+                    0.1661,
+                    0.1681,
+                    0.1668
+                ]
+            }
+        }
+    },
+    "wallet_assets": {
+        "BTC": {
+            "free": 1e-08,
+            "locked": 0.0,
+            "total": 1e-08
+        },
+        "BNB": {
+            "free": 0.00505651,
+            "locked": 0.0,
+            "total": 0.00505651
+        },
+        "USDT": {
+            "free": 0.3166162,
+            "locked": 0.0,
+            "total": 0.3166162
+        },
+        "SCRT": {
+            "free": 0.09230008,
+            "locked": 0.0,
+            "total": 0.09230008
+        },
+        "WIF": {
+            "free": 0.00591665,
+            "locked": 0.0,
+            "total": 0.00591665
+        },
+        "XUSD": {
+            "free": 2.48e-06,
+            "locked": 0.0,
+            "total": 2.48e-06
+        },
+        "SKY": {
+            "free": 0.76500016,
+            "locked": 0.0,
+            "total": 0.76500016
+        },
+        "ASTER": {
+            "free": 0.00176001,
+            "locked": 0.0,
+            "total": 0.00176001
+        },
+        "KITE": {
+            "free": 56.4,
+            "locked": 0.0,
+            "total": 56.4
+        },
+        "AT": {
+            "free": 0.06150004,
+            "locked": 0.0,
+            "total": 0.06150004
+        }
+    },
+    "total_balance": 0.3166162,
+    "is_live": true,
+    "commentary": {
+        "market_regime": {
+            "trend": "SIDEWAYS",
+            "volatility": "LOW"
+        },
+        "active_strategy": "Yatay Piyasa (Grid Trading Aktif) \ud83d\udd78\ufe0f",
+        "top_opportunities": [
+            {
+                "symbol": "KITE/USDT",
+                "score": 12.5,
+                "price": 0.1681,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "SPK/USDT",
+                "score": 11.5,
+                "price": 0.022358,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "SKY/USDT",
+                "score": 10.5,
+                "price": 0.06748,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "\u5e01\u5b89\u4eba\u751f/USDT",
+                "score": 10.5,
+                "price": 0.096,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            },
+            {
+                "symbol": "XUSD/USDT",
+                "score": 10.5,
+                "price": 1.0009,
+                "reason": "Y\u00fcksek Skorlu Sinyal"
+            }
+        ],
+        "portfolio_analysis": {
+            "KITE/USDT": {
+                "pnl_pct": -0.7733491969066005,
+                "comment": "Maliyet: 0.1681. Zarar: %-0.77 \ud83d\udd34",
+                "value": 10.425
+            }
+        },
+        "last_updated": 1770604785.234821,
+        "brain_plan": null,
+        "brain_plan_history": [
+            {
+                "timestamp": 1770604491.9571106,
+                "action": "HOLD",
+                "reason": "Piyasada daha iyi bir f\u0131rsat bulunamad\u0131.",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 0,
+                        "is_locked": true,
+                        "hold_time": 312.6646225452423
+                    }
+                }
+            },
+            {
+                "timestamp": 1770604549.019782,
+                "action": "HOLD",
+                "reason": "KITE/USDT yeni al\u0131nd\u0131, hen\u00fcz sat\u0131lamaz. (18s < 3600s)",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 12.5,
+                        "is_locked": true,
+                        "hold_time": 18.74974822998047
+                    },
+                    "best_opportunity": {
+                        "symbol": "SKY/USDT",
+                        "score": 10.5
+                    },
+                    "score_diff": -2.0,
+                    "threshold": 5.0
+                }
+            },
+            {
+                "timestamp": 1770604587.5282853,
+                "action": "HOLD",
+                "reason": "KITE/USDT yeni al\u0131nd\u0131, hen\u00fcz sat\u0131lamaz. (57s < 3600s)",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 12.5,
+                        "is_locked": true,
+                        "hold_time": 57.258238077163696
+                    },
+                    "best_opportunity": {
+                        "symbol": "SKY/USDT",
+                        "score": 10.5
+                    },
+                    "score_diff": -2.0,
+                    "threshold": 5.0
+                }
+            },
+            {
+                "timestamp": 1770604632.1971085,
+                "action": "HOLD",
+                "reason": "KITE/USDT yeni al\u0131nd\u0131, hen\u00fcz sat\u0131lamaz. (101s < 3600s)",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 12.5,
+                        "is_locked": true,
+                        "hold_time": 101.9270510673523
+                    },
+                    "best_opportunity": {
+                        "symbol": "SPK/USDT",
+                        "score": 11.5
+                    },
+                    "score_diff": -1.0,
+                    "threshold": 5.0
+                }
+            },
+            {
+                "timestamp": 1770604676.0137486,
+                "action": "HOLD",
+                "reason": "KITE/USDT yeni al\u0131nd\u0131, hen\u00fcz sat\u0131lamaz. (145s < 3600s)",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 12.5,
+                        "is_locked": true,
+                        "hold_time": 145.74329352378845
+                    },
+                    "best_opportunity": {
+                        "symbol": "SPK/USDT",
+                        "score": 11.5
+                    },
+                    "score_diff": -1.0,
+                    "threshold": 5.0
+                }
+            },
+            {
+                "timestamp": 1770604714.0693803,
+                "action": "HOLD",
+                "reason": "KITE/USDT yeni al\u0131nd\u0131, hen\u00fcz sat\u0131lamaz. (183s < 3600s)",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 12.5,
+                        "is_locked": true,
+                        "hold_time": 183.79929327964783
+                    },
+                    "best_opportunity": {
+                        "symbol": "SPK/USDT",
+                        "score": 11.5
+                    },
+                    "score_diff": -1.0,
+                    "threshold": 5.0
+                }
+            },
+            {
+                "timestamp": 1770604750.97716,
+                "action": "HOLD",
+                "reason": "KITE/USDT yeni al\u0131nd\u0131, hen\u00fcz sat\u0131lamaz. (220s < 3600s)",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 12.5,
+                        "is_locked": true,
+                        "hold_time": 220.7070894241333
+                    },
+                    "best_opportunity": {
+                        "symbol": "SPK/USDT",
+                        "score": 11.5
+                    },
+                    "score_diff": -1.0,
+                    "threshold": 5.0
+                }
+            },
+            {
+                "timestamp": 1770604785.2349777,
+                "action": "HOLD",
+                "reason": "KITE/USDT yeni al\u0131nd\u0131, hen\u00fcz sat\u0131lamaz. (254s < 3600s)",
+                "details": {
+                    "worst_asset": {
+                        "symbol": "KITE/USDT",
+                        "score": 12.5,
+                        "is_locked": true,
+                        "hold_time": 254.9648666381836
+                    },
+                    "best_opportunity": {
+                        "symbol": "SPK/USDT",
+                        "score": 11.5
+                    },
+                    "score_diff": -1.0,
+                    "threshold": 5.0
+                }
+            }
+        ]
+    },
+    "order_history": [
+        {
+            "timestamp": 1770604504.964136,
+            "symbol": "KITE/USDT",
+            "action": "SELL",
+            "price": 0.1668,
+            "quantity": 56.4,
+            "pnl_pct": -0.7733491969066005,
+            "status": "FILLED"
+        },
+        {
+            "timestamp": 1770604508.2391217,
+            "symbol": "USD1/USDT",
+            "action": "BUY",
+            "price": 1.0009,
+            "quantity": 13.0,
+            "status": "FILLED",
+            "details": {
+                "rsi": 55.55555555555556,
+                "macd": 2.7729317144675747e-06,
+                "super_trend": NaN,
+                "st_direction": 1,
+                "vwap": 1.0008702682554083,
+                "atr": 0.00016999999999998128,
+                "ATR": 0.00016999999999998128,
+                "close": 1.0009,
+                "ml_prob": 0.5,
+                "indicators": {
+                    "BREAKOUT": {
+                        "strategy": "BREAKOUT",
+                        "action": "HOLD",
+                        "score": 0.0,
+                        "details": {
+                            "bb_width": 0.0003948931910570547,
+                            "vol_ratio": 1.569877885833472,
+                            "was_squeezed": true,
+                            "breakout": false
+                        }
+                    },
+                    "MEAN_REVERSION": {
+                        "strategy": "MEAN_REVERSION",
+                        "action": "HOLD",
+                        "score": 0.0,
+                        "details": {
+                            "rsi": 55.55555555555556,
+                            "hist_bottoming": false,
+                            "touched_lower": false
+                        }
+                    },
+                    "MOMENTUM": {
+                        "strategy": "MOMENTUM",
+                        "action": "ENTRY",
+                        "score": 6.0,
+                        "details": {
+                            "adx": 31.924077264401035,
+                            "st_bullish": true,
+                            "macd_cross": false
+                        }
+                    }
+                },
+                "regime": "TRENDING",
+                "is_no_trade_zone": false,
+                "primary_strategy": "high_score_override",
+                "bb_width": 0.0003975472766662617,
+                "price_history": [
+                    1.0008,
+                    1.001,
+                    1.001,
+                    1.0009,
+                    1.0009,
+                    1.0009,
+                    1.0008,
+                    1.0009,
+                    1.0008,
+                    1.0008,
+                    1.0008,
+                    1.0009,
+                    1.0008,
+                    1.0009,
+                    1.0009,
+                    1.0008,
+                    1.0009,
+                    1.001,
+                    1.0009,
+                    1.001,
+                    1.0009,
+                    1.0011,
+                    1.001,
+                    1.0007,
+                    1.0007,
+                    1.0009,
+                    1.001,
+                    1.0009,
+                    1.0009,
+                    1.0009,
+                    1.001,
+                    1.001,
+                    1.0009,
+                    1.0008,
+                    1.0008,
+                    1.0008,
+                    1.0008,
+                    1.0007,
+                    1.0007,
+                    1.0009,
+                    1.0009,
+                    1.0008,
+                    1.0008,
+                    1.001,
+                    1.001,
+                    1.001,
+                    1.0008,
+                    1.0008,
+                    1.0009,
+                    1.0008
+                ]
+            }
+        },
+        {
+            "timestamp": 1770604526.9945736,
+            "symbol": "USD1/USDT",
+            "action": "SELL",
+            "price": 1.0007,
+            "quantity": 9.0,
+            "pnl_pct": -0.019982016185430912,
+            "status": "FILLED"
+        },
+        {
+            "timestamp": 1770604530.2699654,
+            "symbol": "KITE/USDT",
+            "action": "BUY",
+            "price": 0.1681,
+            "quantity": 62.5,
+            "status": "FILLED",
+            "details": {
+                "rsi": 65.92920353982305,
+                "macd": 0.003471299468164629,
+                "super_trend": NaN,
+                "st_direction": 1,
+                "vwap": 0.15759553858530975,
+                "atr": 0.004080000000000003,
+                "ATR": 0.004080000000000003,
+                "close": 0.1681,
+                "ml_prob": 0.5,
+                "indicators": {
+                    "BREAKOUT": {
+                        "strategy": "BREAKOUT",
+                        "action": "HOLD",
+                        "score": 0.0,
+                        "details": {
+                            "bb_width": 0.09535233318423178,
+                            "vol_ratio": 0.9286021219525097,
+                            "was_squeezed": false,
+                            "breakout": false
+                        }
+                    },
+                    "MEAN_REVERSION": {
+                        "strategy": "MEAN_REVERSION",
+                        "action": "HOLD",
+                        "score": 0.0,
+                        "details": {
+                            "rsi": 65.92920353982305,
+                            "hist_bottoming": false,
+                            "touched_lower": false
+                        }
+                    },
+                    "MOMENTUM": {
+                        "strategy": "MOMENTUM",
+                        "action": "ENTRY",
+                        "score": 8.0,
+                        "details": {
+                            "adx": 54.72260568235404,
+                            "st_bullish": true,
+                            "macd_cross": true
+                        }
+                    }
+                },
+                "regime": "NEUTRAL",
+                "is_no_trade_zone": false,
+                "primary_strategy": "high_score_override",
+                "bb_width": 0.08465304027803498,
+                "price_history": [
+                    0.1527,
+                    0.1562,
+                    0.1543,
+                    0.1514,
+                    0.1494,
+                    0.1478,
+                    0.1434,
+                    0.1457,
+                    0.1451,
+                    0.1441,
+                    0.1438,
+                    0.1447,
+                    0.1449,
+                    0.1432,
+                    0.1451,
+                    0.149,
+                    0.1479,
+                    0.148,
+                    0.148,
+                    0.1491,
+                    0.1486,
+                    0.1487,
+                    0.1472,
+                    0.1488,
+                    0.1483,
+                    0.1508,
+                    0.1502,
+                    0.1513,
+                    0.1527,
+                    0.1535,
+                    0.1553,
+                    0.1569,
+                    0.1582,
+                    0.1573,
+                    0.1609,
+                    0.1636,
+                    0.165,
+                    0.163,
+                    0.1646,
+                    0.162,
+                    0.1638,
+                    0.1648,
+                    0.1648,
+                    0.1648,
+                    0.1622,
+                    0.1617,
+                    0.1635,
+                    0.1661,
+                    0.1681,
+                    0.1668
+                ]
+            }
+        }
+    ],
+    "paper_balance": 10000.0,
+    "last_updated": 1770604785.2349842
+}

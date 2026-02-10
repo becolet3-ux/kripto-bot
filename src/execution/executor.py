@@ -84,7 +84,8 @@ class BinanceExecutor:
         else:
              # Increase to 10.0 to prevent NOTIONAL filter failures (Code -1013)
              # Binance often enforces 10 USDT min notional for API orders
-             self.min_trade_amount = 10.0 # USDT
+             # UPDATE: Lowered to 5.5 to allow trading with small balances (User has ~6 USD)
+             self.min_trade_amount = 5.5 # USDT
             
         log(f"Executor başlatıldı. Mod: {'CANLI' if self.is_live else 'KAĞIT'} | Min İşlem: {self.min_trade_amount} {'TRY' if self.is_tr else 'USDT'}")
         
@@ -367,8 +368,12 @@ class BinanceExecutor:
                     
                     # Eğer fark %1'den büyükse güncelle
                     if abs(current_qty - wallet_qty) > (wallet_qty * 0.01) and wallet_qty > 0:
+                        old_qty = self.paper_positions[symbol]['quantity']
                         self.paper_positions[symbol]['quantity'] = wallet_qty
-                        log(f"🔄 Bakiye Senkronize Edildi ({symbol}): {current_qty:.4f} -> {wallet_qty:.4f}")
+                        
+                        # Tahmini değer hesapla (Log anlaşılsın diye)
+                        est_value = wallet_qty * self.paper_positions[symbol].get('entry_price', 0.0)
+                        log(f"🔄 Bakiye Senkronize Edildi ({symbol}): {old_qty:.4f} -> {wallet_qty:.4f} Adet (~${est_value:.2f})")
                     continue
                 
                 # Bu varlık işlem yaptığımız semboller listesinde mi?
@@ -650,9 +655,10 @@ class BinanceExecutor:
                 
                 # FIX: Use FREE balance for All-In, not Total Equity
                 # This prevents "Insufficient Balance" errors if equity is locked in other positions/dust
-                target_position_size_usdt = free_balance * current_leverage * 0.98
+                risk_pct = settings.SNIPER_MAX_RISK_PCT / 100.0
+                target_position_size_usdt = free_balance * current_leverage * risk_pct
                 
-                log(f"🎯 SNIPER MODU: Tüm serbest bakiye kullanılıyor! Hedef Notional={target_position_size_usdt:.2f} (Free={free_balance:.2f}, Total={total_balance:.2f})")
+                log(f"🎯 SNIPER MODU: Tüm serbest bakiye kullanılıyor! Hedef Notional={target_position_size_usdt:.2f} (Free={free_balance:.2f}, Risk=%{risk_pct*100})")
                 
                 # Miktar hesapla ve dön
                 quantity = target_position_size_usdt / price
@@ -718,13 +724,15 @@ class BinanceExecutor:
                     target_position_size_usdt = min_trade_val * 1.05
             
             # Güvenlik: Asla toplam bakiyeden (kaldıraçlı) fazla işlem açma
-            # Max Notional = Balance * Leverage * 0.98
+            # Max Notional = Balance * Leverage * RiskPct
             current_leverage = target_leverage if 'target_leverage' in locals() else settings.LEVERAGE
-            max_safe_notional_equity = balance * current_leverage * 0.98
+            risk_pct = settings.SNIPER_MAX_RISK_PCT / 100.0
+            
+            max_safe_notional_equity = balance * current_leverage * risk_pct
             
             # Phase 3 FIX: Ayrıca mevcut kullanılabilir bakiyeyi de kontrol et (Total Equity'e güvenme)
-            # Free Balance * Leverage * 0.98
-            max_safe_notional_free = free_balance * current_leverage * 0.98
+            # Free Balance * Leverage * RiskPct
+            max_safe_notional_free = free_balance * current_leverage * risk_pct
             
             # En kısıtlayıcı olanı seç
             max_safe_notional = min(max_safe_notional_equity, max_safe_notional_free)
@@ -815,10 +823,12 @@ class BinanceExecutor:
 
     async def execute_strategy(self, signals: Union[pd.DataFrame, TradeSignal, List[TradeSignal]], latest_scores: Dict[str, float] = None):
         """Sinyalleri işle"""
-        # Günlük zarar limiti kontrolü
-        if self.stats.get('daily_realized_pnl', 0) < -(self.max_daily_loss):
+        # Günlük zarar limiti kontrolü (realized PnL yüzdesi üzerinden, legacy güvenlik katmanı)
+        # Not: daily_realized_pnl, her işlemde yüzdesel PnL toplamı olarak tutuluyor.
+        daily_realized_pct = self.stats.get('daily_realized_pnl', 0.0)
+        if daily_realized_pct <= -self.max_daily_loss:
             if not self.emergency_stop:
-                log(f"🛑 GÜNLÜK ZARAR LİMİTİ AŞILDI (%{self.max_daily_loss}). İşlemler durduruluyor.")
+                log(f"🛑 GÜNLÜK ZARAR LİMİTİ AŞILDI (Realized) (%{self.max_daily_loss}). İşlemler durduruluyor.")
                 self.emergency_stop = True
             return
 
@@ -874,86 +884,13 @@ class BinanceExecutor:
                              await self.execute_buy(symbol, qty, price)
                         return # Diğer kontrolleri atla
 
-                    # --- SMART SWAP LOGIC START ---
-                    # Yetersiz bakiye durumunda düşük puanlı varlığı satıp buna geçme kontrolü
-                    base_asset = 'TRY' if self.is_tr else 'USDT'
-                    free_balance = await self.get_free_balance(base_asset)
-                    total_balance = await self.get_total_balance()
-                    min_trade_val = self.min_trade_amount
+                    # --- SMART SWAP LOGIC (DISABLED) ---
+                    # Yetersiz bakiye durumunda swap işlemleri artık main.py içinde
+                    # OpportunityManager ve 3-Loop Confirmation ile yönetiliyor.
+                    # Bu blok, teyitsiz işlem yapmaması için devre dışı bırakıldı.
                     
-                    # Eğer boşta kalan bakiye, portföyün %5'inden azsa (yeni pozisyon açılamaz) veya pozisyon sayısı dolduysa
-                    # Not: Normalde %15-35 arası pozisyon açıyoruz, %5 altı bakiye "yetersiz" sayılır.
-                    low_balance_threshold = max(min_trade_val * 2, total_balance * 0.05)
-                    
-                    if (free_balance < low_balance_threshold or len(self.paper_positions) >= settings.MAX_OPEN_POSITIONS) and latest_scores:
-                        reason = "Yetersiz Bakiye" if free_balance < low_balance_threshold else "Pozisyon Sınırı"
-                        log(f"📉 {reason} ({len(self.paper_positions)}/{settings.MAX_OPEN_POSITIONS}). Swap fırsatı aranıyor...")
-                        
-                        worst_symbol = None
-                        worst_score = 999.0
-                        
-                        # Elimdeki pozisyonları tara
-                        for pos_sym in list(self.paper_positions.keys()):
-                            # Eğer şu anki aday sembol zaten elimizdeyse geç (mantıken buraya girmemeli ama check)
-                            if pos_sym == symbol: continue
-                            
-                            # Pozisyonun güncel skorunu bul
-                            current_score = latest_scores.get(pos_sym)
-                            
-                            # Eğer güncel skor yoksa, bu sembol henüz taranmamış olabilir.
-                            # Varsayılan olarak çok düşük ver ki hacim listesinden düşenler satılsın
-                            if current_score is None:
-                                current_score = -10.0
-                                log(f"⚠️ {pos_sym} güncel tarama listesinde yok. Skor -10.0 varsayılıyor.")
-                            
-                            log(f"🔍 Swap Aday Kontrolü: {pos_sym} Skor: {current_score:.1f}")
-                                
-                            if current_score < worst_score:
-                                worst_score = current_score
-                                worst_symbol = pos_sym
-                        
-                        # Swap Kararı: Yeni aday, en kötüden %5 daha iyiyse (daha agresif swap)
-                        if worst_symbol and score > (worst_score * 1.05):
-                            log(f"♻️ SWAP FIRSATI: {worst_symbol} (Skor: {worst_score:.1f}) -> {symbol} (Skor: {score:.1f})")
-                            log(f"🚀 {worst_symbol} satılıyor ve bakiye {symbol} için kullanılacak.")
-                            
-                            # Satış yap
-                            pos_data = self.paper_positions.get(worst_symbol)
-                            if pos_data:
-                                # Satılacak coinin güncel fiyatını al (PnL hesabı için)
-                                current_sell_price = pos_data.get('entry_price', 0.0)
-                                try:
-                                    if self.exchange_spot:
-                                        ticker = await asyncio.to_thread(self.exchange_spot.fetch_ticker, worst_symbol)
-                                        current_sell_price = float(ticker['last'])
-                                except Exception as e:
-                                    log(f"⚠️ Fiyat alma hatası ({worst_symbol}): {e}")
-
-                                sell_success = await self.execute_sell(worst_symbol, pos_data['quantity'], current_sell_price, pos_data)
-                                
-                                # Eğer satış başarısızsa alımı yapma!
-                                if not sell_success:
-                                    # DUST CHECK FOR SWAP
-                                    est_value = pos_data['quantity'] * current_sell_price
-                                    if 0.0 < est_value < 10.0 and not self.is_tr:
-                                        log(f"🧹 Swap başarısız (Dust): {worst_symbol} (${est_value:.2f}) -> BNB Convert ediliyor.")
-                                        await self.convert_dust_to_bnb()
-                                        # Remove from memory so it doesn't block future trades/swaps
-                                        if worst_symbol in self.paper_positions:
-                                            del self.paper_positions[worst_symbol]
-                                            self.save_positions()
-                                        log(f"🗑️ {worst_symbol} hafızadan silindi (Dust Convert sonrası).")
-                                        
-                                    log(f"🛑 Satış başarısız olduğu için Swap iptal edildi: {worst_symbol}")
-                                    continue
-                                
-                                # Bakiyenin güncellenmesi için kısa bekleme
-                                await asyncio.sleep(2.0)
-                        else:
-                            if worst_symbol:
-                                log(f"✋ Swap yapılmadı. En kötü {worst_symbol} ({worst_score:.1f}) vs Aday ({score:.1f}). Fark yetersiz.")
-                            else:
-                                log("✋ Swap yapılamadı. Uygun aday bulunamadı.")
+                    # Normal Mode: Proceed to calculate quantity based on balance
+                    pass 
                     
                     # --- SMART SWAP LOGIC END ---
                     
@@ -1197,7 +1134,8 @@ class BinanceExecutor:
             'highest_price': price,  # Trailing stop için
             'stop_loss': initial_stop_loss, # ATR bazlı dinamik stop
             'atr_value': atr_value,
-            'features': features or {} # Öğrenme için özellikleri sakla
+            'features': features or {}, # Öğrenme için özellikleri sakla
+            'is_sniper_mode': features.get('force_all_in', False) if features else False
         }
         
         # Sipariş Geçmişine Ekle
@@ -1410,6 +1348,8 @@ class BinanceExecutor:
                     log(f"⚠️ Kısmi satış sonrası miktar ({remaining_qty:.6f}) önemsiz, pozisyon tamamen kapatıldı: {symbol}")
                 else:
                     self.paper_positions[symbol]['quantity'] = remaining_qty
+                    # FIX: Update partial_exit_executed flag
+                    self.paper_positions[symbol]['partial_exit_executed'] = True
                     log(f"📉 Kısmi Satış Sonrası Kalan Miktar ({symbol}): {remaining_qty:.6f}")
             else:
                 del self.paper_positions[symbol]
@@ -1559,16 +1499,64 @@ class BinanceExecutor:
             return None
 
     async def check_daily_loss_limit(self) -> bool:
-        """Günlük zarar limitini kontrol et"""
-        if self.stats.get('daily_realized_pnl', 0.0) <= -self.max_daily_loss:
-             log(f"🛑 Günlük zarar limiti aşıldı: %{self.stats['daily_realized_pnl']:.2f}")
+        """
+        Günlük zarar limitini ve Minimum Bakiye (Hard Stop) kontrol eder.
+        
+        Returns:
+            bool: Eğer True dönerse bot durmalı.
+        """
+        # 0. Global Hard Stop (Survival Mode)
+        # Eğer toplam bakiye $5.0'ın altına düşerse botu zorla durdur.
+        # Bu, kalan son parayı komisyonlara kaptırmamak için son çaredir.
+        if self.is_live and not self.is_tr:
+             total_balance = await self.get_total_balance()
+             # Sadece 0.1'den büyük ve 5'ten küçükse durdur (Hata durumunda 0 dönebilir)
+             if 0.1 < total_balance < 5.0:
+                 log(f"💀 CRITICAL WARNING: Bakiye kritik seviyenin altında (${total_balance:.2f} < $5.00). Bot durduruluyor.")
+                 return True
+
+        # 1. Günlük başlangıç bakiyesini belirle (Eğer yoksa)
+        if 'daily_start_balance_date' not in self.stats:
+             self.stats['daily_start_balance_date'] = ""
+             self.stats['daily_start_balance'] = 0.0
+
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        if self.stats['daily_start_balance_date'] != today_str:
+            # Yeni gün
+            current_balance = await self.get_total_balance()
+            self.stats['daily_start_balance'] = current_balance
+            self.stats['daily_start_balance_date'] = today_str
+            self.state_manager.save_stats(self.stats)
+            log(f"📅 Yeni Gün: {today_str}. Başlangıç Bakiyesi: ${current_balance:.2f}")
+            return False
+            
+        # 2. Anlık bakiye ile karşılaştır
+        start_balance = self.stats['daily_start_balance']
+        if start_balance <= 0: return False
+        
+        # Sadece realized PnL kontrolü yerine Total Equity drawdown kontrolü daha güvenli
+        current_balance = await self.get_total_balance()
+        drawdown_pct = (start_balance - current_balance) / start_balance
+        
+        # Fix: Yüzdesel karşılaştırma için 100 ile çarpıyoruz
+        if (drawdown_pct * 100) >= self.max_daily_loss:
+            log(f"🛑 GÜNLÜK ZARAR LİMİTİ AŞILDI! (Limit: %{self.max_daily_loss}, Mevcut: %{drawdown_pct*100:.2f})")
+            log(f"📉 Başlangıç: ${start_balance:.2f} -> Mevcut: ${current_balance:.2f}")
+            return True
+
+        # Legacy check (Realized PnL based – daily_realized_pnl zaten yüzdesel toplam)
+        pnl_pct = self.stats.get('daily_realized_pnl', 0.0)
+        if pnl_pct <= -self.max_daily_loss:
+             log(f"🛑 Günlük (Realized) zarar limiti aşıldı: %{pnl_pct:.2f}")
              return True
+             
         return False
 
     async def close(self):
         """Kaynakları temizle"""
         log("Executor kapatılıyor...")
-        self.state_manager.save_state(self.paper_positions)
+        # Tüm state yapısını (full_state) kaydet
+        self.save_positions()
         self.state_manager.save_stats(self.stats)
         if self.is_tr and self.exchange_spot:
              self.exchange_spot.close()

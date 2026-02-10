@@ -1,0 +1,2001 @@
+Attaching to 7fb3ae83a415_kripto-bot-live
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TAO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 163.7
+[36m7fb3ae83a415_kripto-bot-live |[0m TAO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m TAO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TAO/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZIL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZIL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0047
+[36m7fb3ae83a415_kripto-bot-live |[0m ZIL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZIL/USDT blocked by Negative Funding: -0.1704%
+[36m7fb3ae83a415_kripto-bot-live |[0m ZIL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZIL/USDT blocked by Negative Funding: -0.1704%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ZIL/USDT: HOLD (Score: -11.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZRO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZRO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.703
+[36m7fb3ae83a415_kripto-bot-live |[0m ZRO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZRO/USDT blocked by Negative Funding: -0.0028%
+[36m7fb3ae83a415_kripto-bot-live |[0m ZRO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZRO/USDT blocked by Negative Funding: -0.0028%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ZRO/USDT: HOLD (Score: -8.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ENA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ENA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1205
+[36m7fb3ae83a415_kripto-bot-live |[0m ENA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ENA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ENA/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ROSE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ROSE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01412
+[36m7fb3ae83a415_kripto-bot-live |[0m ROSE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ROSE/USDT blocked by Negative Funding: -0.5602%
+[36m7fb3ae83a415_kripto-bot-live |[0m ROSE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ROSE/USDT Entry triggered by High Score (5.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ROSE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ROSE/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.01412
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed ROSE/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KITE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1667
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ROSE/USDT: ENTRY (Score: 5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (5.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for ROSE/USDT: 4.60% (HIGH) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 1x, Size 15.0% ($1.62)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=HIGH | Kaldıraç=1x | Hedef Notional=0.89
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 0.89 -> 0.28 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.28 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DASH/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DASH/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 36.88
+[36m7fb3ae83a415_kripto-bot-live |[0m DASH/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 DASH/USDT blocked by Negative Funding: -0.0134%
+[36m7fb3ae83a415_kripto-bot-live |[0m DASH/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 DASH/USDT blocked by Negative Funding: -0.0134%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for DASH/USDT: HOLD (Score: -5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NEAR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NEAR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.035
+[36m7fb3ae83a415_kripto-bot-live |[0m NEAR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m NEAR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for NEAR/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SKY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SKY/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.06728
+[36m7fb3ae83a415_kripto-bot-live |[0m SKY/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 SKY/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m SKY/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 SKY/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SKY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SKY/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.06728
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed SKY/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔗 Correlation Alert: SKY/USDT is highly correlated with held KITE/USDT (0.92). Skipping to diversify.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FIL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FIL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.931
+[36m7fb3ae83a415_kripto-bot-live |[0m FIL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FIL/USDT blocked by Negative Funding: -0.0114%
+[36m7fb3ae83a415_kripto-bot-live |[0m FIL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FIL/USDT blocked by Negative Funding: -0.0114%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FIL/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 40/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WIF/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WIF/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.227
+[36m7fb3ae83a415_kripto-bot-live |[0m WIF/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WIF/USDT blocked by Negative Funding: -0.0076%
+[36m7fb3ae83a415_kripto-bot-live |[0m WIF/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WIF/USDT blocked by Negative Funding: -0.0076%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WIF/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 币安人生/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 币安人生/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0961
+[36m7fb3ae83a415_kripto-bot-live |[0m 币安人生/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 币安人生/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m 币安人生/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 币安人生/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 币安人生/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 币安人生/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.0961
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 币安人生/USDT: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for 币安人生/USDT: ENTRY (Score: 10.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (10.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for 币安人生/USDT: 2.95% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=5.40
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 5.40 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv UNI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: UNI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.453
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AAVE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AAVE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 112.19
+[36m7fb3ae83a415_kripto-bot-live |[0m AAVE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ICP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ICP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 2.423
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WLD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WLD/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.3892
+[36m7fb3ae83a415_kripto-bot-live |[0m WLD/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WLD/USDT blocked by Negative Funding: -0.0045%
+[36m7fb3ae83a415_kripto-bot-live |[0m WLD/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WLD/USDT blocked by Negative Funding: -0.0045%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WLD/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ARB/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ARB/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.116
+[36m7fb3ae83a415_kripto-bot-live |[0m ARB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ARB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ARB/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XPL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XPL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0824
+[36m7fb3ae83a415_kripto-bot-live |[0m XPL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m XPL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for XPL/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SENT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SENT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.02792
+[36m7fb3ae83a415_kripto-bot-live |[0m SENT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SENT/USDT blocked by Negative Funding: -0.2584%
+[36m7fb3ae83a415_kripto-bot-live |[0m SENT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SENT/USDT blocked by Negative Funding: -0.2584%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SENT/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv API3/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: API3/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.3286
+[36m7fb3ae83a415_kripto-bot-live |[0m API3/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 API3/USDT blocked by Negative Funding: -0.1051%
+[36m7fb3ae83a415_kripto-bot-live |[0m API3/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 API3/USDT blocked by Negative Funding: -0.1051%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for API3/USDT: HOLD (Score: -8.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XUSD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XUSD/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.0005
+[36m7fb3ae83a415_kripto-bot-live |[0m XUSD/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 XUSD/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m XUSD/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 XUSD/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XUSD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XUSD/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 1.0005
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed XUSD/USDT: 4h Trend is SIDEWAYS
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for XUSD/USDT: ENTRY (Score: 10.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (10.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for XUSD/USDT: 0.02% (LOW) | Regime: TRENDING
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=11.33
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 11.33 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BREV/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BREV/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1585
+[36m7fb3ae83a415_kripto-bot-live |[0m BREV/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 BREV/USDT blocked by Negative Funding: -0.0842%
+[36m7fb3ae83a415_kripto-bot-live |[0m BREV/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 BREV/USDT blocked by Negative Funding: -0.0842%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BREV/USDT: HOLD (Score: -8.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PYR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PYR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.359
+[36m7fb3ae83a415_kripto-bot-live |[0m PYR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 PYR/USDT Entry triggered by High Score (5.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m PYR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 PYR/USDT Entry triggered by High Score (5.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PYR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PYR/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.359
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed PYR/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PYR/USDT: ENTRY (Score: 5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (5.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for PYR/USDT: 7.00% (HIGH) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 1x, Size 15.0% ($1.62)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=HIGH | Kaldıraç=1x | Hedef Notional=0.89
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 0.89 -> 0.28 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.28 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TRUMP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TRUMP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.36
+[36m7fb3ae83a415_kripto-bot-live |[0m TRUMP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 TRUMP/USDT blocked by Negative Funding: -0.0277%
+[36m7fb3ae83a415_kripto-bot-live |[0m TRUMP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 TRUMP/USDT blocked by Negative Funding: -0.0277%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TRUMP/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ONDO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ONDO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2554
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PENGU/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PENGU/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.006472
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TON/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TON/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.393
+[36m7fb3ae83a415_kripto-bot-live |[0m TON/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 TON/USDT blocked by Negative Funding: -0.0043%
+[36m7fb3ae83a415_kripto-bot-live |[0m TON/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 TON/USDT blocked by Negative Funding: -0.0043%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TON/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WBTC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WBTC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 70313.61
+[36m7fb3ae83a415_kripto-bot-live |[0m WBTC/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m WBTC/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WBTC/USDT: HOLD (Score: 1.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv F/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: F/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00607
+[36m7fb3ae83a415_kripto-bot-live |[0m F/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 F/USDT blocked by Negative Funding: -0.6313%
+[36m7fb3ae83a415_kripto-bot-live |[0m F/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 F/USDT blocked by Negative Funding: -0.6313%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for F/USDT: HOLD (Score: -13.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SHIB/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SHIB/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 6.11e-06
+[36m7fb3ae83a415_kripto-bot-live |[0m SHIB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SHIB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SHIB/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 60/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv OG/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: OG/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.798
+[36m7fb3ae83a415_kripto-bot-live |[0m OG/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m OG/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for OG/USDT: HOLD (Score: -1.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XLM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XLM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1611
+[36m7fb3ae83a415_kripto-bot-live |[0m XLM/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 XLM/USDT blocked by Negative Funding: -0.0174%
+[36m7fb3ae83a415_kripto-bot-live |[0m XLM/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 XLM/USDT blocked by Negative Funding: -0.0174%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for XLM/USDT: EXIT (Score: -24.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BONK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BONK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 6.23e-06
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.237
+[36m7fb3ae83a415_kripto-bot-live |[0m LA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LA/USDT blocked by Negative Funding: -0.1316%
+[36m7fb3ae83a415_kripto-bot-live |[0m LA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LA/USDT blocked by Negative Funding: -0.1316%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LA/USDT: HOLD (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AXS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AXS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.377
+[36m7fb3ae83a415_kripto-bot-live |[0m AXS/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AXS/USDT blocked by Negative Funding: -0.1117%
+[36m7fb3ae83a415_kripto-bot-live |[0m AXS/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AXS/USDT blocked by Negative Funding: -0.1117%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AXS/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FET/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FET/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1629
+[36m7fb3ae83a415_kripto-bot-live |[0m FET/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FET/USDT blocked by Negative Funding: -0.0114%
+[36m7fb3ae83a415_kripto-bot-live |[0m FET/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FET/USDT blocked by Negative Funding: -0.0114%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FET/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DOT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DOT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.336
+[36m7fb3ae83a415_kripto-bot-live |[0m DOT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DOT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for DOT/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv VIRTUAL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: VIRTUAL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.5769
+[36m7fb3ae83a415_kripto-bot-live |[0m VIRTUAL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ETHFI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ETHFI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.459
+[36m7fb3ae83a415_kripto-bot-live |[0m ETHFI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ETHFI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ETHFI/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GIGGLE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GIGGLE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 31.64
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv APT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: APT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.062
+[36m7fb3ae83a415_kripto-bot-live |[0m APT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 APT/USDT blocked by Negative Funding: -0.0171%
+[36m7fb3ae83a415_kripto-bot-live |[0m APT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 APT/USDT blocked by Negative Funding: -0.0171%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for APT/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.97
+[36m7fb3ae83a415_kripto-bot-live |[0m AR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m AR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AR/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.02097
+[36m7fb3ae83a415_kripto-bot-live |[0m ZK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZK/USDT blocked by Negative Funding: -0.0790%
+[36m7fb3ae83a415_kripto-bot-live |[0m ZK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZK/USDT blocked by Negative Funding: -0.0790%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ZK/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv STX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: STX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2647
+[36m7fb3ae83a415_kripto-bot-live |[0m STX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 STX/USDT blocked by Negative Funding: -0.0310%
+[36m7fb3ae83a415_kripto-bot-live |[0m STX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 STX/USDT blocked by Negative Funding: -0.0310%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for STX/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PARTI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PARTI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1052
+[36m7fb3ae83a415_kripto-bot-live |[0m PARTI/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 PARTI/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m PARTI/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 PARTI/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PARTI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PARTI/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.1052
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed PARTI/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KITE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.167
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔗 Correlation Alert: PARTI/USDT is highly correlated with held KITE/USDT (0.86). Skipping to diversify.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EIGEN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EIGEN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.207
+[36m7fb3ae83a415_kripto-bot-live |[0m EIGEN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m EIGEN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for EIGEN/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SEI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SEI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0762
+[36m7fb3ae83a415_kripto-bot-live |[0m SEI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AUCTION/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AUCTION/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 4.8
+[36m7fb3ae83a415_kripto-bot-live |[0m AUCTION/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AUCTION/USDT blocked by Negative Funding: -0.1490%
+[36m7fb3ae83a415_kripto-bot-live |[0m AUCTION/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AUCTION/USDT blocked by Negative Funding: -0.1490%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AUCTION/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv S/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: S/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.04228
+[36m7fb3ae83a415_kripto-bot-live |[0m S/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 S/USDT blocked by Negative Funding: -0.0049%
+[36m7fb3ae83a415_kripto-bot-live |[0m S/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 S/USDT blocked by Negative Funding: -0.0049%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for S/USDT: HOLD (Score: -12.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PROVE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PROVE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.3253
+[36m7fb3ae83a415_kripto-bot-live |[0m PROVE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PROVE/USDT blocked by Negative Funding: -0.1251%
+[36m7fb3ae83a415_kripto-bot-live |[0m PROVE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PROVE/USDT blocked by Negative Funding: -0.1251%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PROVE/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 80/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RENDER/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RENDER/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.347
+[36m7fb3ae83a415_kripto-bot-live |[0m RENDER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 RENDER/USDT blocked by Negative Funding: -0.0050%
+[36m7fb3ae83a415_kripto-bot-live |[0m RENDER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 RENDER/USDT blocked by Negative Funding: -0.0050%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for RENDER/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv OP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: OP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.19
+[36m7fb3ae83a415_kripto-bot-live |[0m OP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m OP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for OP/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CRV/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CRV/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2531
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ETC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ETC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 8.57
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv POL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: POL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.096
+[36m7fb3ae83a415_kripto-bot-live |[0m POL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 POL/USDT blocked by Negative Funding: -0.0262%
+[36m7fb3ae83a415_kripto-bot-live |[0m POL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 POL/USDT blocked by Negative Funding: -0.0262%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for POL/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ENSO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ENSO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.294
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FOGO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FOGO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.02316
+[36m7fb3ae83a415_kripto-bot-live |[0m FOGO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FOGO/USDT blocked by Negative Funding: -0.0228%
+[36m7fb3ae83a415_kripto-bot-live |[0m FOGO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FOGO/USDT blocked by Negative Funding: -0.0228%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FOGO/USDT: HOLD (Score: -12.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PENDLE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PENDLE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.152
+[36m7fb3ae83a415_kripto-bot-live |[0m PENDLE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PENDLE/USDT blocked by Negative Funding: -0.0004%
+[36m7fb3ae83a415_kripto-bot-live |[0m PENDLE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PENDLE/USDT blocked by Negative Funding: -0.0004%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PENDLE/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv STRK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: STRK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0497
+[36m7fb3ae83a415_kripto-bot-live |[0m STRK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 STRK/USDT blocked by Negative Funding: -0.0139%
+[36m7fb3ae83a415_kripto-bot-live |[0m STRK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 STRK/USDT blocked by Negative Funding: -0.0139%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for STRK/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FLOKI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FLOKI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.086e-05
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FLUX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FLUX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0771
+[36m7fb3ae83a415_kripto-bot-live |[0m FLUX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FLUX/USDT blocked by Negative Funding: -0.0069%
+[36m7fb3ae83a415_kripto-bot-live |[0m FLUX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FLUX/USDT blocked by Negative Funding: -0.0069%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FLUX/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv INJ/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: INJ/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.198
+[36m7fb3ae83a415_kripto-bot-live |[0m INJ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 INJ/USDT blocked by Negative Funding: -0.0015%
+[36m7fb3ae83a415_kripto-bot-live |[0m INJ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 INJ/USDT blocked by Negative Funding: -0.0015%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for INJ/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SIGN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SIGN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.027
+[36m7fb3ae83a415_kripto-bot-live |[0m SIGN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SIGN/USDT blocked by Negative Funding: -0.3462%
+[36m7fb3ae83a415_kripto-bot-live |[0m SIGN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SIGN/USDT blocked by Negative Funding: -0.3462%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SIGN/USDT: HOLD (Score: -12.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LDO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LDO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.3535
+[36m7fb3ae83a415_kripto-bot-live |[0m LDO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv U/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: U/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.0003
+[36m7fb3ae83a415_kripto-bot-live |[0m U/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m U/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for U/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CHZ/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CHZ/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.04137
+[36m7fb3ae83a415_kripto-bot-live |[0m CHZ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m CHZ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CHZ/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 0G/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 0G/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.54
+[36m7fb3ae83a415_kripto-bot-live |[0m 0G/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 0G/USDT blocked by Negative Funding: -0.0827%
+[36m7fb3ae83a415_kripto-bot-live |[0m 0G/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 0G/USDT blocked by Negative Funding: -0.0827%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for 0G/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GPS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GPS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01068
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ✨ GPS/USDT MTF Consensus! Score: 5.43 -> 7.06
+[36m7fb3ae83a415_kripto-bot-live |[0m GPS/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 GPS/USDT blocked by Negative Funding: -0.1360%
+[36m7fb3ae83a415_kripto-bot-live |[0m GPS/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 GPS/USDT blocked by Negative Funding: -0.1360%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for GPS/USDT: HOLD (Score: -0.07)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ALGO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ALGO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0961
+[36m7fb3ae83a415_kripto-bot-live |[0m ALGO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ALGO/USDT blocked by Negative Funding: -0.0020%
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ICX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ICX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0443
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ✨ ICX/USDT MTF Consensus! Score: 5.43 -> 7.06
+[36m7fb3ae83a415_kripto-bot-live |[0m ICX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ICX/USDT blocked by Negative Funding: -1.4055%
+[36m7fb3ae83a415_kripto-bot-live |[0m ICX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ICX/USDT blocked by Negative Funding: -1.4055%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ICX/USDT: HOLD (Score: -6.07)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 100/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TWT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TWT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.5291
+[36m7fb3ae83a415_kripto-bot-live |[0m TWT/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m TWT/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TWT/USDT: EXIT (Score: -13.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WCT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WCT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0575
+[36m7fb3ae83a415_kripto-bot-live |[0m WCT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WCT/USDT blocked by Negative Funding: -0.1926%
+[36m7fb3ae83a415_kripto-bot-live |[0m WCT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WCT/USDT blocked by Negative Funding: -0.1926%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WCT/USDT: HOLD (Score: -7.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SOMI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SOMI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1725
+[36m7fb3ae83a415_kripto-bot-live |[0m SOMI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SOMI/USDT blocked by Negative Funding: -0.0756%
+[36m7fb3ae83a415_kripto-bot-live |[0m SOMI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SOMI/USDT blocked by Negative Funding: -0.0756%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SOMI/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LINEA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LINEA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00313
+[36m7fb3ae83a415_kripto-bot-live |[0m LINEA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LINEA/USDT blocked by Negative Funding: -0.0143%
+[36m7fb3ae83a415_kripto-bot-live |[0m LINEA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LINEA/USDT blocked by Negative Funding: -0.0143%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LINEA/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CAKE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CAKE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.365
+[36m7fb3ae83a415_kripto-bot-live |[0m CAKE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZEN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZEN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 5.977
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ALLO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ALLO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0581
+[36m7fb3ae83a415_kripto-bot-live |[0m ALLO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ALLO/USDT Entry triggered by High Score (5.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m ALLO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ALLO/USDT Entry triggered by High Score (5.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ALLO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ALLO/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.0581
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed ALLO/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ALLO/USDT: ENTRY (Score: 5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (5.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for ALLO/USDT: 3.07% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=2.97
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 2.97 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TIA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TIA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.3307
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv JUP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: JUP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.159
+[36m7fb3ae83a415_kripto-bot-live |[0m JUP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 JUP/USDT blocked by Negative Funding: -0.0181%
+[36m7fb3ae83a415_kripto-bot-live |[0m JUP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 JUP/USDT blocked by Negative Funding: -0.0181%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for JUP/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ATOM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ATOM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.95
+[36m7fb3ae83a415_kripto-bot-live |[0m ATOM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DCR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DCR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 25.66
+[36m7fb3ae83a415_kripto-bot-live |[0m DCR/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 DCR/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DCR/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 DCR/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DCR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DCR/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 25.66
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed DCR/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for DCR/USDT: ENTRY (Score: 4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (4.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for DCR/USDT: 3.04% (MEDIUM) | Regime: TRENDING
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=3.40
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 3.40 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GALA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GALA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00408
+[36m7fb3ae83a415_kripto-bot-live |[0m GALA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 GALA/USDT blocked by Negative Funding: -0.0043%
+[36m7fb3ae83a415_kripto-bot-live |[0m GALA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 GALA/USDT blocked by Negative Funding: -0.0043%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for GALA/USDT: HOLD (Score: -13.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BROCCOLI714/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BROCCOLI714/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01339
+[36m7fb3ae83a415_kripto-bot-live |[0m BROCCOLI714/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BROCCOLI714/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BROCCOLI714/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv VANRY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: VANRY/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.006322
+[36m7fb3ae83a415_kripto-bot-live |[0m VANRY/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 VANRY/USDT blocked by Negative Funding: -0.0188%
+[36m7fb3ae83a415_kripto-bot-live |[0m VANRY/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 VANRY/USDT blocked by Negative Funding: -0.0188%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for VANRY/USDT: HOLD (Score: -10.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BIO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BIO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0262
+[36m7fb3ae83a415_kripto-bot-live |[0m BIO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BIO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BIO/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv JST/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: JST/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.04211
+[36m7fb3ae83a415_kripto-bot-live |[0m JST/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 JST/USDT blocked by Negative Funding: -0.0136%
+[36m7fb3ae83a415_kripto-bot-live |[0m JST/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 JST/USDT blocked by Negative Funding: -0.0136%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for JST/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AWE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AWE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.07541
+[36m7fb3ae83a415_kripto-bot-live |[0m AWE/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 AWE/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m AWE/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 AWE/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AWE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AWE/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.07541
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed AWE/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KITE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1673
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AWE/USDT: ENTRY (Score: 4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (4.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for AWE/USDT: 1.75% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=5.10
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 5.10 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EUL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EUL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.856
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NEIRO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NEIRO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 7.725e-05
+[36m7fb3ae83a415_kripto-bot-live |[0m NEIRO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m NEIRO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for NEIRO/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ATM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ATM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.877
+[36m7fb3ae83a415_kripto-bot-live |[0m ATM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ATM/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m ATM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ATM/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ATM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ATM/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.877
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed ATM/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ATM/USDT: ENTRY (Score: 4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (4.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for ATM/USDT: 3.81% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=2.43
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 2.43 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 120/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BFUSD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BFUSD/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.9998
+[36m7fb3ae83a415_kripto-bot-live |[0m BFUSD/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 BFUSD/USDT Entry triggered by High Score (7.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m BFUSD/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 BFUSD/USDT Entry triggered by High Score (7.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BFUSD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BFUSD/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.9998
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed BFUSD/USDT: 4h Trend is SIDEWAYS
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BFUSD/USDT: ENTRY (Score: 7.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (7.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for BFUSD/USDT: 0.01% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=8.50
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 8.50 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SYRUP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SYRUP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2816
+[36m7fb3ae83a415_kripto-bot-live |[0m SYRUP/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SYRUP/USDT blocked by Negative Funding: -0.0003%
+[36m7fb3ae83a415_kripto-bot-live |[0m SYRUP/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SYRUP/USDT blocked by Negative Funding: -0.0003%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SYRUP/USDT: HOLD (Score: -5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XVG/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XVG/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.005888
+[36m7fb3ae83a415_kripto-bot-live |[0m XVG/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m XVG/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for XVG/USDT: HOLD (Score: -1.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SAND/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SAND/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0874
+[36m7fb3ae83a415_kripto-bot-live |[0m SAND/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SAND/USDT blocked by Negative Funding: -0.0280%
+[36m7fb3ae83a415_kripto-bot-live |[0m SAND/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SAND/USDT blocked by Negative Funding: -0.0280%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SAND/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv VET/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: VET/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00804
+[36m7fb3ae83a415_kripto-bot-live |[0m VET/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WBETH/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WBETH/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 2259.82
+[36m7fb3ae83a415_kripto-bot-live |[0m WBETH/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m WBETH/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WBETH/USDT: EXIT (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ARKM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ARKM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.12
+[36m7fb3ae83a415_kripto-bot-live |[0m ARKM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ARKM/USDT blocked by Negative Funding: -0.0011%
+[36m7fb3ae83a415_kripto-bot-live |[0m ARKM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ARKM/USDT blocked by Negative Funding: -0.0011%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ARKM/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GUN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GUN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0283
+[36m7fb3ae83a415_kripto-bot-live |[0m GUN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m GUN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for GUN/USDT: HOLD (Score: -1.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SUN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SUN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01694
+[36m7fb3ae83a415_kripto-bot-live |[0m SUN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SUN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SUN/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MAGIC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MAGIC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0694
+[36m7fb3ae83a415_kripto-bot-live |[0m MAGIC/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MAGIC/USDT blocked by Negative Funding: -0.0422%
+[36m7fb3ae83a415_kripto-bot-live |[0m MAGIC/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MAGIC/USDT blocked by Negative Funding: -0.0422%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MAGIC/USDT: HOLD (Score: -10.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ENS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ENS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 5.9
+[36m7fb3ae83a415_kripto-bot-live |[0m ENS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ENS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ENS/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KAIA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KAIA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0561
+[36m7fb3ae83a415_kripto-bot-live |[0m KAIA/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 KAIA/USDT blocked by Negative Funding: -0.0226%
+[36m7fb3ae83a415_kripto-bot-live |[0m KAIA/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 KAIA/USDT blocked by Negative Funding: -0.0226%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for KAIA/USDT: HOLD (Score: -6.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv QNT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: QNT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 65.83
+[36m7fb3ae83a415_kripto-bot-live |[0m QNT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m QNT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for QNT/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FF/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FF/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.08025
+[36m7fb3ae83a415_kripto-bot-live |[0m FF/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m FF/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FF/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PNUT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PNUT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0486
+[36m7fb3ae83a415_kripto-bot-live |[0m PNUT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PNUT/USDT blocked by Negative Funding: -0.0024%
+[36m7fb3ae83a415_kripto-bot-live |[0m PNUT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PNUT/USDT blocked by Negative Funding: -0.0024%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PNUT/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SPK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SPK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.022294
+[36m7fb3ae83a415_kripto-bot-live |[0m SPK/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 SPK/USDT Entry triggered by High Score (11.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m SPK/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 SPK/USDT Entry triggered by High Score (11.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SPK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SPK/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.022294
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed SPK/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SPK/USDT: ENTRY (Score: 11.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (11.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for SPK/USDT: 1.25% (LOW) | Regime: TRENDING
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=11.33
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 11.33 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LSK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LSK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.134
+[36m7fb3ae83a415_kripto-bot-live |[0m LSK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LSK/USDT blocked by Negative Funding: -0.1872%
+[36m7fb3ae83a415_kripto-bot-live |[0m LSK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LSK/USDT blocked by Negative Funding: -0.1872%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LSK/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RAY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RAY/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.603
+[36m7fb3ae83a415_kripto-bot-live |[0m RAY/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv STG/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: STG/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1468
+[36m7fb3ae83a415_kripto-bot-live |[0m STG/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 STG/USDT Entry triggered by High Score (7.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m STG/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 STG/USDT Entry triggered by High Score (7.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv STG/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: STG/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.1468
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed STG/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for STG/USDT: ENTRY (Score: 7.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (7.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for STG/USDT: 2.72% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=4.05
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 4.05 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FLOW/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FLOW/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.047
+[36m7fb3ae83a415_kripto-bot-live |[0m FLOW/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 FLOW/USDT Entry triggered by High Score (9.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m FLOW/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 FLOW/USDT Entry triggered by High Score (9.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FLOW/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FLOW/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.047
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed FLOW/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FLOW/USDT: ENTRY (Score: 9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (9.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for FLOW/USDT: 2.39% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=5.13
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 5.13 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 140/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ORDI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ORDI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 2.816
+[36m7fb3ae83a415_kripto-bot-live |[0m ORDI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ORDI/USDT blocked by Negative Funding: -0.0016%
+[36m7fb3ae83a415_kripto-bot-live |[0m ORDI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ORDI/USDT blocked by Negative Funding: -0.0016%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ORDI/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BARD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BARD/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.7928
+[36m7fb3ae83a415_kripto-bot-live |[0m BARD/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BARD/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BARD/USDT: HOLD (Score: 1.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RIF/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RIF/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0371
+[36m7fb3ae83a415_kripto-bot-live |[0m RIF/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m RIF/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for RIF/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RLUSD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RLUSD/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.0006
+[36m7fb3ae83a415_kripto-bot-live |[0m RLUSD/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m RLUSD/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for RLUSD/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DYDX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DYDX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1083
+[36m7fb3ae83a415_kripto-bot-live |[0m DYDX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DYDX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for DYDX/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MUBARAK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MUBARAK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01388
+[36m7fb3ae83a415_kripto-bot-live |[0m MUBARAK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m MUBARAK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MUBARAK/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZKP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZKP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0785
+[36m7fb3ae83a415_kripto-bot-live |[0m ZKP/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZKP/USDT blocked by Negative Funding: -0.0832%
+[36m7fb3ae83a415_kripto-bot-live |[0m ZKP/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZKP/USDT blocked by Negative Funding: -0.0832%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ZKP/USDT: HOLD (Score: -6.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CFX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CFX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0468
+[36m7fb3ae83a415_kripto-bot-live |[0m CFX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 CFX/USDT blocked by Negative Funding: -0.0109%
+[36m7fb3ae83a415_kripto-bot-live |[0m CFX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 CFX/USDT blocked by Negative Funding: -0.0109%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CFX/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RUNE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RUNE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.417
+[36m7fb3ae83a415_kripto-bot-live |[0m RUNE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m RUNE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for RUNE/USDT: EXIT (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ACT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ACT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0146
+[36m7fb3ae83a415_kripto-bot-live |[0m ACT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ACT/USDT blocked by Negative Funding: -0.0094%
+[36m7fb3ae83a415_kripto-bot-live |[0m ACT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ACT/USDT blocked by Negative Funding: -0.0094%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ACT/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SCRT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SCRT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0993
+[36m7fb3ae83a415_kripto-bot-live |[0m SCRT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SCRT/USDT blocked by Negative Funding: -0.0120%
+[36m7fb3ae83a415_kripto-bot-live |[0m SCRT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SCRT/USDT blocked by Negative Funding: -0.0120%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SCRT/USDT: HOLD (Score: -5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv APE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: APE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1276
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LUNC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LUNC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.507e-05
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HUMA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HUMA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01336
+[36m7fb3ae83a415_kripto-bot-live |[0m HUMA/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 HUMA/USDT Entry triggered by High Score (6.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m HUMA/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 HUMA/USDT Entry triggered by High Score (6.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HUMA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HUMA/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.01336
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 HUMA/USDT: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KITE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1671
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for HUMA/USDT: ENTRY (Score: 6.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (6.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for HUMA/USDT: 2.31% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=3.51
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 3.51 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HEMI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HEMI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01175
+[36m7fb3ae83a415_kripto-bot-live |[0m HEMI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 1000CHEEMS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 1000CHEEMS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.000518
+[36m7fb3ae83a415_kripto-bot-live |[0m 1000CHEEMS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 1000CHEEMS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for 1000CHEEMS/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv YGG/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: YGG/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0412
+[36m7fb3ae83a415_kripto-bot-live |[0m YGG/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m YGG/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for YGG/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DOLO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DOLO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.03442
+[36m7fb3ae83a415_kripto-bot-live |[0m DOLO/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 DOLO/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DOLO/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 DOLO/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DOLO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DOLO/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.03442
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed DOLO/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for DOLO/USDT: ENTRY (Score: 4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (4.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for DOLO/USDT: 2.27% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=2.43
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 2.43 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EURI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EURI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.1818
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ✨ EURI/USDT MTF Consensus! Score: 5.86 -> 6.74
+[36m7fb3ae83a415_kripto-bot-live |[0m EURI/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m EURI/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EURI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EURI/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 1.1818
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed EURI/USDT: 4h Trend is SIDEWAYS
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for EURI/USDT: ENTRY (Score: 9.36)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (9.4). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for EURI/USDT: 0.08% (LOW) | Regime: TRENDING
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=10.61
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 10.61 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 2Z/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 2Z/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.08788
+[36m7fb3ae83a415_kripto-bot-live |[0m 2Z/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 2Z/USDT blocked by Negative Funding: -0.0224%
+[36m7fb3ae83a415_kripto-bot-live |[0m 2Z/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 2Z/USDT blocked by Negative Funding: -0.0224%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for 2Z/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 160/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PSG/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PSG/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.661
+[36m7fb3ae83a415_kripto-bot-live |[0m PSG/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m PSG/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PSG/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv USDE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: USDE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.9993
+[36m7fb3ae83a415_kripto-bot-live |[0m USDE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m USDE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for USDE/USDT: EXIT (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AUDIO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AUDIO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0211
+[36m7fb3ae83a415_kripto-bot-live |[0m AUDIO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m AUDIO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AUDIO/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv IOTA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: IOTA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0695
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv IO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: IO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.105
+[36m7fb3ae83a415_kripto-bot-live |[0m IO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 IO/USDT blocked by Negative Funding: -0.0260%
+[36m7fb3ae83a415_kripto-bot-live |[0m IO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 IO/USDT blocked by Negative Funding: -0.0260%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for IO/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SNX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SNX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.29
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CHESS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CHESS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00719
+[36m7fb3ae83a415_kripto-bot-live |[0m CHESS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m CHESS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CHESS/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv W/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: W/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0197
+[36m7fb3ae83a415_kripto-bot-live |[0m W/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m W/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for W/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv THE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: THE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2713
+[36m7fb3ae83a415_kripto-bot-live |[0m THE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 THE/USDT blocked by Negative Funding: -0.1116%
+[36m7fb3ae83a415_kripto-bot-live |[0m THE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 THE/USDT blocked by Negative Funding: -0.1116%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for THE/USDT: HOLD (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FRAX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FRAX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.7202
+[36m7fb3ae83a415_kripto-bot-live |[0m FRAX/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FRAX/USDT blocked by Negative Funding: -0.1073%
+[36m7fb3ae83a415_kripto-bot-live |[0m FRAX/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 FRAX/USDT blocked by Negative Funding: -0.1073%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FRAX/USDT: HOLD (Score: -8.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv OPEN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: OPEN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1625
+[36m7fb3ae83a415_kripto-bot-live |[0m OPEN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 OPEN/USDT Entry triggered by High Score (3.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m OPEN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 OPEN/USDT Entry triggered by High Score (3.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv OPEN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: OPEN/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.1625
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed OPEN/USDT: 4h Trend is SIDEWAYS
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for OPEN/USDT: ENTRY (Score: 3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (3.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for OPEN/USDT: 1.94% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=3.97
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 3.97 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv JASMY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: JASMY/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00541
+[36m7fb3ae83a415_kripto-bot-live |[0m JASMY/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 JASMY/USDT blocked by Negative Funding: -0.0191%
+[36m7fb3ae83a415_kripto-bot-live |[0m JASMY/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 JASMY/USDT blocked by Negative Funding: -0.0191%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for JASMY/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MET/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MET/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2128
+[36m7fb3ae83a415_kripto-bot-live |[0m MET/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv C98/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: C98/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0258
+[36m7fb3ae83a415_kripto-bot-live |[0m C98/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 C98/USDT blocked by Negative Funding: -0.0672%
+[36m7fb3ae83a415_kripto-bot-live |[0m C98/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 C98/USDT blocked by Negative Funding: -0.0672%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for C98/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ADX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ADX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0783
+[36m7fb3ae83a415_kripto-bot-live |[0m ADX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ADX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ADX/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MORPHO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MORPHO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.151
+[36m7fb3ae83a415_kripto-bot-live |[0m MORPHO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m MORPHO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MORPHO/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LQTY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LQTY/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.344
+[36m7fb3ae83a415_kripto-bot-live |[0m LQTY/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 LQTY/USDT Entry triggered by High Score (9.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m LQTY/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 LQTY/USDT Entry triggered by High Score (9.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LQTY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LQTY/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.344
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed LQTY/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LQTY/USDT: ENTRY (Score: 9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (9.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for LQTY/USDT: 2.24% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=5.13
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 5.13 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BEAMX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BEAMX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.002463
+[36m7fb3ae83a415_kripto-bot-live |[0m BEAMX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BEAMX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BEAMX/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv JTO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: JTO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2551
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ARPA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ARPA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00992
+[36m7fb3ae83a415_kripto-bot-live |[0m ARPA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ARPA/USDT blocked by Negative Funding: -0.0071%
+[36m7fb3ae83a415_kripto-bot-live |[0m ARPA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ARPA/USDT blocked by Negative Funding: -0.0071%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ARPA/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 180/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SSV/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SSV/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.186
+[36m7fb3ae83a415_kripto-bot-live |[0m SSV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SSV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SSV/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ANKR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ANKR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00459
+[36m7fb3ae83a415_kripto-bot-live |[0m ANKR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ANKR/USDT blocked by Negative Funding: -0.0426%
+[36m7fb3ae83a415_kripto-bot-live |[0m ANKR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ANKR/USDT blocked by Negative Funding: -0.0426%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ANKR/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MANTA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MANTA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0702
+[36m7fb3ae83a415_kripto-bot-live |[0m MANTA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MANTA/USDT blocked by Negative Funding: -0.0151%
+[36m7fb3ae83a415_kripto-bot-live |[0m MANTA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MANTA/USDT blocked by Negative Funding: -0.0151%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MANTA/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AVNT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AVNT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1953
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HOME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HOME/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.02863
+[36m7fb3ae83a415_kripto-bot-live |[0m HOME/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 HOME/USDT Entry triggered by High Score (9.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m HOME/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 HOME/USDT Entry triggered by High Score (9.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HOME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HOME/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.02863
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed HOME/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for HOME/USDT: ENTRY (Score: 9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (9.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for HOME/USDT: 1.27% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=10.77
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 10.77 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ARK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ARK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1798
+[36m7fb3ae83a415_kripto-bot-live |[0m ARK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ARK/USDT blocked by Negative Funding: -0.2105%
+[36m7fb3ae83a415_kripto-bot-live |[0m ARK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ARK/USDT blocked by Negative Funding: -0.2105%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ARK/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv JUV/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: JUV/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.562
+[36m7fb3ae83a415_kripto-bot-live |[0m JUV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m JUV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for JUV/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NMR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NMR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 8.42
+[36m7fb3ae83a415_kripto-bot-live |[0m NMR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m NMR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for NMR/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AIXBT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AIXBT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0203
+[36m7fb3ae83a415_kripto-bot-live |[0m AIXBT/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AIXBT/USDT blocked by Negative Funding: -0.0047%
+[36m7fb3ae83a415_kripto-bot-live |[0m AIXBT/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AIXBT/USDT blocked by Negative Funding: -0.0047%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AIXBT/USDT: HOLD (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PYTH/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PYTH/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0456
+[36m7fb3ae83a415_kripto-bot-live |[0m PYTH/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PYTH/USDT blocked by Negative Funding: -0.0060%
+[36m7fb3ae83a415_kripto-bot-live |[0m PYTH/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 PYTH/USDT blocked by Negative Funding: -0.0060%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PYTH/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1601
+[36m7fb3ae83a415_kripto-bot-live |[0m AT/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 AT/USDT Entry triggered by High Score (3.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m AT/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 AT/USDT Entry triggered by High Score (3.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AT/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.1601
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed AT/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KITE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1668
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AT/USDT: ENTRY (Score: 3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (3.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for AT/USDT: 0.67% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=3.97
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 3.97 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 1MBABYDOGE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 1MBABYDOGE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0003865
+[36m7fb3ae83a415_kripto-bot-live |[0m 1MBABYDOGE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 1MBABYDOGE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for 1MBABYDOGE/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XTZ/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XTZ/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.4132
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ARDR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ARDR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.04717
+[36m7fb3ae83a415_kripto-bot-live |[0m ARDR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ARDR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ARDR/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CYBER/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CYBER/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.522
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NOM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NOM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00596
+[36m7fb3ae83a415_kripto-bot-live |[0m NOM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 NOM/USDT blocked by Negative Funding: -0.4013%
+[36m7fb3ae83a415_kripto-bot-live |[0m NOM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 NOM/USDT blocked by Negative Funding: -0.4013%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for NOM/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TRB/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TRB/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 14.59
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NEXO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NEXO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.81
+[36m7fb3ae83a415_kripto-bot-live |[0m NEXO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 NEXO/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m NEXO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 NEXO/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NEXO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NEXO/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.81
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed NEXO/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for NEXO/USDT: ENTRY (Score: 10.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (10.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for NEXO/USDT: 1.70% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=11.33
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 11.33 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv YFI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: YFI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3062.0
+[36m7fb3ae83a415_kripto-bot-live |[0m YFI/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 YFI/USDT blocked by Negative Funding: -0.0011%
+[36m7fb3ae83a415_kripto-bot-live |[0m YFI/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 YFI/USDT blocked by Negative Funding: -0.0011%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for YFI/USDT: HOLD (Score: 0.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ANIME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ANIME/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00536
+[36m7fb3ae83a415_kripto-bot-live |[0m ANIME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ANIME/USDT blocked by Negative Funding: -0.0558%
+[36m7fb3ae83a415_kripto-bot-live |[0m ANIME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ANIME/USDT blocked by Negative Funding: -0.0558%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ANIME/USDT: HOLD (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 200/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MMT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MMT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1249
+[36m7fb3ae83a415_kripto-bot-live |[0m MMT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MMT/USDT blocked by Negative Funding: -0.0171%
+[36m7fb3ae83a415_kripto-bot-live |[0m MMT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MMT/USDT blocked by Negative Funding: -0.0171%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MMT/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BOME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BOME/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.000403
+[36m7fb3ae83a415_kripto-bot-live |[0m BOME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BOME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BOME/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ASR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ASR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.326
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 1INCH/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 1INCH/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0975
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EDU/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EDU/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1349
+[36m7fb3ae83a415_kripto-bot-live |[0m EDU/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m EDU/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for EDU/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CITY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CITY/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.526
+[36m7fb3ae83a415_kripto-bot-live |[0m CITY/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 CITY/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m CITY/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 CITY/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CITY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CITY/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.526
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed CITY/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CITY/USDT: ENTRY (Score: 4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (4.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for CITY/USDT: 2.73% (MEDIUM) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 2x, Size 25.0% ($2.70)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=MEDIUM | Kaldıraç=2x | Hedef Notional=2.43
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 2.43 -> 0.56 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.56 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv 1000SATS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: 1000SATS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.165e-05
+[36m7fb3ae83a415_kripto-bot-live |[0m 1000SATS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 1000SATS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for 1000SATS/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SAHARA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SAHARA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01521
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SAGA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SAGA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0315
+[36m7fb3ae83a415_kripto-bot-live |[0m SAGA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SAGA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SAGA/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SANTOS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SANTOS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.943
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KAITO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KAITO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.3204
+[36m7fb3ae83a415_kripto-bot-live |[0m KAITO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m KAITO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for KAITO/USDT: HOLD (Score: -2.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ALICE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ALICE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1194
+[36m7fb3ae83a415_kripto-bot-live |[0m ALICE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ALICE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ALICE/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv INIT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: INIT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0685
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CVX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CVX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.859
+[36m7fb3ae83a415_kripto-bot-live |[0m CVX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 CVX/USDT blocked by Negative Funding: -0.0337%
+[36m7fb3ae83a415_kripto-bot-live |[0m CVX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 CVX/USDT blocked by Negative Funding: -0.0337%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CVX/USDT: HOLD (Score: -5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv IMX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: IMX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1588
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FORM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FORM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2136
+[36m7fb3ae83a415_kripto-bot-live |[0m FORM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m FORM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FORM/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EGLD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EGLD/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 4.62
+[36m7fb3ae83a415_kripto-bot-live |[0m EGLD/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m EGLD/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for EGLD/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PEOPLE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PEOPLE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00657
+[36m7fb3ae83a415_kripto-bot-live |[0m PEOPLE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m PEOPLE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PEOPLE/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SOLV/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SOLV/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00534
+[36m7fb3ae83a415_kripto-bot-live |[0m SOLV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SOLV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SOLV/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HIGH/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HIGH/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.144
+[36m7fb3ae83a415_kripto-bot-live |[0m HIGH/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m HIGH/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for HIGH/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 220/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TREE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TREE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0659
+[36m7fb3ae83a415_kripto-bot-live |[0m TREE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m TREE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TREE/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ALT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ALT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0084
+[36m7fb3ae83a415_kripto-bot-live |[0m ALT/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ALT/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ALT/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ACM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ACM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.413
+[36m7fb3ae83a415_kripto-bot-live |[0m ACM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AMP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AMP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.001611
+[36m7fb3ae83a415_kripto-bot-live |[0m AMP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m AMP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AMP/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv POLYX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: POLYX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.044
+[36m7fb3ae83a415_kripto-bot-live |[0m POLYX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 POLYX/USDT blocked by Negative Funding: -0.0470%
+[36m7fb3ae83a415_kripto-bot-live |[0m POLYX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 POLYX/USDT blocked by Negative Funding: -0.0470%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for POLYX/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PROM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PROM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.165
+[36m7fb3ae83a415_kripto-bot-live |[0m PROM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m PROM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PROM/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LUNA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LUNA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0624
+[36m7fb3ae83a415_kripto-bot-live |[0m LUNA/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m LUNA/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LUNA/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MIRA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MIRA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0872
+[36m7fb3ae83a415_kripto-bot-live |[0m MIRA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MANA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MANA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1017
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GRT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GRT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0275
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BIFI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BIFI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 127.9
+[36m7fb3ae83a415_kripto-bot-live |[0m BIFI/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BIFI/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BIFI/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FUN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FUN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.001325
+[36m7fb3ae83a415_kripto-bot-live |[0m FUN/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 FUN/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m FUN/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 FUN/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FUN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FUN/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.001325
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed FUN/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KITE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.167
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FUN/USDT: ENTRY (Score: 4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (4.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for FUN/USDT: 1.76% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=5.10
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 5.10 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PLUME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PLUME/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01126
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NXPC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NXPC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2877
+[36m7fb3ae83a415_kripto-bot-live |[0m NXPC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m NXPC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for NXPC/USDT: HOLD (Score: -2.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BANANA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BANANA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 4.63
+[36m7fb3ae83a415_kripto-bot-live |[0m BANANA/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BANANA/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BANANA/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CVC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CVC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.03245
+[36m7fb3ae83a415_kripto-bot-live |[0m CVC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 CVC/USDT blocked by Negative Funding: -0.0338%
+[36m7fb3ae83a415_kripto-bot-live |[0m CVC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 CVC/USDT blocked by Negative Funding: -0.0338%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CVC/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MOVE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MOVE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0226
+[36m7fb3ae83a415_kripto-bot-live |[0m MOVE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m MOVE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MOVE/USDT: HOLD (Score: 0.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LAYER/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LAYER/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0822
+[36m7fb3ae83a415_kripto-bot-live |[0m LAYER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m LAYER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LAYER/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NEO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NEO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 2.757
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv COW/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: COW/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1691
+[36m7fb3ae83a415_kripto-bot-live |[0m COW/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 COW/USDT Entry triggered by High Score (4.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 240/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MEME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MEME/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.000716
+[36m7fb3ae83a415_kripto-bot-live |[0m MEME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MEME/USDT blocked by Negative Funding: -0.0064%
+[36m7fb3ae83a415_kripto-bot-live |[0m MEME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 MEME/USDT blocked by Negative Funding: -0.0064%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MEME/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZRX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZRX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1082
+[36m7fb3ae83a415_kripto-bot-live |[0m ZRX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZRX/USDT blocked by Negative Funding: -0.0458%
+[36m7fb3ae83a415_kripto-bot-live |[0m ZRX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZRX/USDT blocked by Negative Funding: -0.0458%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ZRX/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ALPINE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ALPINE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.412
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TURBO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TURBO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.001054
+[36m7fb3ae83a415_kripto-bot-live |[0m TURBO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m TURBO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TURBO/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PUNDIX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PUNDIX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1645
+[36m7fb3ae83a415_kripto-bot-live |[0m PUNDIX/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 PUNDIX/USDT Entry triggered by High Score (2.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m PUNDIX/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 PUNDIX/USDT Entry triggered by High Score (2.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PUNDIX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PUNDIX/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.1645
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 PUNDIX/USDT: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PUNDIX/USDT: ENTRY (Score: 2.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (2.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for PUNDIX/USDT: 1.48% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=2.83
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 2.83 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BABY/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BABY/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01375
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HMSTR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HMSTR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0001729
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ACE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ACE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.177
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv THETA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: THETA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.203
+[36m7fb3ae83a415_kripto-bot-live |[0m THETA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 THETA/USDT blocked by Negative Funding: -0.0028%
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MINA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MINA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0647
+[36m7fb3ae83a415_kripto-bot-live |[0m MINA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AXL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AXL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0581
+[36m7fb3ae83a415_kripto-bot-live |[0m AXL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AXL/USDT blocked by Negative Funding: -0.0125%
+[36m7fb3ae83a415_kripto-bot-live |[0m AXL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 AXL/USDT blocked by Negative Funding: -0.0125%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AXL/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv STO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: STO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.055
+[36m7fb3ae83a415_kripto-bot-live |[0m STO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m STO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for STO/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TNSR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TNSR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0438
+[36m7fb3ae83a415_kripto-bot-live |[0m TNSR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m TNSR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TNSR/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BANK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BANK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0303
+[36m7fb3ae83a415_kripto-bot-live |[0m BANK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BANK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BANK/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CELO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CELO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0837
+[36m7fb3ae83a415_kripto-bot-live |[0m CELO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 CELO/USDT Entry triggered by High Score (3.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m CELO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 CELO/USDT Entry triggered by High Score (3.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CELO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CELO/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.0837
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed CELO/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CELO/USDT: ENTRY (Score: 3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (3.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for CELO/USDT: 1.26% (LOW) | Regime: NEUTRAL
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=3.97
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 3.97 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv A/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: A/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0831
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KSM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KSM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 4.37
+[36m7fb3ae83a415_kripto-bot-live |[0m KSM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 KSM/USDT blocked by Negative Funding: -0.0046%
+[36m7fb3ae83a415_kripto-bot-live |[0m KSM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 KSM/USDT blocked by Negative Funding: -0.0046%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for KSM/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SUSHI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SUSHI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2039
+[36m7fb3ae83a415_kripto-bot-live |[0m SUSHI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SUSHI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SUSHI/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MBL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MBL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.000987
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ✨ MBL/USDT MTF Consensus! Score: 5.50 -> 6.32
+[36m7fb3ae83a415_kripto-bot-live |[0m MBL/USDT VP Score: -2.0 | Reason: Near VAH (Resistance Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m MBL/USDT VP Score: -2.0 | Reason: Near VAH (Resistance Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MBL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MBL/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.000987
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed MBL/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MBL/USDT: ENTRY (Score: -3.00)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (-3.0). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for MBL/USDT: 1.07% (LOW) | Regime: TRENDING
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=2.27
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 2.27 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZKC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZKC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0866
+[36m7fb3ae83a415_kripto-bot-live |[0m ZKC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZKC/USDT blocked by Negative Funding: -0.0041%
+[36m7fb3ae83a415_kripto-bot-live |[0m ZKC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ZKC/USDT blocked by Negative Funding: -0.0041%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ZKC/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 260/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TURTLE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TURTLE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0405
+[36m7fb3ae83a415_kripto-bot-live |[0m TURTLE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m TURTLE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for TURTLE/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LPT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LPT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 2.413
+[36m7fb3ae83a415_kripto-bot-live |[0m LPT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LPT/USDT blocked by Negative Funding: -0.0046%
+[36m7fb3ae83a415_kripto-bot-live |[0m LPT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 LPT/USDT blocked by Negative Funding: -0.0046%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LPT/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BAR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BAR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.464
+[36m7fb3ae83a415_kripto-bot-live |[0m BAR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BAR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BAR/USDT: EXIT (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RSR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RSR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.001657
+[36m7fb3ae83a415_kripto-bot-live |[0m RSR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m RSR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for RSR/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PORTO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PORTO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.921
+[36m7fb3ae83a415_kripto-bot-live |[0m PORTO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m PORTO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PORTO/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv OM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: OM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0451
+[36m7fb3ae83a415_kripto-bot-live |[0m OM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 OM/USDT blocked by Negative Funding: -0.0070%
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XVS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XVS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.3
+[36m7fb3ae83a415_kripto-bot-live |[0m XVS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m XVS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for XVS/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WOO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WOO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0172
+[36m7fb3ae83a415_kripto-bot-live |[0m WOO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m WOO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WOO/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FORTH/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FORTH/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.101
+[36m7fb3ae83a415_kripto-bot-live |[0m FORTH/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m FORTH/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FORTH/USDT: HOLD (Score: -2.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv COMP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: COMP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 16.9
+[36m7fb3ae83a415_kripto-bot-live |[0m COMP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 COMP/USDT blocked by Negative Funding: -0.0088%
+[36m7fb3ae83a415_kripto-bot-live |[0m COMP/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 COMP/USDT blocked by Negative Funding: -0.0088%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for COMP/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv USUAL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: USUAL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01503
+[36m7fb3ae83a415_kripto-bot-live |[0m USUAL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m USUAL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for USUAL/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv YB/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: YB/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1551
+[36m7fb3ae83a415_kripto-bot-live |[0m YB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m YB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for YB/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GMT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GMT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01232
+[36m7fb3ae83a415_kripto-bot-live |[0m GMT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m GMT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for GMT/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BAT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BAT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1208
+[36m7fb3ae83a415_kripto-bot-live |[0m BAT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BAT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BAT/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ZBT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ZBT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0657
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ACA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ACA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0037
+[36m7fb3ae83a415_kripto-bot-live |[0m ACA/USDT VP Score: -2.0 | Reason: Near VAH (Resistance Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ACA/USDT VP Score: -2.0 | Reason: Near VAH (Resistance Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ACA/USDT: HOLD (Score: -8.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BB/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BB/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0325
+[36m7fb3ae83a415_kripto-bot-live |[0m BB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BB/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ERA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ERA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1549
+[36m7fb3ae83a415_kripto-bot-live |[0m ERA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ERA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ERA/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CKB/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CKB/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00167
+[36m7fb3ae83a415_kripto-bot-live |[0m CKB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m CKB/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CKB/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RONIN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RONIN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0955
+[36m7fb3ae83a415_kripto-bot-live |[0m RONIN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 RONIN/USDT blocked by Negative Funding: -0.0010%
+[36m7fb3ae83a415_kripto-bot-live |[0m RONIN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 RONIN/USDT blocked by Negative Funding: -0.0010%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for RONIN/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 280/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GLM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GLM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1911
+[36m7fb3ae83a415_kripto-bot-live |[0m GLM/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 GLM/USDT blocked by Negative Funding: -0.0036%
+[36m7fb3ae83a415_kripto-bot-live |[0m GLM/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 GLM/USDT blocked by Negative Funding: -0.0036%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for GLM/USDT: HOLD (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BTTC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BTTC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.3e-07
+[36m7fb3ae83a415_kripto-bot-live |[0m BTTC/USDT VP Score: -2.0 | Reason: Near VAH (Resistance Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BTTC/USDT VP Score: -2.0 | Reason: Near VAH (Resistance Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BTTC/USDT: HOLD (Score: -5.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv METIS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: METIS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.67
+[36m7fb3ae83a415_kripto-bot-live |[0m METIS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 METIS/USDT blocked by Negative Funding: -0.0054%
+[36m7fb3ae83a415_kripto-bot-live |[0m METIS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 METIS/USDT blocked by Negative Funding: -0.0054%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for METIS/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv USTC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: USTC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00468
+[36m7fb3ae83a415_kripto-bot-live |[0m USTC/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TLM/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TLM/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00171
+[36m7fb3ae83a415_kripto-bot-live |[0m TLM/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 TLM/USDT blocked by Negative Funding: -0.2801%
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BNSOL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BNSOL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 95.1
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WAXP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WAXP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00676
+[36m7fb3ae83a415_kripto-bot-live |[0m WAXP/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WAXP/USDT blocked by Negative Funding: -0.0351%
+[36m7fb3ae83a415_kripto-bot-live |[0m WAXP/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 WAXP/USDT blocked by Negative Funding: -0.0351%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WAXP/USDT: HOLD (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KERNEL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KERNEL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0528
+[36m7fb3ae83a415_kripto-bot-live |[0m KERNEL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 KERNEL/USDT blocked by Negative Funding: -0.0239%
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ACH/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ACH/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00716
+[36m7fb3ae83a415_kripto-bot-live |[0m ACH/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ACH/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ACH/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FIDA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FIDA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0198
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv COOKIE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: COOKIE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0197
+[36m7fb3ae83a415_kripto-bot-live |[0m COOKIE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m COOKIE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for COOKIE/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EPIC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EPIC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.305
+[36m7fb3ae83a415_kripto-bot-live |[0m EPIC/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m EPIC/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for EPIC/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SYN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SYN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0579
+[36m7fb3ae83a415_kripto-bot-live |[0m SYN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SYN/USDT blocked by Negative Funding: -0.0435%
+[36m7fb3ae83a415_kripto-bot-live |[0m SYN/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SYN/USDT blocked by Negative Funding: -0.0435%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SYN/USDT: HOLD (Score: -10.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SCR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SCR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.05049
+[36m7fb3ae83a415_kripto-bot-live |[0m SCR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SCR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SCR/USDT: HOLD (Score: -2.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ID/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ID/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0512
+[36m7fb3ae83a415_kripto-bot-live |[0m ID/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ID/USDT blocked by Negative Funding: -0.0887%
+[36m7fb3ae83a415_kripto-bot-live |[0m ID/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 ID/USDT blocked by Negative Funding: -0.0887%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ID/USDT: HOLD (Score: -14.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SAPIEN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SAPIEN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0817
+[36m7fb3ae83a415_kripto-bot-live |[0m SAPIEN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SAPIEN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SAPIEN/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ONT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ONT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0455
+[36m7fb3ae83a415_kripto-bot-live |[0m ONT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ONT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ONT/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HYPER/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HYPER/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0978
+[36m7fb3ae83a415_kripto-bot-live |[0m HYPER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 HYPER/USDT blocked by Negative Funding: -0.0393%
+[36m7fb3ae83a415_kripto-bot-live |[0m HYPER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 HYPER/USDT blocked by Negative Funding: -0.0393%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for HYPER/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HIVE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HIVE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0724
+[36m7fb3ae83a415_kripto-bot-live |[0m HIVE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 HIVE/USDT blocked by Negative Funding: -0.0128%
+[36m7fb3ae83a415_kripto-bot-live |[0m HIVE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 HIVE/USDT blocked by Negative Funding: -0.0128%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for HIVE/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv STRAX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: STRAX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01514
+[36m7fb3ae83a415_kripto-bot-live |[0m STRAX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m STRAX/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for STRAX/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 300/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv IQ/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: IQ/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.001235
+[36m7fb3ae83a415_kripto-bot-live |[0m IQ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m IQ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for IQ/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KMNO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KMNO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.03022
+[36m7fb3ae83a415_kripto-bot-live |[0m KMNO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m KMNO/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for KMNO/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RVN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RVN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00588
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv G/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: G/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00363
+[36m7fb3ae83a415_kripto-bot-live |[0m G/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 G/USDT blocked by Negative Funding: -0.0499%
+[36m7fb3ae83a415_kripto-bot-live |[0m G/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 G/USDT blocked by Negative Funding: -0.0499%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for G/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv AEVO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: AEVO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0288
+[36m7fb3ae83a415_kripto-bot-live |[0m AEVO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m AEVO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for AEVO/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RAD/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RAD/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.239
+[36m7fb3ae83a415_kripto-bot-live |[0m RAD/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m RAD/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for RAD/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SUPER/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SUPER/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1238
+[36m7fb3ae83a415_kripto-bot-live |[0m SUPER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SUPER/USDT blocked by Negative Funding: -0.0179%
+[36m7fb3ae83a415_kripto-bot-live |[0m SUPER/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 SUPER/USDT blocked by Negative Funding: -0.0179%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SUPER/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XAI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XAI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01034
+[36m7fb3ae83a415_kripto-bot-live |[0m XAI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m XAI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for XAI/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv STORJ/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: STORJ/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1006
+[36m7fb3ae83a415_kripto-bot-live |[0m STORJ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 STORJ/USDT blocked by Negative Funding: -0.0067%
+[36m7fb3ae83a415_kripto-bot-live |[0m STORJ/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 STORJ/USDT blocked by Negative Funding: -0.0067%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for STORJ/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv NOT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: NOT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.000396
+[36m7fb3ae83a415_kripto-bot-live |[0m NOT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv COTI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: COTI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0121
+[36m7fb3ae83a415_kripto-bot-live |[0m COTI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m COTI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for COTI/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv RARE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: RARE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0193
+[36m7fb3ae83a415_kripto-bot-live |[0m RARE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LRC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LRC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0393
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ONE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ONE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00254
+[36m7fb3ae83a415_kripto-bot-live |[0m ONE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ONE/USDT Entry triggered by High Score (2.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m ONE/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ONE/USDT Entry triggered by High Score (2.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ONE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ONE/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 0.00254
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 ONE/USDT: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KITE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.167
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ONE/USDT: ENTRY (Score: 2.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Yetersiz Bakiye (1/10). Swap fırsatı aranıyor...
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔍 Swap Aday Kontrolü: KITE/USDT Skor: 12.5
+[36m7fb3ae83a415_kripto-bot-live |[0m ✋ Swap yapılmadı. En kötü KITE/USDT (12.5) vs Aday (2.5). Fark yetersiz.
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Volatility Analysis for ONE/USDT: 1.56% (LOW) | Regime: TRENDING
+[36m7fb3ae83a415_kripto-bot-live |[0m 🎯 Recommended: Leverage 3x, Size 35.0% ($3.78)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚖️ Pozisyon Hesaplama (Phase 2): Bakiye=10.79 (Free: 0.29) | Risk=LOW | Kaldıraç=3x | Hedef Notional=2.83
+[36m7fb3ae83a415_kripto-bot-live |[0m 📉 Bakiye Koruması: Tutar 2.83 -> 0.85 olarak sınırlandı (Free: 0.29)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚠️ Yetersiz Bakiye: 0.85 < 10.0. İşlem iptal.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BIGTIME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BIGTIME/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01485
+[36m7fb3ae83a415_kripto-bot-live |[0m BIGTIME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m BIGTIME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for BIGTIME/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MASK/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MASK/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.463
+[36m7fb3ae83a415_kripto-bot-live |[0m MASK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m MASK/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MASK/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv FTT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: FTT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.3082
+[36m7fb3ae83a415_kripto-bot-live |[0m FTT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m FTT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for FTT/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DEXE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DEXE/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 2.102
+[36m7fb3ae83a415_kripto-bot-live |[0m DEXE/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TST/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TST/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01019
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CGPT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CGPT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.02083
+[36m7fb3ae83a415_kripto-bot-live |[0m CGPT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m CGPT/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CGPT/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 320/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LUMIA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LUMIA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0648
+[36m7fb3ae83a415_kripto-bot-live |[0m LUMIA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m LUMIA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LUMIA/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PIVX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PIVX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0949
+[36m7fb3ae83a415_kripto-bot-live |[0m PIVX/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m PIVX/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PIVX/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CELR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CELR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.002465
+[36m7fb3ae83a415_kripto-bot-live |[0m CELR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GNO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GNO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 125.83
+[36m7fb3ae83a415_kripto-bot-live |[0m GNO/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 GNO/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m GNO/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚀 GNO/USDT Entry triggered by High Score (10.50) - Override
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv GNO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: GNO/USDT Last Candle Time: 2026-02-09 00:00:00 | Close: 125.83
+[36m7fb3ae83a415_kripto-bot-live |[0m ✅ Multi-TF Confirmed GNO/USDT: 4h Trend is UP
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KITE/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m 🔗 Correlation Alert: GNO/USDT is highly correlated with held KITE/USDT (0.86). Skipping to diversify.
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SKL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SKL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00663
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MTL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MTL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.273
+[36m7fb3ae83a415_kripto-bot-live |[0m MTL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m MTL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MTL/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BAND/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BAND/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.246
+[36m7fb3ae83a415_kripto-bot-live |[0m BAND/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CHR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CHR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0278
+[36m7fb3ae83a415_kripto-bot-live |[0m CHR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m CHR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CHR/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv EDEN/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: EDEN/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0322
+[36m7fb3ae83a415_kripto-bot-live |[0m EDEN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m EDEN/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for EDEN/USDT: HOLD (Score: 1.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ILV/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ILV/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 3.97
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv REZ/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: REZ/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0031
+[36m7fb3ae83a415_kripto-bot-live |[0m REZ/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m REZ/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for REZ/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TUT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TUT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01079
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HFT/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HFT/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0184
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv PIXEL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: PIXEL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00547
+[36m7fb3ae83a415_kripto-bot-live |[0m PIXEL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m PIXEL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for PIXEL/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ASTR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ASTR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00766
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SHELL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SHELL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0307
+[36m7fb3ae83a415_kripto-bot-live |[0m SHELL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m SHELL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for SHELL/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv BLUR/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: BLUR/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.02025
+[36m7fb3ae83a415_kripto-bot-live |[0m BLUR/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 BLUR/USDT blocked by Negative Funding: -0.0006%
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv HEI/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: HEI/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0855
+[36m7fb3ae83a415_kripto-bot-live |[0m HEI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m HEI/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for HEI/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LAZIO/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LAZIO/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.797
+[36m7fb3ae83a415_kripto-bot-live |[0m LAZIO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m LAZIO/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LAZIO/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv CETUS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: CETUS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01597
+[36m7fb3ae83a415_kripto-bot-live |[0m CETUS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m CETUS/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for CETUS/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⏳ Scanned 340/400 symbols...
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv XEC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: XEC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 7.83e-06
+[36m7fb3ae83a415_kripto-bot-live |[0m XEC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m XEC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for XEC/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv T/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: T/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00697
+[36m7fb3ae83a415_kripto-bot-live |[0m T/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m T/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for T/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv DOGS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: DOGS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 2.91e-05
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv D/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: D/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00964
+[36m7fb3ae83a415_kripto-bot-live |[0m D/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m D/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for D/USDT: HOLD (Score: -4.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv KNC/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: KNC/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1489
+[36m7fb3ae83a415_kripto-bot-live |[0m KNC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 KNC/USDT blocked by Negative Funding: -0.0023%
+[36m7fb3ae83a415_kripto-bot-live |[0m KNC/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 KNC/USDT blocked by Negative Funding: -0.0023%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for KNC/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv VANA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: VANA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 1.495
+[36m7fb3ae83a415_kripto-bot-live |[0m VANA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 VANA/USDT blocked by Negative Funding: -0.0022%
+[36m7fb3ae83a415_kripto-bot-live |[0m VANA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m 🚫 VANA/USDT blocked by Negative Funding: -0.0022%
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for VANA/USDT: HOLD (Score: -19.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MBOX/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MBOX/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0207
+[36m7fb3ae83a415_kripto-bot-live |[0m MBOX/USDT VP Score: 2.0 | Reason: Near VAL (Support Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TFUEL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TFUEL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01481
+[36m7fb3ae83a415_kripto-bot-live |[0m TFUEL/USDT VP Score: 3.0 | Reason: Above VAH (Breakout Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv SFP/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: SFP/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.2706
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv ME/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: ME/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.1376
+[36m7fb3ae83a415_kripto-bot-live |[0m ME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ME/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for ME/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv TOWNS/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: TOWNS/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.00438
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv WAL/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: WAL/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0828
+[36m7fb3ae83a415_kripto-bot-live |[0m WAL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m WAL/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for WAL/USDT: HOLD (Score: -3.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv LISTA/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: LISTA/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.0981
+[36m7fb3ae83a415_kripto-bot-live |[0m LISTA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m LISTA/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for LISTA/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MAV/USDT Mock=False
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: MAV/USDT Last Candle Time: 2026-02-09 02:00:00 | Close: 0.01712
+[36m7fb3ae83a415_kripto-bot-live |[0m MAV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m MAV/USDT VP Score: -3.0 | Reason: Below VAL (Weak Zone)
+[36m7fb3ae83a415_kripto-bot-live |[0m ⚡ Signal Detected for MAV/USDT: HOLD (Score: -9.50)
+[36m7fb3ae83a415_kripto-bot-live |[0m DEBUG: get_ohlcv MOVR/USDT Mock=False

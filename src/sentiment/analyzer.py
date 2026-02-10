@@ -192,6 +192,83 @@ class SentimentAnalyzer:
             'reddit': reddit_sentiment,
             'signal': self._get_signal(combined_score)
         }
+
+    def get_fear_and_greed_index(self) -> Dict:
+        """
+        Fetches the Fear and Greed Index from Alternative.me API.
+        Returns:
+            Dict: {'value': int, 'value_classification': str, 'timestamp': int}
+            or default neutral values on error.
+        """
+        import requests
+        try:
+            url = "https://api.alternative.me/fng/?limit=1"
+            response = requests.get(url, timeout=10)
+            data = response.json()
+            if data.get('metadata', {}).get('error') is None:
+                item = data['data'][0]
+                return {
+                    'value': int(item['value']),
+                    'value_classification': item['value_classification'],
+                    'timestamp': int(item['timestamp'])
+                }
+        except Exception as e:
+            log(f"⚠️ Fear & Greed Index fetch failed: {e}")
+        
+        return {
+            'value': 50,
+            'value_classification': 'Neutral',
+            'timestamp': 0
+        }
+
+    async def get_futures_sentiment(self, symbol: str) -> Dict:
+        """
+        Binance Futures Sentiment Verilerini Çeker (Long/Short Ratio, Open Interest).
+        Kullanıcının bahsettiği 'Futures Market' verileri buradan gelir.
+        """
+        import aiohttp
+        
+        # Symbol format adjustment (BTC/USDT -> BTCUSDT)
+        clean_symbol = symbol.replace('/', '')
+        
+        results = {
+            'long_short_ratio': 0.0,
+            'open_interest': 0.0,
+            'sentiment_score': 5.0 # Neutral default
+        }
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                # 1. Long/Short Ratio (Global Accounts)
+                # API: GET /futures/data/globalLongShortAccountRatio
+                ls_url = f"https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol={clean_symbol}&period=5m&limit=1"
+                async with session.get(ls_url, timeout=5) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        if data and len(data) > 0:
+                            ratio = float(data[0]['longShortRatio'])
+                            results['long_short_ratio'] = ratio
+                            
+                            # Basit Yorumlama:
+                            # Ratio > 2.0 -> Aşırı Long (Short Squeeze Riski) -> Bearish
+                            # Ratio < 0.5 -> Aşırı Short (Long Squeeze Fırsatı) -> Bullish
+                            if ratio > 2.5:
+                                results['sentiment_score'] = 3.0 # Bearish
+                            elif ratio < 0.6:
+                                results['sentiment_score'] = 8.0 # Bullish
+                            
+                # 2. Open Interest (Opsiyonel, sadece bilgi için)
+                # oi_url = f"https://fapi.binance.com/fapi/v1/openInterest?symbol={clean_symbol}"
+                # async with session.get(oi_url, timeout=5) as resp:
+                #     if resp.status == 200:
+                #         data = await resp.json()
+                #         results['open_interest'] = float(data['openInterest'])
+                        
+        except Exception as e:
+            log(f"⚠️ Futures Sentiment Error ({symbol}): {e}")
+            
+        return results
+
     
     def _convert_to_score(self, polarity: float) -> float:
         """Polarity (-1 to 1) -> Score (0 to 10)"""

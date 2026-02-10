@@ -159,8 +159,23 @@ class OpportunityManager:
         
         for symbol, data in portfolio.items():
             signal = signal_map.get(symbol)
+            score_source = "fresh"
+            
             # Use cached score if current signal is missing (prevent Score 0 during partial scans)
-            score = signal.score if signal else score_cache.get(symbol, 0)
+            # If both missing, default to -10.0 ONLY IF it's not a fresh buy.
+            # However, for analyze_swap_status, we want to be honest about missing data.
+            # But "0" implies "Neutral", which is misleading if it's actually "Unknown".
+            
+            if signal:
+                score = signal.score
+            else:
+                if symbol in score_cache:
+                    score = score_cache[symbol]
+                    score_source = "cached"
+                else:
+                    score = 0
+                    score_source = "missing_data"
+                # If truly unknown, maybe mark it? But 0 is safe for comparison.
             
             # Hold time check
             hold_time = current_time - data.get('timestamp', 0)
@@ -169,6 +184,7 @@ class OpportunityManager:
             portfolio_scores.append({
                 'symbol': symbol,
                 'score': score,
+                'score_source': score_source,
                 'is_locked': is_locked,
                 'hold_time': hold_time
             })

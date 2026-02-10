@@ -1,238 +1,290 @@
-# Kripto Bot Projesi - Algoritma ve Mimari Dokümantasyonu (v2.2)
+# Proje Algoritma ve Mimari Dokümantasyonu (v2.6)
 
-Bu belge, Kripto Bot projesinin **Binance Global (USDT)** sistem mimarisini, gelişmiş özelliklerini ve operasyonel süreçlerini detaylandırmaktadır. Proje, **USDT** bazlı işlemlere, çoklu strateji yapısına ve düşük bakiye (Sniper Mode) yönetimine odaklanmıştır.
+Bu doküman, Kripto Bot projesinin en güncel (v2.6) teknik mimarisini, algoritma detaylarını ve kod yapısını **en ince ayrıntısına kadar** açıklamaktadır.
 
-> **Not:** v2.2 itibarıyla Paper Trading modu devre dışı bırakılmış ve sadece **LIVE (Canlı)** mod aktiftir.
+---
 
-## 1. Sistem Mimarisi (Global - USDT Focused)
+## 1. Sistem Mimarisi (System Architecture)
 
-Sistem; veri toplama, analiz, karar destek (beyin), yürütme ve izleme katmanlarından oluşan modüler bir yapıya sahiptir.
+Sistem, **Modüler Ajan Mimarisi (Modular Agent Architecture)** üzerine kuruludur. Her bir modül (Ajan), belirli bir sorumluluk alanına sahiptir ve merkezi bir "Main Loop" tarafından koordine edilir.
+
+### Mimari Şema (Mermaid Diagram)
 
 ```mermaid
 graph TD
-    subgraph Data Layer
-        A1[Binance Global Loader (CCXT)]
-        A2[Funding Rate Loader]
-        A3[Sentiment Analyzer]
-    end
+%% Veri Katmanı
+subgraph Data_Layer [Veri Katmanı]
+    DL1[Binance Global API (CCXT)] -->|OHLCV & Ticker| AL1
+    DL2[Funding Rate Loader] -->|8h Rates| AL3
+    DL3[Sentiment Analyzer] -->|Futures L/S Ratio| AL2
+    DL4[Wallet Manager] -->|Balance & Positions| EXEC
+end
+
+%% Analiz Katmanı
+subgraph Analysis_Layer [Analiz Katmanı]
+    AL1[Market Analyzer]
+    AL2[Sentiment Score]
+    AL3[Funding Strategy]
+    AL4[Volume Profile & OrderBook]
+    AL5[Market Regime Detector]
     
-    subgraph Analysis Layer
-        B1[Market Analyzer Technical]
-        B2[Multi-Timeframe Analysis]
-        B3[Sentiment Score]
-        B4[Advanced Indicators]
-        B5[Market Regime Detector]
-    end
+    AL1 -->|Technical Signals| DL_DECISION
+    AL2 -->|Sentiment Boost| DL_DECISION
+    AL3 -->|Long/Short Block| DL_DECISION
+    AL4 -->|Support/Resistance| DL_DECISION
+    AL5 -->|Trend/Range| DL_DECISION
+end
+
+%% Karar Katmanı (Decision Engine)
+subgraph Decision_Engine [Karar Motoru]
+    DL_DECISION{TradeSignal Generator}
     
-    subgraph Decision Layer
-        C1[Multi-Strategy Manager (Phase 5)]
-        C2[Voting System]
-        C3[Safety Checks & Risk Manager]
-        C4[Regime Adaptive Strategy]
-    end
+    DL_DECISION -->|Score Calculation| SCORE[Skor Hesaplama]
+    SCORE -->|Base Score| STRAT[Strateji Ağırlıkları]
+    STRAT -->|Final Score| FILTERS[Filtreler]
     
-    subgraph Execution Layer
-        D1[Executor (Global/USDT)]
-        D4[Wallet & Asset Manager]
-        D5[Position Sizer (Volatility Based)]
-        D6[Sniper Mode (Low Balance)]
-    end
-    
-    subgraph Infrastructure Layer
-        I1[Docker Containerization]
-        I2[AWS EC2 Cloud]
-        I3[Advanced Dashboard (USDT)]
-    end
-    
-    A1 & A2 --> B1 & B2 & B4 & B5
-    A3 --> B3
-    B1 & B2 & B3 & B4 & B5 --> C1
-    C1 --> C2 --> C3 --> C4 --> D1
-    C3 --> D1
-    D1 --> D5 --> D4
-    D4 --> D6
-    D1 --> I3
+    FILTERS -->|Is Safe?| RISK[Risk & Safety Check]
+    RISK -->|Approved| SNIPER[Sniper Mode Logic]
+    SNIPER -->|Low Balance?| OPP[Opportunity Manager]
+    OPP -->|Swap Needed?| CONFIRM[3-Loop Confirmation]
+end
+
+%% Öğrenme Katmanı (Learning Layer)
+subgraph Learning_Layer [Öğrenme Katmanı (Brain)]
+    EXEC -->|Trade Result (PnL)| BRAIN[BotBrain]
+    BRAIN -->|Update Weights| STRAT
+    BRAIN -->|Ghost Trades| GHOST[Sanal Takip]
+    BRAIN -->|Performance Regime| RISK
+end
+
+%% Yürütme Katmanı (Execution)
+subgraph Execution_Layer [Yürütme Katmanı]
+    CONFIRM -->|Approved| EXEC[Executor]
+    EXEC -->|Order| BINANCE[Binance Exchange]
+    EXEC -->|Sync| WALLET
+    WALLET -->|Dust| DUST[Dust Converter]
+end
+
+Data_Layer --> Analysis_Layer
+Analysis_Layer --> Decision_Engine
+Decision_Engine --> Execution_Layer
+Execution_Layer --> Learning_Layer
 ```
 
 ---
 
-## 2. Gelişmiş Özellikler: Mantık ve Örnekler
+## 2. Temel Veri Modelleri (Core Data Models)
 
-Botun sahip olduğu kritik risk yönetimi, strateji ve bakiye yönetimi özelliklerinin detaylı çalışma mantığı aşağıdadır.
+Sistemin kalbinde, modüller arası veri taşıyan standartlaştırılmış sınıflar bulunur.
 
-### 2.1. Sniper Modu ve Dust (Toz) Yönetimi (YENİ)
-Düşük bakiyelerde (<50$) botun verimliliğini korumak ve "bakiye erimesi" sorununu önlemek için geliştirilmiş özel bir moddur.
+### 2.1. TradeSignal (Sinyal Paketi)
+`src/strategies/analyzer.py` içinde tanımlıdır. Analiz katmanının çıktısıdır.
 
-*   **Sniper Modu:**
-    *   Toplam bakiye **50 USDT** altına düştüğünde otomatik aktifleşir.
-    *   Mevcut tüm pozisyonları satıp nakite geçmeye odaklanır.
-    *   Tek bir "En İyi" sinyale tüm bakiye (All-In) ile girer.
-*   **Dust (Toz) Temizliği:**
-    *   Değeri **6 USDT** (veya 10 USDT) altında kalan ve satılamayan (Binance min. işlem limiti altı) "toz" varlıkları algılar.
-    *   Bu varlıkları otomatik olarak **BNB'ye dönüştürür** (`convert_dust_to_bnb`).
-    *   Böylece küçük bakiyelerin cüzdanda atıl kalması ve swap döngüsüne girmesi engellenir.
-*   **0.0 Fiyat Koruması:**
-    *   Satış sırasında API'den fiyat `0.0` dönerse, anlık fiyat tekrar sorgulanır.
-    *   Hatalı fiyatla satış yapılması ve bakiyenin yanlış hesaplanması engellenir.
+```python
+class TradeSignal(BaseModel):
+    symbol: str
+    action: str            # "ENTRY", "EXIT", "HOLD"
+    direction: str         # "LONG" (Spot için)
+    score: float           # -20.0 ile +20.0 arası puan
+    estimated_yield: float # Tahmini getiri (Opsiyonel)
+    timestamp: int         # Sinyal üretim zamanı (Unix Epoch)
+    details: Dict          # İndikatör değerleri (RSI, MACD vb.)
+    primary_strategy: Optional[str] = None # "high_score_override" vb.
+```
 
-### 2.2. Funding Rate Strateji Entegrasyonu
-Funding Rate (Fonlama Oranı), vadeli işlemler piyasasında pozisyon tutanların birbirine ödediği komisyondur. Piyasa yönü hakkında güçlü sinyaller verir.
-
-*   **Mantık:**
-    *   **Veri:** `FundingRateLoader` her 8 saatte bir tüm paritelerin oranlarını çeker.
-    *   **Pozitif (>%0.05):** Long pozisyonlar için destekleyici (Boğa piyasası emaresi). Skoru artırır.
-    *   **Negatif (<-%0.05):** Short baskısı veya düşüş beklentisi. Long işlemleri **bloklar**.
-
-### 2.3. Trailing Stop Loss (İz Süren Stop)
-Fiyat lehimize hareket ettiğinde karı korumak için stop seviyesini yukarı taşıyan mekanizmadır.
-
-*   **Mantık:**
-    *   **Başlangıç:** Giriş fiyatının %5 altı (veya ATR katı).
-    *   **Güncelleme:** Fiyat her yeni zirve yaptığında, stop seviyesi de `(Yeni Zirve - ATR)` seviyesine çekilir.
-    *   Stop seviyesi asla aşağı inmez.
-
-### 2.4. Kısmi Kar Realizasyonu (Partial Take Profit)
-Pozisyon hedefe gitmeden dönerse elde edilen karın bir kısmını garantiye almak için kullanılır.
-
-*   **Mantık:**
-    *   Pozisyon **%4** kara ulaştığında tetiklenir.
-    *   Mevcut miktarın **%50'si** o anki fiyattan satılır.
-    *   Kalan %50 için Stop Loss seviyesi **Giriş Fiyatına (Breakeven)** çekilir.
-
-### 2.5. Portföy Limitleri ve Smart Swap
-Sermayeyi korumak ve en iyi fırsatları değerlendirmek için portföy yönetimi yapar.
-
-*   **Limit:** Maksimum **4** açık pozisyon.
-*   **Smart Swap (Akıllı Değişim):**
-    *   Portföy dolu (4/4) iken çok yüksek skorlu (örn. 8.5/10) yeni bir fırsat gelirse:
-    *   Mevcut portföydeki en düşük skorlu pozisyonu satar.
-    *   **Dust Kontrolü:** Satış sonrası kalan bakiye "toz" ise BNB'ye çevrilir ve hafızadan silinir.
-    *   Yeni ve güçlü olan pozisyon açılır.
+### 2.2. Market Regime (Piyasa Rejimi)
+İki farklı rejim analizi yapılır:
+1.  **Teknik Rejim (`src/analysis/market_regime.py`):** Fiyat hareketine dayalı (TRENDING, RANGING).
+2.  **Performans Rejimi (`src/learning/brain.py`):** Botun başarısına dayalı (BULL, BEAR, CRASH).
 
 ---
 
-## 3. Dashboard ve Metrikler
+## 3. Algoritma Detayları ve Kod Akışı
 
-Dashboard (`src/dashboard.py`), botun **Canlı (Live)** durumunu gösterir. Paper trading modu kaldırılmıştır.
+Botun "Main Loop" (`src/main.py`) içindeki her bir döngüsü şu adımları izler:
 
-### 3.1. Kritik Metrikler
-*   **Toplam Bakiye (USDT):** Cüzdandaki USDT ve coinlerin toplam USDT değeri.
-*   **Günlük PnL:** O gün içinde yapılan işlemlerden elde edilen Kar/Zarar oranı. **% -5.0** altına düşerse bot o gün için işlem yapmayı durdurur (Circuit Breaker).
-*   **Brain Planı:** Botun neden işlem açtığına veya neden beklediğine dair yapay zeka yorumları.
-*   **Market Rejimi:** Piyasanın Yönü (TREND/SIDEWAYS) ve Volatilitesi.
+### Adım 1: Piyasa Rejimi Tespiti (Market Regime Detection)
+Her döngü başında BTC verisi analiz edilir.
+
+```python
+# src/analysis/market_regime.py
+def detect_regime(self, df: pd.DataFrame) -> Dict[str, Any]:
+    # Bollinger Band Genişliği (Volatilite Göstergesi)
+    curr_bb_width = (curr['BB_Upper'] - curr['BB_Lower']) / curr['BB_Middle']
+    bb_widening = curr_bb_width > prev_bb_width
+    
+    # ADX (Trend Gücü)
+    adx = curr.get('ADX', 0)
+    
+    if adx > 25 and bb_widening:
+        return "TRENDING"
+    elif adx < 20 and bb_narrow:
+        return "RANGING"
+    else:
+        return "NEUTRAL"
+```
+
+### Adım 2: Sinyal Üretimi ve Puanlama (Scoring System)
+Her coin için `analyze_spot` fonksiyonu çalışır. Puanlama **Ağırlıklı Oylama (Weighted Voting)** sistemiyle yapılır.
+
+**Skor Tablosu (Base Score):**
+
+| İndikatör | Koşul | Puan Etkisi | Mantık |
+| :--- | :--- | :--- | :--- |
+| **RSI** | < 30 (Oversold) | +2.0 | Tepki alımı ihtimali. |
+| **RSI** | > 70 (Overbought) | -2.0 | Düşüş riski. |
+| **Golden Cross** | SMA7 > SMA25 | +3.0 | Kısa vadeli yükseliş trendi. |
+| **Death Cross** | SMA7 < SMA25 | -3.0 | Düşüş trendi. |
+| **SuperTrend** | Yeşil (Al) | +2.0 | Trend takibi. |
+| **MACD** | Al Sinyali | +1.5 | Momentum artışı. |
+| **Bollinger** | Alt Band Teması | +2.0 | Destekten dönüş. |
+| **Volume** | Vol > 1.5x Ort. | +1.0 | Hacimli hareket onayı. |
+| **Sentiment** | L/S Ratio > 1.2 | +1.5 | Vadeli piyasa beklentisi pozitif. |
+
+**Öğrenen Ağırlıklar (BotBrain):**
+Her indikatörün etkisi, botun geçmiş performansına göre dinamik olarak değişir.
+```python
+# src/learning/brain.py
+def update_indicator_weights(self, indicator_signals, pnl_pct):
+    lr = 0.02 # Öğrenme hızı
+    if is_win:
+        # Kazandıran indikatörün ağırlığını artır
+        weights[ind] *= (1 + lr)
+    else:
+        # Kaybettirenin ağırlığını azalt
+        weights[ind] *= (1 - lr)
+```
+
+### Adım 3: Karar Motoru (Decision Engine)
+
+Sinyaller toplandıktan sonra bot nasıl hareket edeceğine karar verir. İki ana mod vardır:
+
+#### A. Sniper Mode (Düşük Bakiye / All-In)
+Eğer bakiye az ise ve portföy doluysa, bot **en iyi fırsata** geçmek için "Swap" (Takas) arar.
+
+**5 Puan Kuralı ve 3-Loop Teyit Mekanizması:**
+Botun sürekli al-sat yapıp komisyon eritmesini (Churning) önlemek için katı kurallar vardır.
+
+```python
+# src/strategies/opportunity_manager.py
+
+def check_for_swap_opportunity(self, portfolio, market_signals):
+    worst_asset = min(portfolio, key=lambda x: x.score) # En kötü coin
+    best_opp = max(market_signals, key=lambda x: x.score) # En iyi fırsat
+    
+    score_diff = best_opp.score - worst_asset.score
+    
+    # KURAL 1: En az 5.0 puan fark olmalı
+    if score_diff < 5.0:
+        return None 
+        
+    return {
+        'action': 'SWAP',
+        'sell': worst_asset,
+        'buy': best_opp
+    }
+```
+
+```mermaid
+sequenceDiagram
+participant MainLoop
+participant OpportunityManager
+participant ConfirmationTracker
+participant Executor
+
+MainLoop->>OpportunityManager: Swap Kontrolü Yap
+OpportunityManager-->>MainLoop: Fırsat Var (Fark > 5.0)
+
+MainLoop->>ConfirmationTracker: Bu sinyal kaç kere geldi?
+
+alt Sayaç < 3
+    ConfirmationTracker-->>MainLoop: Henüz 1 veya 2. (Bekle)
+    MainLoop->>MainLoop: İşlem Yapma (Debounce)
+else Sayaç >= 3
+    ConfirmationTracker-->>MainLoop: Teyitli (3/3)
+    MainLoop->>Executor: SAT (Kötü Coin)
+    Executor-->>MainLoop: Satış Başarılı
+    MainLoop->>Executor: AL (İyi Coin)
+end
+```
+
+#### B. Normal Mod (Yüksek Bakiye)
+Bakiye varsa ve `Score > Eşik Değer` (Genelde 1.0) ise alım yapar.
 
 ---
 
-## 4. Operasyonel Checklist (Günlük/Haftalık)
+## 4. Yürütme ve Güvenlik (Execution & Safety)
 
-Botun sağlıklı çalışması için yapılması gereken kontroller:
+`src/execution/executor.py` içindeki mantık, emirlerin borsaya iletilmesini sağlar.
 
-### Günlük Kontroller
-1.  **Dashboard Kontrolü:**
-    *   Bot çalışıyor mu? (Son güncelleme saati güncel mi?)
-    *   **Bakiye Kontrolü:** Beklenmedik düşüş var mı? (Varsa "Dust Loop" kontrolü yapın).
-2.  **Log Kontrolü:**
-    *   `docker-compose logs --tail=100 bot` komutu ile son loglara bakın.
-    *   "ERROR", "Exception" veya "Dust" kelimelerini aratın.
+### Dinamik Miktar ve Min Notional Kontrolü
+Binance'in "En az 5 USDT'lik işlem" kuralına takılmamak için miktar dinamik ayarlanır.
 
-### Haftalık Kontroller
-1.  **Sunucu Kaynakları:**
-    *   AWS/Sunucu disk ve RAM doluluk oranı (`htop`, `df -h`).
-2.  **Güncellemeler:**
-    *   Git reposundan güncellemeleri çekin (`git pull`).
-    *   Docker imajını yeniden derleyin (`docker-compose up -d --build`).
+```python
+async def execute_buy(self, symbol, quantity, price):
+    # Min Notional (Tutar) Kontrolü
+    total_value = quantity * price
+    min_notional = 5.5 # USDT (Güvenlik payı ile)
+    
+    if total_value < min_notional:
+        # Eğer bakiye yetiyorsa miktarı artır
+        required_qty = min_notional / price
+        quantity = required_qty * 1.05 # %5 tampon
+        
+    # Emir Gönder
+    order = await client.create_order(...)
+```
+
+### Güvenlik Duvarları (Safety Valves)
+
+1.  **Günlük Zarar Limiti (Hard Stop):**
+    ```python
+    if daily_pnl < -5.0: # %5 Kayıp
+        emergency_stop = True
+        log("🛑 GÜNLÜK ZARAR LİMİTİ AŞILDI. İşlemler durduruluyor.")
+    ```
+
+2.  **Düşen Bıçak (Falling Knife) Koruması:**
+    Eğer fiyat çok hızlı düşüyorsa (RSI < 30 olsa bile) alım yapmaz.
+
+3.  **Zombie Position Koruması:**
+    Eğer bir coin hacim sıralamasından düşerse (ilk 400 dışı), bot onu unutmaz. Otomatik olarak tarama listesine ekler ve skorunu takip etmeye devam eder.
+
+4.  **Stablecoin Blacklist:**
+    USDT, USDC, FDUSD, TUSD gibi coinler kara listededir, bot bunları asla almaz (Parite/Churning önlemi).
 
 ---
 
-## 5. Troubleshooting (Sorun Giderme)
+## 5. Öğrenme Katmanı (BotBrain)
 
-| Sorun | Olası Neden | Çözüm |
-| :--- | :--- | :--- |
-| **Bakiye Eriyor / Azalıyor** | "Dust Loop" sorunu. Bot küçük bakiyeleri satamayıp komisyon ödüyor olabilir. | **v2.2 ile Çözüldü:** Bot artık <6$ bakiyeleri otomatik BNB'ye çeviriyor. Loglarda "Dust Convert" arayın. |
-| **İşlem Açmıyor** | Bakiye yetersiz, piyasa yatay (regime), veya funding rate negatif. | Dashboard'daki "Brain Planı" sekmesine bakın. "WAIT" veya "Negative Funding" sebebini kontrol edin. |
-| **Dashboard Veri Gelmiyor** | Bot durmuş veya State dosyası bozuk. | `docker-compose logs` ile hatayı bulun. Gerekirse `data/bot_state.json` dosyasını silip yeniden başlatın. |
-| **API Hatası (401/403)** | API Key süresi dolmuş veya IP izni yok. | Binance panelinden API anahtarını ve IP whitelist ayarlarını kontrol edin. |
+Bot, her işlemin sonucunu (Kar/Zarar) kaydeder ve buna göre kendini günceller.
+
+### Hayalet İşlemler (Ghost Trades)
+Botun filtreye takıldığı için **girmediği** işlemleri sanal olarak takip etmesi özelliğidir.
+*"Eğer girseydim ne olurdu?"* sorusunun cevabını arar. Eğer hayalet işlem karlıysa, o filtreyi gevşetir.
+
+```python
+def record_ghost_trade(self, symbol, price, reason):
+    ghost_trade = {
+        "symbol": symbol,
+        "entry_price": price,
+        "reason": reason, # Örn: "Score < 0.75"
+        "status": "ACTIVE"
+    }
+    self.memory["ghost_trades"].append(ghost_trade)
+```
 
 ---
 
-## 6. Roadmap (Yol Haritası)
+## 6. Sıkça Sorulan Sorular ve Sorun Giderme
 
-Projenin gelecek vizyonu ve planlanan geliştirmeler:
+### S: Bot neden işlem yapmıyor?
+1.  **Piyasa Rejimi:** Piyasa "SIDEWAYS" (Yatay) veya "Düşüş" trendinde olabilir.
+2.  **Skor Farkı:** Sniper modunda eldeki coinden daha iyi (en az +5 puan) bir fırsat çıkmamıştır.
+3.  **3-Loop Teyit:** Fırsat çıkmıştır ama henüz 3 döngü (yaklaşık 15-20 saniye) boyunca kalıcı olmamıştır.
 
-*   **Faz 1-5 (Tamamlandı):** Temel altyapı, çoklu strateji, risk yönetimi, dashboard.
-*   **Faz 6 (Q2 2026):** **Machine Learning (ML) Modeli:** Toplanan verilerle eğitilmiş XGBoost/LSTM modelinin karar mekanizmasına dahil edilmesi (Şu an veri toplama modunda).
-*   **Faz 7 (Q3 2026):** **Webhook & TradingView Entegrasyonu:** Dış kaynaklı sinyallerin bota entegre edilmesi.
-*   **Faz 8 (Q4 2026):** **DeFi & DEX Desteği:** Merkeziyetsiz borsalarda (Uniswap/Pancake) işlem yeteneği.
+### S: Neden "Score: 0" görüyorum?
+Genellikle veri henüz tam yüklenmemiştir veya hesaplama hatası olmuştur. v2.5 güncellemesi ile bu durumlarda varsayılan değer atamak yerine "Bekle" durumuna geçilir.
 
----
-
-## 7. Teknik Altyapı Detayları (Technical Infrastructure)
-
-*   **Programlama Dili:** Python 3.9+
-*   **Temel Kütüphaneler:**
-    *   `ccxt`: Binance Global ve TR borsa bağlantısı ve emir yönetimi için.
-    *   `pandas` & `numpy`: Zaman serisi analizi, indikatör hesaplamaları ve veri manipülasyonu için.
-    *   `ta-lib`: RSI, MACD, Bollinger Bands gibi teknik indikatörlerin performanslı hesaplanması için.
-    *   `asyncio`: Eşzamanlı (concurrent) veri tarama ve emir yönetimi için asenkron mimari.
-*   **Veritabanı Yapısı:**
-    *   Proje, karmaşıklığı azaltmak ve taşınabilirliği artırmak için **Dosya Tabanlı (File-Based)** bir yapı kullanır.
-    *   `bot_state.json`: Canlı botun anlık durumu, pozisyonları ve bakiyesi.
-    *   `bot_brain.json`: Beyin sisteminin öğrenilmiş ağırlıkları ve geçmiş işlem istatistikleri.
-    *   Herhangi bir harici SQL/NoSQL veritabanı gerektirmez, bu da kurulumu ve yedeklemeyi kolaylaştırır.
-*   **Mimari:** Modüler "Micro-Service Like" yapı. Executor (Yürütücü), Strategy (Karar), Risk (Denetim) ve Brain (Yönetim) modülleri birbirinden bağımsız çalışır ancak uyum içindedir.
-
-## 8. Strateji Detayları (Strategy Deep Dive)
-
-Bot, tek bir indikatöre güvenmek yerine "Weighted Voting" (Ağırlıklı Oylama) sistemi kullanır. Karar vermek için toplam konsensüsün **%55** (0.55) üzerinde olması gerekir.
-
-### Kullanılan Alt Stratejiler:
-1.  **Breakout Strategy (Ağırlık: 0.4):**
-    *   **Mantık:** Fiyatın sıkışma alanından (Bollinger Squeeze) hacimli bir şekilde çıkmasını hedefler.
-    *   **İndikatörler:** Bollinger Band Width (Bant Genişliği), Volume Ratio (Hacim Oranı > 2x), Üst Bant Kırılımı.
-    *   **Giriş:** Bant genişliyor + Fiyat üst bandı kırıyor + Hacim ortalamanın 2 katı.
-2.  **Mean Reversion Strategy (Ağırlık: 0.3):**
-    *   **Mantık:** Aşırı satım (Oversold) bölgelerinden tepki yükselişlerini yakalar.
-    *   **İndikatörler:** RSI (< 35), Bollinger Lower Band (Alt Bant Teması), MACD Histogram.
-    *   **Giriş:** Fiyat alt banda değdi + RSI 35 altından yukarı dönüyor + MACD histogramı dip yapıp yükselişe geçti.
-3.  **Momentum Strategy (Ağırlık: 0.3):**
-    *   **Mantık:** Güçlü trendleri takip eder. "Trend is your friend" ilkesi.
-    *   **İndikatörler:** ADX (Trend Gücü), SuperTrend, MACD.
-    *   **Giriş:** ADX > 25 (Güçlü Trend) + SuperTrend Boğa (Bullish) + MACD Al Sinyali.
-
-**Zaman Dilimleri:**
-*   **Sinyal:** 15 Dakika (Hızlı tepki için).
-*   **Trend/Rejim Teyidi:** 1 Saat (Ana yönü belirlemek için).
-
-## 9. Risk Yönetimi (Risk Management Details)
-
-Sermaye koruması, kar etmekten daha önceliklidir.
-
-*   **Pozisyon Büyüklüğü (Position Sizing):** Sabit miktar yerine **Volatilite Bazlı (ATR)** hesaplama yapılır.
-    *   Düşük Volatilite -> Daha Büyük Pozisyon (Daha az risk).
-    *   Yüksek Volatilite -> Daha Küçük Pozisyon (Patlama riskine karşı koruma).
-*   **Stop Loss:** ATR Trailing Stop (İz Süren Stop). Fiyatla birlikte yukarı hareket eder, asla aşağı inmez.
-*   **Circuit Breaker (Sigorta):**
-    *   **API Hataları:** Üst üste 5 API hatası alınırsa bot 5 dakika kendini "Soğumaya" alır.
-    *   **Günlük Zarar Limiti:** Günlük PnL %-5'in altına düşerse, o gün için yeni işlem açılması durdurulur (Ertesi gün 00:00 UTC'de sıfırlanır).
-*   **Sniper Mode:** Toplam varlık kritik seviyenin (100 USDT) altına düşerse, tüm strateji kuralları "Kurtarma Modu"na geçer ve en iyi tek bir işleme odaklanır.
-
-## 10. Brain Sistemi (Brain System Logic)
-
-*   **Yapay Zeka Türü:** Rule-Based (Kural Tabanlı) ve Adaptive (Uyarlanabilir). Şu aşamada LLM (Large Language Model) entegrasyonu yoktur, deterministik algoritmalar çalışır.
-*   **İşlevi:**
-    *   Her işlemin sonucunu (`WIN` veya `LOSS`) kaydeder.
-    *   Başarılı olan stratejinin (örn. Breakout) ağırlığını artırır, başarısız olanınkini azaltır.
-    *   Piyasa rejimine (Trending/Ranging) göre hangi stratejinin daha aktif olacağına karar verir.
-*   **Öğrenme:** `bot_brain.json` dosyasında strateji performanslarını tutar ve zamanla kendi parametrelerini optimize eder.
-
-## 11. Operasyonel Sorular (Operational FAQ)
-
-*   **Döngü Hızı:** Bot, semboller arasında **0.1 saniye** (100ms) bekleme süresi ile tarama yapar. Bu, Binance API limitlerine (1200 request/dk) takılmadan maksimum hızda tarama sağlar.
-*   **Sunucu:** AWS üzerinde Docker konteynerleri içinde çalışır. Canlı (Live) bot, izole bir ortamda çalışarak dış etkenlerden korunur.
-*   **Yedekleme:** State dosyaları JSON formatında olduğu için sunucu kapansa bile son durum (pozisyonlar, bakiye) kaybolmaz. Başlangıçta bu dosya okunarak kaldığı yerden devam eder.
-
-## 12. Sorun Alanları ve Çözümleri (Known Issues)
-
-*   **WIF Bakiyesi (Balance Discrepancy):** Cüzdan senkronizasyonunda nadiren görülen "Earn" cüzdanı ile "Spot" cüzdanı arasındaki bakiye farkı. (Çözüm: `sync_wallet` fonksiyonu her döngüde bakiyeyi tazeler).
-*   **Dust Accumulation (Toz Birikmesi):** Küçük bakiyelerin işlem limitlerine takılması. (Çözüm: Sniper Modu içindeki `convert_dust_to_bnb` fonksiyonu ile çözüldü).
-*   **API Rate Limits:** Çok sık istek atılması sonucu IP ban riski. (Çözüm: Semboller arası `sleep(0.1)` ve hata durumunda `CircuitBreaker` beklemesi ile tamamen önlendi).
+### S: Bakiye neden 20$'dan 6$'a düştü?
+Düşük bakiye ile yapılan testlerde "Min Notional" (Minimum İşlem Tutarı) sınırlarına takılma ve komisyon oranlarının (BNB indirimi yoksa) bakiyeyi eritmesi (Churning) olasıdır. Sniper modu bu yüzden "Sık İşlem" yerine "Nokta Atışı" (Yüksek Skor Farkı) prensibiyle çalışır.

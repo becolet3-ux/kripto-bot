@@ -17,12 +17,28 @@ class StateManager:
         if not os.path.exists(self.stats_filepath):
             self.save_stats({})
 
+    def _atomic_write(self, filepath: str, data: Dict[str, Any]):
+        """Safely write data to file using atomic replacement"""
+        temp_path = f"{filepath}.tmp"
+        try:
+            with open(temp_path, 'w') as f:
+                json.dump(data, f, indent=4)
+                f.flush()
+                os.fsync(f.fileno()) # Ensure write to disk
+            os.replace(temp_path, filepath) # Atomic move
+        except Exception as e:
+            print(f"❌ Failed to save atomic {filepath}: {e}")
+            if os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except:
+                    pass
+
     def save_state(self, data: Dict[str, Any]):
         try:
             # Add timestamp to state
             data['last_updated'] = time.time()
-            with open(self.filepath, 'w') as f:
-                json.dump(data, f, indent=4)
+            self._atomic_write(self.filepath, data)
         except Exception as e:
             print(f"❌ Failed to save state: {e}")
 
@@ -39,8 +55,7 @@ class StateManager:
     def save_stats(self, stats: Dict[str, Any]):
         try:
             stats['last_updated'] = time.time()
-            with open(self.stats_filepath, 'w') as f:
-                json.dump(stats, f, indent=4)
+            self._atomic_write(self.stats_filepath, stats)
         except Exception as e:
             print(f"❌ Failed to save stats: {e}")
 

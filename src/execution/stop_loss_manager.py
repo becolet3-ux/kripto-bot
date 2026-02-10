@@ -87,6 +87,11 @@ class StopLossManager:
         if atr_value > 0:
             # Tighten stop after partial exit
             multiplier = settings.TRAILING_STOP_TIGHT_MULTIPLIER if position.get('partial_exit_executed') else settings.TRAILING_STOP_ATR_MULTIPLIER
+            
+            # Sniper Mode Override (Tighter Trailing)
+            if position.get('is_sniper_mode', False):
+                 multiplier = 2.0
+            
             stop_distance = atr_value * multiplier
         else:
             # Fallback to fixed percentage if ATR failed
@@ -94,11 +99,14 @@ class StopLossManager:
             stop_distance = current_price * fallback_pct
 
         # 3. Trailing Stop Logic
-        current_stop_price = float(position.get('trailing_stop_price', 0.0))
+        # FIX: Use 'stop_loss' key to match Executor
+        current_stop_price = float(position.get('stop_loss', 0.0))
         
         # Initial stop setup
         if current_stop_price == 0:
             current_stop_price = entry_price - stop_distance
+            # FIX: Return update immediately to save initial stop
+            return {'action': 'UPDATE_STOP', 'new_stop_price': current_stop_price}
 
         new_stop_price = current_price - stop_distance
         

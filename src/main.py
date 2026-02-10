@@ -133,16 +133,21 @@ async def run_bot():
     analyzer = MarketAnalyzer(funding_loader=funding_loader)
     
     sentiment_analyzer = None
-    if settings.SENTIMENT_ENABLED:
+    try:
         from src.sentiment.analyzer import SentimentAnalyzer
+        # Always initialize for Fear & Greed Index support
+        # Keys are only passed if SENTIMENT_ENABLED is True
         sentiment_analyzer = SentimentAnalyzer(
-            twitter_api_key=settings.TWITTER_API_KEY,
+            twitter_api_key=settings.TWITTER_API_KEY if settings.SENTIMENT_ENABLED else None,
             reddit_credentials={
                 'client_id': settings.REDDIT_CLIENT_ID,
                 'client_secret': settings.REDDIT_CLIENT_SECRET,
                 'user_agent': settings.REDDIT_USER_AGENT
-            } if settings.REDDIT_CLIENT_ID else None
+            } if settings.SENTIMENT_ENABLED and settings.REDDIT_CLIENT_ID else None
         )
+    except Exception as e:
+        log(f"⚠️ Sentiment Analyzer Init Failed: {e}")
+        sentiment_analyzer = None
     grid_trader = GridTrading()
     opportunity_manager = OpportunityManager()
     
@@ -214,6 +219,12 @@ async def run_bot():
                         is_usdt_pair = '/USDT' in symbol
                         is_active = loader.exchange.markets.get(symbol, {}).get('active', False)
                         
+                        # Blacklist check
+                        blacklist = ['USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USDe', 'EURI', 'EUR', 'AEUR', 'USD1', 'BUSD', 'RLUSD']
+                        base_currency = symbol.split('/')[0]
+                        if base_currency in blacklist:
+                            continue
+
                         if is_usdt_pair and is_active:
                             active_symbols.append(symbol)
                 
@@ -240,6 +251,9 @@ async def run_bot():
     
     # Scores cache for swap logic
     latest_scores = {}
+    
+    # Swap Confirmation Tracker (Debounce Logic)
+    swap_confirmation_tracker = {}
 
     try:
         # Emergency Flag Check
@@ -265,6 +279,17 @@ async def run_bot():
             # Sync Wallet First!
             await executor.sync_wallet()
 
+            # Ensure held positions are always scanned (Zombie Position Fix)
+            try:
+                held_symbols = list(executor.paper_positions.keys())
+                for sym in held_symbols:
+                    # Check if symbol is valid (has /USDT) and not already in list
+                    if sym not in settings.SYMBOLS and '/USDT' in sym:
+                         settings.SYMBOLS.append(sym)
+                         log(f"🧟 Zombie Position Detected: {sym} added to scan list.")
+            except Exception as e:
+                log(f"⚠️ Failed to update scan list for held positions: {e}")
+
             # Periodic Dust Cleanup (Every 20 loops ~ 10-20 mins)
             if loop_count % 20 == 0:
                  if not settings.IS_TR_BINANCE:
@@ -273,6 +298,16 @@ async def run_bot():
             # 0. Update Funding Rates (Phase 4)
             if not settings.IS_TR_BINANCE:
                 await funding_loader.update_funding_rates()
+            
+            # 0.5 Fear & Greed Index (Global Sentiment)
+            if sentiment_analyzer and loop_count % 20 == 1:
+                try:
+                    fng_data = await asyncio.to_thread(sentiment_analyzer.get_fear_and_greed_index)
+                    if fng_data:
+                         log(f"😨 Fear & Greed Index: {fng_data['value']} ({fng_data['value_classification']})")
+                except Exception as e:
+                    log(f"⚠️ F&G Fetch Error: {e}")
+
             
             # 1. Market Regime Analysis (Global Trend)
             market_regime = None
@@ -299,112 +334,113 @@ async def run_bot():
             log(f"🔍 Scanning {len(settings.SYMBOLS)} symbols...")
 
             for i, symbol in enumerate(settings.SYMBOLS):
-                # Rate Limit Smoothing (Client Side) - Optimized sleep
-                await asyncio.sleep(0.1) 
+                try:
+                    # Rate Limit Smoothing (Client Side) - Optimized sleep
+                    await asyncio.sleep(0.1) 
 
-                # Progress indicator every 20 symbols
-                if (i + 1) % 20 == 0:
-                    log(f"⏳ Scanned {i + 1}/{len(settings.SYMBOLS)} symbols...")
-                
-                # Update Dashboard Commentary periodically (Every 50 symbols)
-                if (i + 1) % 50 == 0:
-                    await update_dashboard_commentary(
-                        executor, 
-                        opportunity_manager, 
-                        market_regime, 
-                        all_market_signals, 
-                        current_prices_map,
-                        latest_scores
-                    )
-
-                # Use get_ohlcv for Spot Strategy
-                # Timeframe changed to 1h for better trend following
-                candles = await loader.get_ohlcv(symbol, timeframe='1h', limit=50)
-                
-                if candles:
-                    scanned_count += 1
-                    current_price = float(candles[-1][4])
-                    current_prices_map[symbol] = current_price
+                    # Progress indicator every 20 symbols
+                    if (i + 1) % 20 == 0:
+                        log(f"⏳ Scanned {i + 1}/{len(settings.SYMBOLS)} symbols...")
                     
-                    # --- Sentiment Analysis ---
-                    sentiment_score = 0.0
-                    if settings.SENTIMENT_ENABLED and not settings.DISABLE_SENTIMENT_ANALYSIS and sentiment_analyzer:
-                        try:
-                            sentiment_score = 0.0
-                        except Exception:
-                            sentiment_score = 0.0
-
-                    # --- Grid Trading Check ---
-                    if market_regime and market_regime['trend'] == 'SIDEWAYS':
-                        current_price = float(candles[-1][4])
-                        
-                        if symbol not in grid_trader.active_grids:
-                            # 1. Bakiye ve Precision Bilgilerini Al
-                            try:
-                                free_balance = await executor.get_free_balance('TRY')
-                            except Exception:
-                                free_balance = 0.0
-
-                            step_size = 1.0
-                            min_qty = 0.0
-                            try:
-                                info = await executor.get_symbol_info(symbol)
-                                if info:
-                                    step_size = float(info.get('stepSize', '1.0'))
-                                    min_qty = float(info.get('minQty', '0.0'))
-                            except Exception:
-                                pass
-
-                            # 2. Sermaye Tahsisi (Bakiyenin %90'ı, max 1000 TRY)
-                            # Minimum işlem limiti genellikle 10-20 TRY'dir. Seviye başına 20 TRY ayıralım.
-                            allocation = min(free_balance * 0.90, 1000.0)
-                            min_required = 20.0 * grid_trader.grid_levels 
-
-                            if allocation >= min_required:
-                                grid_trader.setup_grid(
-                                    symbol, 
-                                    current_price, 
-                                    total_capital=allocation,
-                                    step_size=step_size,
-                                    min_qty=min_qty
-                                )
-                                await grid_trader.place_grid_orders(symbol, executor)
-                                log(f"🕸️ Grid Started for {symbol} (Cap: {allocation:.2f} TRY)")
-                            else:
-                                # Yetersiz bakiye, log kirletmemek için sessiz geçiyoruz.
-                                # Ancak debug modunda veya çok düşük bakiye varsa uyarabiliriz.
-                                pass
-
-                        else:
-                            await grid_trader.check_grid_status(symbol, current_price, executor)
-
-                    # 0. Safety Check (Brain)
-                    pre_signal = analyzer.analyze_spot(symbol, candles, exchange=loader.exchange)
-                    
-                    if pre_signal:
-                        volatility = pre_signal.details.get('volatility', 0)
-                        vol_ratio = pre_signal.details.get('volume_ratio', 1.0)
-                        current_rsi = pre_signal.details.get('rsi', 50.0)
-                        
-                        # Step 2: Ask Brain for Permission & Advice
-                        safety = executor.brain.check_safety(
-                            symbol, 
-                            current_volatility=volatility, 
-                            volume_ratio=vol_ratio,
-                            current_rsi=current_rsi
+                    # Update Dashboard Commentary periodically (Every 50 symbols)
+                    if (i + 1) % 50 == 0:
+                        await update_dashboard_commentary(
+                            executor, 
+                            opportunity_manager, 
+                            market_regime, 
+                            all_market_signals, 
+                            current_prices_map,
+                            latest_scores
                         )
-                        is_blocked = not safety['safe']
-                        modifier = safety.get('modifier', 0)
+
+                    # Use get_ohlcv for Spot Strategy
+                    # Timeframe changed to 1h for better trend following
+                    candles = await loader.get_ohlcv(symbol, timeframe='1h', limit=50)
+                    
+                    if candles:
+                        scanned_count += 1
+                        current_price = float(candles[-1][4])
+                        current_prices_map[symbol] = current_price
                         
-                        # Only log brain block if verbose or specific condition (reduced noise)
-                        if is_blocked and pre_signal.action == "ENTRY":
-                             # log(f"🧠 Brain Blocked {symbol}: {safety['reason']}")
-                             executor.brain.record_ghost_trade(
-                                 symbol, 
-                                 current_price, 
-                                 f"Brain Filter: {safety['reason']}", 
-                                 pre_signal.score
-                             )
+                        # --- Sentiment Analysis ---
+                        sentiment_score = 0.0
+                        if settings.SENTIMENT_ENABLED and not settings.DISABLE_SENTIMENT_ANALYSIS and sentiment_analyzer:
+                            try:
+                                sentiment_score = 0.0
+                            except Exception:
+                                sentiment_score = 0.0
+
+                        # --- Grid Trading Check ---
+                        if market_regime and market_regime['trend'] == 'SIDEWAYS':
+                            current_price = float(candles[-1][4])
+                            
+                            if symbol not in grid_trader.active_grids:
+                                # 1. Bakiye ve Precision Bilgilerini Al
+                                try:
+                                    free_balance = await executor.get_free_balance('TRY')
+                                except Exception:
+                                    free_balance = 0.0
+
+                                step_size = 1.0
+                                min_qty = 0.0
+                                try:
+                                    info = await executor.get_symbol_info(symbol)
+                                    if info:
+                                        step_size = float(info.get('stepSize', '1.0'))
+                                        min_qty = float(info.get('minQty', '0.0'))
+                                except Exception:
+                                    pass
+
+                                # 2. Sermaye Tahsisi (Bakiyenin %90'ı, max 1000 TRY)
+                                # Minimum işlem limiti genellikle 10-20 TRY'dir. Seviye başına 20 TRY ayıralım.
+                                allocation = min(free_balance * 0.90, 1000.0)
+                                min_required = 20.0 * grid_trader.grid_levels 
+                                
+                                if allocation >= min_required:
+                                    grid_trader.setup_grid(
+                                        symbol, 
+                                        current_price, 
+                                        total_capital=allocation,
+                                        step_size=step_size,
+                                        min_qty=min_qty
+                                    )
+                                    await grid_trader.place_grid_orders(symbol, executor)
+                                    log(f"🕸️ Grid Started for {symbol} (Cap: {allocation:.2f} TRY)")
+                                else:
+                                    # Yetersiz bakiye, log kirletmemek için sessiz geçiyoruz.
+                                    # Ancak debug modunda veya çok düşük bakiye varsa uyarabiliriz.
+                                    pass
+
+                            else:
+                                await grid_trader.check_grid_status(symbol, current_price, executor)
+
+                        # 0. Safety Check (Brain)
+                        pre_signal = analyzer.analyze_spot(symbol, candles, exchange=loader.exchange)
+                        
+                        if pre_signal:
+                            volatility = pre_signal.details.get('volatility', 0)
+                            vol_ratio = pre_signal.details.get('volume_ratio', 1.0)
+                            current_rsi = pre_signal.details.get('rsi', 50.0)
+                            
+                            # Step 2: Ask Brain for Permission & Advice
+                            safety = executor.brain.check_safety(
+                                symbol, 
+                                current_volatility=volatility, 
+                                volume_ratio=vol_ratio,
+                                current_rsi=current_rsi
+                            )
+                            is_blocked = not safety['safe']
+                            modifier = safety.get('modifier', 0)
+                            
+                            # Only log brain block if verbose or specific condition (reduced noise)
+                            if is_blocked and pre_signal.action == "ENTRY":
+                                 # log(f"🧠 Brain Blocked {symbol}: {safety['reason']}")
+                                 executor.brain.record_ghost_trade(
+                                     symbol, 
+                                     current_price, 
+                                     f"Brain Filter: {safety['reason']}", 
+                                     pre_signal.score
+                                 )
 
                         # Step 3: Final Analysis with Brain's Advice
                         signal = analyzer.analyze_spot(
@@ -523,6 +559,10 @@ async def run_bot():
                         signals_found += 1
                         log(f"⚡ Signal Detected for {symbol}: {signal.action} (Score: {signal.score:.2f})")
                         await executor.execute_strategy(signal, latest_scores=latest_scores)
+
+                except Exception as e:
+                    log(f"⚠️ Error scanning {symbol}: {e}")
+                    continue
             
             if scanned_count > 0:
                 log(f"✅ Scan Complete. Checked {scanned_count} symbols. Found {signals_found} signals.")
@@ -549,9 +589,37 @@ async def run_bot():
                 if total_equity < LOW_BALANCE_THRESHOLD and settings.LIVE_TRADING:
                     log(f"⚠️ Düşük Bakiye Modu Aktif (${total_equity:.2f} < ${LOW_BALANCE_THRESHOLD}). Sniper Modu Devrede!")
                     
-                    # 1. En iyi sinyali bul (ENTRY olanlardan)
-                    sorted_signals = sorted([s for s in all_market_signals if s.action == 'ENTRY'], key=lambda x: x.score, reverse=True)
-                    best_signal = sorted_signals[0] if sorted_signals else None
+                    # 1. En iyi sinyali bul (ENTRY olanlardan) - Yüksek Kalite Filtresi (>0.75)
+                    # Sniper Modu (All-In) için sadece çok güçlü sinyallere giriyoruz.
+                    high_quality_signals = sorted([
+                        s for s in all_market_signals 
+                        if s.action == 'ENTRY' and s.score >= 0.75
+                    ], key=lambda x: x.score, reverse=True)
+                    
+                    if not high_quality_signals:
+                        if [s for s in all_market_signals if s.action == 'ENTRY']:
+                             log("⏳ Sniper Modu: Giriş sinyalleri var ama yeterince güçlü değil (<0.75). Nakitte bekleniyor...")
+                        best_signal = None
+                    else:
+                        best_signal = high_quality_signals[0]
+                        
+                        # --- FUTURES SENTIMENT CHECK (New Feature) ---
+                        # Eğer SentimentAnalyzer aktifse, Futures L/S oranına bak
+                        if sentiment_analyzer:
+                            try:
+                                log(f"🔍 Futures Sentiment Analizi: {best_signal.symbol}...")
+                                futures_data = await sentiment_analyzer.get_futures_sentiment(best_signal.symbol)
+                                ls_ratio = futures_data.get('long_short_ratio', 0)
+                                if ls_ratio > 0:
+                                    log(f"📊 {best_signal.symbol} Futures L/S Ratio: {ls_ratio:.2f}")
+                                    
+                                    # Aşırı Kalabalık Long Uyarısı
+                                    if ls_ratio > 2.5:
+                                        log(f"⚠️ DİKKAT: {best_signal.symbol} üzerinde aşırı Long yığılması var (Ratio: {ls_ratio}). Düzeltme riski!")
+                                        # Skoru biraz düşürebiliriz veya sadece loglarız.
+                                        # best_signal.score -= 1.0 
+                            except Exception as e:
+                                log(f"⚠️ Futures Check Failed: {e}")
                     
                     # 2. Mevcut Pozisyonları Yönet (Tek bir en iyiye düşür)
                     current_positions = list(executor.paper_positions.keys())
@@ -561,8 +629,34 @@ async def run_bot():
                         
                         # Durum A: En iyi sinyal var ama elimizdeki o değil -> Sat (Swap için yer aç)
                         if best_signal and symbol != best_signal.symbol:
-                            should_sell = True
-                            log(f"📉 Sniper Modu: {symbol} satılıyor. (Daha iyi fırsat: {best_signal.symbol})")
+                            # User Request: Check for 5 point score difference
+                            current_pos_signal = next((s for s in all_market_signals if s.symbol == symbol), None)
+                            
+                            # Use cache if signal missing (prevent Score 0 glitch)
+                            if current_pos_signal:
+                                current_score = current_pos_signal.score
+                            else:
+                                current_score = latest_scores.get(symbol, 0.0)
+
+                            score_diff = best_signal.score - current_score
+                            
+                            if score_diff >= 5.0:
+                                # Debounce Logic: 3 döngü teyit (User Request)
+                                current_count = swap_confirmation_tracker.get(symbol, 0) + 1
+                                swap_confirmation_tracker[symbol] = current_count
+                                
+                                if current_count >= 3:
+                                    should_sell = True
+                                    log(f"📉 Sniper Modu: {symbol} satılıyor. (Fark: {score_diff:.1f} >= 5.0 | Onay: {current_count}/3 | Yeni: {best_signal.symbol})")
+                                    swap_confirmation_tracker[symbol] = 0 # Reset
+                                else:
+                                    log(f"⏳ Sniper Modu: {symbol} için swap şartı sağlandı ({current_count}/3). Fark: {score_diff:.1f}. Onay bekleniyor...")
+                            else:
+                                # Reset counter if condition is lost
+                                if swap_confirmation_tracker.get(symbol, 0) > 0:
+                                     log(f"✋ Sniper Modu: {symbol} swap onayı sıfırlandı. Fark düştü ({score_diff:.1f}).")
+                                swap_confirmation_tracker[symbol] = 0
+                                log(f"✋ Sniper Modu: {symbol} tutuluyor. Fark yetersiz ({score_diff:.1f} < 5.0).")
                         
                         # Durum B: En iyi sinyal yok ama elimizde pozisyon var -> 
                         # Eğer çoklu pozisyon varsa ve bu en iyisi değilse sat. 
@@ -616,7 +710,7 @@ async def run_bot():
                          log("🧹 Sniper Modu: Dust Temizliği Başlatılıyor...")
                          await executor.convert_dust_to_bnb()
                          # Cüzdanı tekrar senkronize et ki yeni BNB/USDT bakiyesi görünsün
-                         await executor.sync_wallet_balances()
+                         await executor.sync_wallet()
                          
                          # CRITICAL: Dust convert sonrası biriken BNB'yi satmayı dene (Eğer hedef BNB değilse)
                          # Bu adım, 3.70$ BNB + 1.50$ Dust -> 5.20$ BNB -> USDT dönüşümünü sağlar.
@@ -681,25 +775,45 @@ async def run_bot():
                     )
                     
                     if swap_opp:
-                        log(f"🔄 SWAP OPPORTUNITY DETECTED: Sell {swap_opp['sell_symbol']} -> Buy {swap_opp['buy_signal'].symbol} ({swap_opp['reason']})")
+                        # 3-Loop Confirmation Logic (Extended to Normal Mode)
+                        sell_symbol = swap_opp['sell_symbol']
+                        buy_symbol = swap_opp['buy_signal'].symbol
                         
-                        # 1. Sell the old asset
-                        sell_signal = TradeSignal(
-                            symbol=swap_opp['sell_symbol'],
-                            action="EXIT",
-                            direction="LONG",
-                            score=-1.0, # Zorunlu çıkış
-                            estimated_yield=0.0,
-                            timestamp=int(time.time() * 1000),
-                            details={"reason": "SWAP_FOR_BETTER_OPPORTUNITY"}
-                        )
-                        await executor.execute_strategy(sell_signal)
+                        current_count = swap_confirmation_tracker.get(sell_symbol, 0) + 1
+                        swap_confirmation_tracker[sell_symbol] = current_count
                         
-                        # 2. Buy the new asset
-                        # Biraz bekle ki bakiye güncellensin
-                        await asyncio.sleep(2.0) 
-                        await executor.sync_wallet_balances()
-                        await executor.execute_strategy(swap_opp['buy_signal'])
+                        if current_count >= 3:
+                            log(f"🔄 SWAP CONFIRMED: Sell {sell_symbol} -> Buy {buy_symbol} ({swap_opp['reason']} | Count: {current_count}/3)")
+                            
+                            # 1. Sell the old asset
+                            sell_signal = TradeSignal(
+                                symbol=sell_symbol,
+                                action="EXIT",
+                                direction="LONG",
+                                score=-1.0, # Zorunlu çıkış
+                                estimated_yield=0.0,
+                                timestamp=int(time.time() * 1000),
+                                details={"reason": "SWAP_FOR_BETTER_OPPORTUNITY"}
+                            )
+                            await executor.execute_strategy(sell_signal)
+                            
+                            # 2. Buy the new asset
+                            # Biraz bekle ki bakiye güncellensin
+                            await asyncio.sleep(2.0) 
+                            await executor.sync_wallet_balances()
+                            await executor.execute_strategy(swap_opp['buy_signal'])
+                            
+                            # Reset tracker
+                            swap_confirmation_tracker[sell_symbol] = 0
+                        else:
+                            log(f"⏳ Swap Opportunity Detected: {sell_symbol} -> {buy_symbol}. Waiting for confirmation ({current_count}/3)...")
+                    else:
+                        # No swap opportunity found (diff < 5.0 or hold time constraint)
+                        # Reset trackers for all held positions to be safe
+                        if swap_confirmation_tracker:
+                            # Only clear if we are in this block (meaning not in Sniper Mode)
+                            # log("✋ Swap conditions not met. Resetting confirmation trackers.")
+                            swap_confirmation_tracker.clear()
                         
                 # Her döngü sonunda cüzdanı güncelle
                 if settings.LIVE_TRADING:
