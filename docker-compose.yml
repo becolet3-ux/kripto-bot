@@ -67,7 +67,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2500M
 
   dashboard-live:
     build: .

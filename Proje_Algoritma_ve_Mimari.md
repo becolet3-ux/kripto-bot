@@ -1,4 +1,4 @@
-# Proje Algoritma ve Mimari Dokümantasyonu (v2.6)
+# Proje Algoritma ve Mimari Dokümantasyonu (v2.7 - ML & Automation)
 
 Bu doküman, Kripto Bot projesinin en güncel (v2.6) teknik mimarisini, algoritma detaylarını ve kod yapısını **en ince ayrıntısına kadar** açıklamaktadır.
 
@@ -27,8 +27,10 @@ subgraph Analysis_Layer [Analiz Katmanı]
     AL3[Funding Strategy]
     AL4[Volume Profile & OrderBook]
     AL5[Market Regime Detector]
+    AL6[ML Ensemble Model]
     
     AL1 -->|Technical Signals| DL_DECISION
+    AL6 -->|Prob Score| DL_DECISION
     AL2 -->|Sentiment Boost| DL_DECISION
     AL3 -->|Long/Short Block| DL_DECISION
     AL4 -->|Support/Resistance| DL_DECISION
@@ -36,7 +38,7 @@ subgraph Analysis_Layer [Analiz Katmanı]
 end
 
 %% Karar Katmanı (Decision Engine)
-subgraph Decision_Engine [Karar Motoru]
+subgraph Decision_Engine [Karar Motoru (TradeManager)]
     DL_DECISION{TradeSignal Generator}
     
     DL_DECISION -->|Score Calculation| SCORE[Skor Hesaplama]
@@ -44,14 +46,16 @@ subgraph Decision_Engine [Karar Motoru]
     STRAT -->|Final Score| FILTERS[Filtreler]
     
     FILTERS -->|Is Safe?| RISK[Risk & Safety Check]
-    RISK -->|Approved| SNIPER[Sniper Mode Logic]
+    RISK -->|Approved| TM[TradeManager Orchestrator]
+    TM -->|Sniper Mode Logic| SNIPER[Sniper Handler]
     SNIPER -->|Low Balance?| OPP[Opportunity Manager]
     OPP -->|Swap Needed?| CONFIRM[3-Loop Confirmation]
+    CONFIRM -->|Approved| TM
 end
 
 %% Öğrenme Katmanı (Learning Layer)
 subgraph Learning_Layer [Öğrenme Katmanı (Brain)]
-    EXEC -->|Trade Result (PnL)| BRAIN[BotBrain]
+    TM -->|Trade Result (PnL)| BRAIN[BotBrain]
     BRAIN -->|Update Weights| STRAT
     BRAIN -->|Ghost Trades| GHOST[Sanal Takip]
     BRAIN -->|Performance Regime| RISK
@@ -59,7 +63,7 @@ end
 
 %% Yürütme Katmanı (Execution)
 subgraph Execution_Layer [Yürütme Katmanı]
-    CONFIRM -->|Approved| EXEC[Executor]
+    TM -->|Execute Strategy| EXEC[Executor]
     EXEC -->|Order| BINANCE[Binance Exchange]
     EXEC -->|Sync| WALLET
     WALLET -->|Dust| DUST[Dust Converter]
@@ -140,6 +144,7 @@ Her coin için `analyze_spot` fonksiyonu çalışır. Puanlama **Ağırlıklı O
 | **Bollinger** | Alt Band Teması | +2.0 | Destekten dönüş. |
 | **Volume** | Vol > 1.5x Ort. | +1.0 | Hacimli hareket onayı. |
 | **Sentiment** | L/S Ratio > 1.2 | +1.5 | Vadeli piyasa beklentisi pozitif. |
+| **ML Score** | Prob > 0.6 | ±2.0 | Random Forest Model Tahmini. |
 
 **Öğrenen Ağırlıklar (BotBrain):**
 Her indikatörün etkisi, botun geçmiş performansına göre dinamik olarak değişir.
@@ -155,34 +160,30 @@ def update_indicator_weights(self, indicator_signals, pnl_pct):
         weights[ind] *= (1 - lr)
 ```
 
-### Adım 3: Karar Motoru (Decision Engine)
+### Adım 3: Karar Motoru (TradeManager)
 
-Sinyaller toplandıktan sonra bot nasıl hareket edeceğine karar verir. İki ana mod vardır:
+Sinyaller toplandıktan sonra `TradeManager` sınıfı tüm akışı yönetir. Bu modül, sinyalleri filtreler, risk kontrollerini yapar ve uygun stratejiyi (Sniper veya Normal) seçer.
 
 #### A. Sniper Mode (Düşük Bakiye / All-In)
 Eğer bakiye az ise ve portföy doluysa, bot **en iyi fırsata** geçmek için "Swap" (Takas) arar.
 
 **5 Puan Kuralı ve 3-Loop Teyit Mekanizması:**
-Botun sürekli al-sat yapıp komisyon eritmesini (Churning) önlemek için katı kurallar vardır.
+Botun sürekli al-sat yapıp komisyon eritmesini (Churning) önlemek için katı kurallar vardır. Bu mantık `TradeManager.handle_sniper_mode` içinde yürütülür.
 
 ```python
-# src/strategies/opportunity_manager.py
+# src/execution/trade_manager.py
 
-def check_for_swap_opportunity(self, portfolio, market_signals):
-    worst_asset = min(portfolio, key=lambda x: x.score) # En kötü coin
-    best_opp = max(market_signals, key=lambda x: x.score) # En iyi fırsat
+async def handle_sniper_mode(self, all_market_signals, current_prices_map):
+    # ...
+    score_diff = best_signal.score - worst_position_score
     
-    score_diff = best_opp.score - worst_asset.score
-    
-    # KURAL 1: En az 5.0 puan fark olmalı
-    if score_diff < 5.0:
-        return None 
-        
-    return {
-        'action': 'SWAP',
-        'sell': worst_asset,
-        'buy': best_opp
-    }
+    if score_diff >= 5.0:
+        # 3-Loop Confirmation (Debounce)
+        self.swap_confirmation_tracker[symbol] += 1
+        if self.swap_confirmation_tracker[symbol] >= 3:
+             # EXECUTE SWAP
+             await self.executor.execute_strategy(sell_signal)
+             await self.executor.execute_strategy(buy_signal)
 ```
 
 ```mermaid
@@ -255,11 +256,32 @@ async def execute_buy(self, symbol, quantity, price):
 
 ---
 
-## 5. Öğrenme Katmanı (BotBrain)
+## 5. Öğrenme Katmanı (BotBrain) & Yapay Zeka
 
-Bot, her işlemin sonucunu (Kar/Zarar) kaydeder ve buna göre kendini günceller.
+Bot, her işlemin sonucunu (Kar/Zarar) kaydeder ve buna göre kendini günceller. Ayrıca eğitilmiş ML modelleri ile sinyalleri zenginleştirir.
 
-### Hayalet İşlemler (Ghost Trades)
+### 5.1. Makine Öğrenmesi (Machine Learning) Entegrasyonu
+Bot, `src/ml/ensemble_manager.py` modülü üzerinden **Random Forest Classifier** modelini kullanır.
+
+*   **Model:** RandomForest (n_estimators=100, max_depth=10)
+*   **Girdi (Features):** RSI, MACD, Bollinger, Hacim, ADX vb.
+*   **Hedef (Target):** Bir sonraki mumda fiyat artışı > %0.2 (THRESHOLD).
+*   **Kalıcılık:** Modeller `data/models/rf_model.pkl` yolunda saklanır ve sunucu yeniden başlatılsa bile korunur.
+
+```python
+# src/ml/ensemble_manager.py
+def get_signal_score(self, features: pd.DataFrame) -> float:
+    # Model olasılık tahmini (0.0 - 1.0)
+    prob = self.models['rf'].predict_proba(features)[0][1]
+    
+    # Skora dönüştürme (-2.0 ile +2.0 arası)
+    if prob > 0.7: return 2.0   # Güçlü Al
+    if prob > 0.6: return 1.0   # Al
+    if prob < 0.3: return -2.0  # Güçlü Sat
+    return 0.0
+```
+
+### 5.2. Hayalet İşlemler (Ghost Trades)
 Botun filtreye takıldığı için **girmediği** işlemleri sanal olarak takip etmesi özelliğidir.
 *"Eğer girseydim ne olurdu?"* sorusunun cevabını arar. Eğer hayalet işlem karlıysa, o filtreyi gevşetir.
 
@@ -288,3 +310,34 @@ Genellikle veri henüz tam yüklenmemiştir veya hesaplama hatası olmuştur. v2
 
 ### S: Bakiye neden 20$'dan 6$'a düştü?
 Düşük bakiye ile yapılan testlerde "Min Notional" (Minimum İşlem Tutarı) sınırlarına takılma ve komisyon oranlarının (BNB indirimi yoksa) bakiyeyi eritmesi (Churning) olasıdır. Sniper modu bu yüzden "Sık İşlem" yerine "Nokta Atışı" (Yüksek Skor Farkı) prensibiyle çalışır.
+
+---
+
+## 7. Otomasyon ve Sürekli Eğitim (Auto-Training)
+
+Sistemin "kendi kendine yetebilmesi" için otomatik eğitim mekanizması kurulmuştur.
+
+### 7.1. Aylık Otomatik Eğitim
+Sunucu tarafında çalışan bir Cron Job, her ayın 1'inde tetiklenir ve modeli güncel verilerle yeniden eğitir.
+
+*   **Script:** `scripts/auto_train_ml.sh`
+*   **Zamanlama:** Her ayın 1. günü, saat 03:00.
+*   **Akış:**
+    1.  `src/train_models.py` çalıştırılır (Son 50.000 veri satırı ile).
+    2.  Yeni model `rf_model.pkl` üretilir.
+    3.  Model `data/models/` klasörüne taşınır.
+    4.  Bot servisi (`bot-live`) yeniden başlatılarak yeni model belleğe yüklenir.
+
+```bash
+# auto_train_ml.sh (Özet)
+LOG_FILE="/home/ubuntu/kripto-bot/data/auto_train.log"
+
+# 1. Modeli Eğit
+sudo docker exec kripto-bot-live python src/train_models.py
+
+# 2. Başarılıysa Modeli Taşı ve Botu Yeniden Başlat
+if [ $? -eq 0 ]; then
+    sudo docker exec kripto-bot-live mv /app/models/rf_model.pkl /app/data/models/
+    sudo docker-compose restart bot-live
+fi
+```

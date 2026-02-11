@@ -8,6 +8,7 @@ from typing import Dict, Optional, Union, List, Any
 from binance.error import ClientError
 from src.utils.logger import log
 from src.utils.state_manager import StateManager
+from src.utils.exceptions import BotError, InsufficientBalanceError, ExchangeError
 from src.learning.brain import BotBrain
 from src.strategies.analyzer import TradeSignal
 from src.execution.stop_loss_manager import StopLossManager
@@ -744,7 +745,7 @@ class BinanceExecutor:
             # Son kontrol
             if target_position_size_usdt < min_trade_val:
                 log(f"⚠️ Yetersiz Bakiye: {target_position_size_usdt:.2f} < {min_trade_val}. İşlem iptal.")
-                return 0.0
+                raise InsufficientBalanceError(f"Insufficient funds for minimum trade: {target_position_size_usdt:.2f} < {min_trade_val}")
             
             quantity = target_position_size_usdt / price
             
@@ -925,9 +926,13 @@ class BinanceExecutor:
         
         # Min Notional Check
         notional_value = price * quantity
-        if notional_value < self.min_trade_amount:
-            log(f"⚠️ Alış İptal: İşlem tutarı ({notional_value:.2f}) min limitin ({self.min_trade_amount}) altında.")
-            return False
+        
+        # Phase 3 Improvement: Allow Global/Futures to proceed to "Bump Logic" if value is low but balance is sufficient.
+        # Only enforce strict early blocking for TR (strict limits) or Paper Trading (simulation).
+        if self.is_tr or not self.is_live:
+            if notional_value < self.min_trade_amount:
+                log(f"⚠️ Alış İptal: İşlem tutarı ({notional_value:.2f}) min limitin ({self.min_trade_amount}) altında.")
+                return False
 
         if self.is_live:
             try:
@@ -1093,11 +1098,11 @@ class BinanceExecutor:
                             )
                             log(f"✅ Global ALIŞ Başarılı (Retry): {order.get('id')}")
                         else:
-                            raise e # Re-raise other errors
+                            raise ExchangeError(f"Buy failed after retry check: {e}") from e
 
             except Exception as e:
                 log(f"❌ Canlı ALIŞ Hatası: {e}")
-                return False
+                raise ExchangeError(f"Buy execution failed: {e}") from e
         
         # ATR Trailing Stop Başlangıç Değeri
         initial_stop_loss = 0.0

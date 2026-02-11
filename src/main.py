@@ -18,6 +18,7 @@ from src.collectors.binance_loader import BinanceDataLoader
 from src.collectors.funding_rate_loader import FundingRateLoader
 from src.strategies.analyzer import MarketAnalyzer, TradeSignal
 from src.execution.executor import BinanceExecutor
+from src.execution.trade_manager import TradeManager
 from src.strategies.grid_trading import GridTrading
 from src.strategies.opportunity_manager import OpportunityManager
 from src.utils.logger import log
@@ -169,6 +170,16 @@ async def run_bot():
         
     executor = BinanceExecutor(exchange_client=exchange_client, is_tr=settings.IS_TR_BINANCE)
 
+    # Initialize TradeManager
+    trade_manager = TradeManager(
+        loader=loader,
+        analyzer=analyzer,
+        executor=executor,
+        opportunity_manager=opportunity_manager,
+        grid_trader=grid_trader,
+        sentiment_analyzer=sentiment_analyzer
+    )
+
 
     # Dynamic Symbol Loading for Binance TR (DISABLED)
     # if settings.LIVE_TRADING and settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
@@ -251,9 +262,6 @@ async def run_bot():
     
     # Scores cache for swap logic
     latest_scores = {}
-    
-    # Swap Confirmation Tracker (Debounce Logic)
-    swap_confirmation_tracker = {}
 
     try:
         # Emergency Flag Check
@@ -334,235 +342,36 @@ async def run_bot():
             log(f"🔍 Scanning {len(settings.SYMBOLS)} symbols...")
 
             for i, symbol in enumerate(settings.SYMBOLS):
-                try:
-                    # Rate Limit Smoothing (Client Side) - Optimized sleep
-                    await asyncio.sleep(0.1) 
+                # Progress indicator every 20 symbols
+                if (i + 1) % 20 == 0:
+                    log(f"⏳ Scanned {i + 1}/{len(settings.SYMBOLS)} symbols...")
+                
+                # Update Dashboard Commentary periodically (Every 50 symbols)
+                if (i + 1) % 50 == 0:
+                    await update_dashboard_commentary(
+                        executor, 
+                        opportunity_manager, 
+                        market_regime, 
+                        all_market_signals, 
+                        current_prices_map,
+                        latest_scores
+                    )
 
-                    # Progress indicator every 20 symbols
-                    if (i + 1) % 20 == 0:
-                        log(f"⏳ Scanned {i + 1}/{len(settings.SYMBOLS)} symbols...")
-                    
-                    # Update Dashboard Commentary periodically (Every 50 symbols)
-                    if (i + 1) % 50 == 0:
-                        await update_dashboard_commentary(
-                            executor, 
-                            opportunity_manager, 
-                            market_regime, 
-                            all_market_signals, 
-                            current_prices_map,
-                            latest_scores
-                        )
-
-                    # Use get_ohlcv for Spot Strategy
-                    # Timeframe changed to 1h for better trend following
-                    candles = await loader.get_ohlcv(symbol, timeframe='1h', limit=50)
-                    
-                    if candles:
-                        scanned_count += 1
-                        current_price = float(candles[-1][4])
-                        current_prices_map[symbol] = current_price
-                        
-                        # --- Sentiment Analysis ---
-                        sentiment_score = 0.0
-                        if settings.SENTIMENT_ENABLED and not settings.DISABLE_SENTIMENT_ANALYSIS and sentiment_analyzer:
-                            try:
-                                sentiment_score = 0.0
-                            except Exception:
-                                sentiment_score = 0.0
-
-                        # --- Grid Trading Check ---
-                        if market_regime and market_regime['trend'] == 'SIDEWAYS':
-                            current_price = float(candles[-1][4])
-                            
-                            if symbol not in grid_trader.active_grids:
-                                # 1. Bakiye ve Precision Bilgilerini Al
-                                try:
-                                    free_balance = await executor.get_free_balance('TRY')
-                                except Exception:
-                                    free_balance = 0.0
-
-                                step_size = 1.0
-                                min_qty = 0.0
-                                try:
-                                    info = await executor.get_symbol_info(symbol)
-                                    if info:
-                                        step_size = float(info.get('stepSize', '1.0'))
-                                        min_qty = float(info.get('minQty', '0.0'))
-                                except Exception:
-                                    pass
-
-                                # 2. Sermaye Tahsisi (Bakiyenin %90'ı, max 1000 TRY)
-                                # Minimum işlem limiti genellikle 10-20 TRY'dir. Seviye başına 20 TRY ayıralım.
-                                allocation = min(free_balance * 0.90, 1000.0)
-                                min_required = 20.0 * grid_trader.grid_levels 
-                                
-                                if allocation >= min_required:
-                                    grid_trader.setup_grid(
-                                        symbol, 
-                                        current_price, 
-                                        total_capital=allocation,
-                                        step_size=step_size,
-                                        min_qty=min_qty
-                                    )
-                                    await grid_trader.place_grid_orders(symbol, executor)
-                                    log(f"🕸️ Grid Started for {symbol} (Cap: {allocation:.2f} TRY)")
-                                else:
-                                    # Yetersiz bakiye, log kirletmemek için sessiz geçiyoruz.
-                                    # Ancak debug modunda veya çok düşük bakiye varsa uyarabiliriz.
-                                    pass
-
-                            else:
-                                await grid_trader.check_grid_status(symbol, current_price, executor)
-
-                        # 0. Safety Check (Brain)
-                        pre_signal = analyzer.analyze_spot(symbol, candles, exchange=loader.exchange)
-                        
-                        if pre_signal:
-                            volatility = pre_signal.details.get('volatility', 0)
-                            vol_ratio = pre_signal.details.get('volume_ratio', 1.0)
-                            current_rsi = pre_signal.details.get('rsi', 50.0)
-                            
-                            # Step 2: Ask Brain for Permission & Advice
-                            safety = executor.brain.check_safety(
-                                symbol, 
-                                current_volatility=volatility, 
-                                volume_ratio=vol_ratio,
-                                current_rsi=current_rsi
-                            )
-                            is_blocked = not safety['safe']
-                            modifier = safety.get('modifier', 0)
-                            
-                            # Only log brain block if verbose or specific condition (reduced noise)
-                            if is_blocked and pre_signal.action == "ENTRY":
-                                 # log(f"🧠 Brain Blocked {symbol}: {safety['reason']}")
-                                 executor.brain.record_ghost_trade(
-                                     symbol, 
-                                     current_price, 
-                                     f"Brain Filter: {safety['reason']}", 
-                                     pre_signal.score
-                                 )
-
-                        # Step 3: Final Analysis with Brain's Advice
-                        signal = analyzer.analyze_spot(
-                            symbol, 
-                            candles, 
-                            rsi_modifier=modifier, 
-                            is_blocked=is_blocked,
-                            weights=weights,
-                            indicator_weights=indicator_weights,
-                            market_regime=market_regime,
-                            sentiment_score=sentiment_score
-                        )
-                        
-                        # Sinyali listeye ekle (SWAP analizi için)
-                        if signal:
-                             all_market_signals.append(signal)
-                             latest_scores[symbol] = signal.score
-                        
-                        # Step 3.5: Multi-timeframe Confirmation (4h) for ENTRIES
-                        if signal and signal.action == "ENTRY":
-                            try:
-                                # Fetch 4h candles only if we have a potential entry
-                                candles_4h = await loader.get_ohlcv(symbol, timeframe='4h', limit=30)
-                                if candles_4h:
-                                    regime_4h = analyzer.analyze_market_regime(candles_4h)
-                                    # Filter: Don't buy if 4h Trend is DOWN (Major downtrend)
-                                    # UNLESS it is a High Score Override
-                                    if regime_4h['trend'] == 'DOWN':
-                                        if hasattr(signal, 'primary_strategy') and signal.primary_strategy == "high_score_override":
-                                            log(f"🚀 {symbol}: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.")
-                                        else:
-                                            log(f"📉 Filtered {symbol}: 1h Buy Signal but 4h Trend is DOWN.")
-                                            executor.brain.record_ghost_trade(
-                                                symbol, 
-                                                current_price, 
-                                                "Multi-TF Filter: 4h Trend DOWN", 
-                                                signal.score
-                                            )
-                                            signal = None
-                                    else:
-                                        log(f"✅ Multi-TF Confirmed {symbol}: 4h Trend is {regime_4h['trend']}")
-                            except Exception as e:
-                                log(f"⚠️ Multi-TF Check Failed for {symbol}: {e}")
-                                
-                        # Step 3.6: Correlation Check (Portfolio Diversification)
-                        if signal and signal.action == "ENTRY":
-                            is_correlated = False
-                            # Check against existing positions
-                            for held_symbol in executor.paper_positions:
-                                if held_symbol == symbol: continue
-                                
-                                try:
-                                    # Use cache to get held symbol data fast
-                                    # We need to await because get_ohlcv is async
-                                    held_candles = await loader.get_ohlcv(held_symbol, timeframe='1h', limit=50)
-                                    if held_candles:
-                                        corr = analyzer.calculate_correlation(candles, held_candles)
-                                        if corr > 0.85: # High correlation threshold (0.85 is strong)
-                                            log(f"🔗 Correlation Alert: {symbol} is highly correlated with held {held_symbol} ({corr:.2f}). Skipping to diversify.")
-                                            executor.brain.record_ghost_trade(
-                                                symbol, 
-                                                current_price, 
-                                                f"Correlation Filter: >0.85 with {held_symbol}", 
-                                                signal.score
-                                            )
-                                            is_correlated = True
-                                            break
-                                except Exception as e:
-                                    log(f"⚠️ Correlation check failed for {held_symbol}: {e}")
-                            
-                            if is_correlated:
-                                signal = None
-
-                    else:
-                        signal = None
-                    
-                    # 2. Risk Management Override (Phase 1: StopLossManager Integration)
-                    if symbol in executor.paper_positions:
-                        # Prepare data for ATR calculation
-                        df_candles = None
-                        if candles:
-                             try:
-                                 df_candles = pd.DataFrame(candles, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-                                 for c in ['open', 'high', 'low', 'close', 'volume']:
-                                     df_candles[c] = df_candles[c].astype(float)
-                             except Exception as e:
-                                 log(f"⚠️ Risk Data Prep Error ({symbol}): {e}")
-                        
-                        # Check Risk Conditions via Executor -> StopLossManager
-                        risk_check = executor.check_risk_conditions(symbol, current_price, df_candles)
-                        action = risk_check.get('action')
-                        
-                        if action in ['CLOSE', 'PARTIAL_CLOSE']:
-                            reason = risk_check.get('reason', 'RISK_EXIT')
-                            log(f"🛡️ Risk Exit Triggered [{symbol}]: {action} - {reason}")
-                            
-                            signal_action = "EXIT" if action == 'CLOSE' else "PARTIAL_EXIT"
-                            score = -100.0 if action == 'CLOSE' else 100.0 # Partial profit is positive
-                            
-                            signal = TradeSignal(
-                                symbol=symbol,
-                                action=signal_action,
-                                direction="LONG",
-                                score=score,
-                                estimated_yield=0.0, # Will be calculated by executor
-                                timestamp=int(time.time() * 1000),
-                                details={
-                                    "reason": reason, 
-                                    "close": current_price,
-                                    "qty_pct": risk_check.get('qty_pct', 1.0)
-                                }
-                            )
-
-                    # 3. Execution
-                    if signal:
-                        signals_found += 1
-                        log(f"⚡ Signal Detected for {symbol}: {signal.action} (Score: {signal.score:.2f})")
-                        await executor.execute_strategy(signal, latest_scores=latest_scores)
-
-                except Exception as e:
-                    log(f"⚠️ Error scanning {symbol}: {e}")
-                    continue
+                # Use TradeManager to process symbol
+                # Logic: Fetch Data -> Analyze -> Risk Check -> Execute if Signal
+                signal = await trade_manager.process_symbol_logic(
+                    symbol, 
+                    market_regime, 
+                    latest_scores, 
+                    current_prices_map
+                )
+                
+                if symbol in current_prices_map:
+                    scanned_count += 1
+                
+                if signal:
+                    signals_found += 1
+                    all_market_signals.append(signal)
             
             if scanned_count > 0:
                 log(f"✅ Scan Complete. Checked {scanned_count} symbols. Found {signals_found} signals.")
@@ -580,240 +389,20 @@ async def run_bot():
                     current_prices_map
                 )
                 
-                # --- LOW BALANCE RECOVERY MODE (< $50) ---
-                # Kullanıcı isteği: Toplam varlık < $50 ise tek varlığa düş ve en iyisini al
+                # --- LOW BALANCE RECOVERY MODE (< $100) ---
+                # Kullanıcı isteği: Toplam varlık < $100 ise tek varlığa düş ve en iyisini al
                 total_equity = await executor.get_total_balance()
                 log(f"DEBUG: Total Equity Check: ${total_equity:.2f} (Positions: {len(executor.paper_positions)})")
-                LOW_BALANCE_THRESHOLD = 100.0 # Increased to 100 to ensure trigger
+                LOW_BALANCE_THRESHOLD = 100.0 
                 
                 if total_equity < LOW_BALANCE_THRESHOLD and settings.LIVE_TRADING:
-                    log(f"⚠️ Düşük Bakiye Modu Aktif (${total_equity:.2f} < ${LOW_BALANCE_THRESHOLD}). Sniper Modu Devrede!")
-                    
-                    # 1. En iyi sinyali bul (ENTRY olanlardan) - Yüksek Kalite Filtresi (>0.75)
-                    # Sniper Modu (All-In) için sadece çok güçlü sinyallere giriyoruz.
-                    high_quality_signals = sorted([
-                        s for s in all_market_signals 
-                        if s.action == 'ENTRY' and s.score >= 0.75
-                    ], key=lambda x: x.score, reverse=True)
-                    
-                    if not high_quality_signals:
-                        if [s for s in all_market_signals if s.action == 'ENTRY']:
-                             log("⏳ Sniper Modu: Giriş sinyalleri var ama yeterince güçlü değil (<0.75). Nakitte bekleniyor...")
-                        best_signal = None
-                    else:
-                        best_signal = high_quality_signals[0]
-                        
-                        # --- FUTURES SENTIMENT CHECK (New Feature) ---
-                        # Eğer SentimentAnalyzer aktifse, Futures L/S oranına bak
-                        if sentiment_analyzer:
-                            try:
-                                log(f"🔍 Futures Sentiment Analizi: {best_signal.symbol}...")
-                                futures_data = await sentiment_analyzer.get_futures_sentiment(best_signal.symbol)
-                                ls_ratio = futures_data.get('long_short_ratio', 0)
-                                if ls_ratio > 0:
-                                    log(f"📊 {best_signal.symbol} Futures L/S Ratio: {ls_ratio:.2f}")
-                                    
-                                    # Aşırı Kalabalık Long Uyarısı
-                                    if ls_ratio > 2.5:
-                                        log(f"⚠️ DİKKAT: {best_signal.symbol} üzerinde aşırı Long yığılması var (Ratio: {ls_ratio}). Düzeltme riski!")
-                                        # Skoru biraz düşürebiliriz veya sadece loglarız.
-                                        # best_signal.score -= 1.0 
-                            except Exception as e:
-                                log(f"⚠️ Futures Check Failed: {e}")
-                    
-                    # 2. Mevcut Pozisyonları Yönet (Tek bir en iyiye düşür)
-                    current_positions = list(executor.paper_positions.keys())
-                    
-                    for symbol in current_positions:
-                        should_sell = False
-                        
-                        # Durum A: En iyi sinyal var ama elimizdeki o değil -> Sat (Swap için yer aç)
-                        if best_signal and symbol != best_signal.symbol:
-                            # User Request: Check for 5 point score difference
-                            current_pos_signal = next((s for s in all_market_signals if s.symbol == symbol), None)
-                            
-                            # Use cache if signal missing (prevent Score 0 glitch)
-                            if current_pos_signal:
-                                current_score = current_pos_signal.score
-                            else:
-                                current_score = latest_scores.get(symbol, 0.0)
-
-                            score_diff = best_signal.score - current_score
-                            
-                            if score_diff >= 5.0:
-                                # Debounce Logic: 3 döngü teyit (User Request)
-                                current_count = swap_confirmation_tracker.get(symbol, 0) + 1
-                                swap_confirmation_tracker[symbol] = current_count
-                                
-                                if current_count >= 3:
-                                    should_sell = True
-                                    log(f"📉 Sniper Modu: {symbol} satılıyor. (Fark: {score_diff:.1f} >= 5.0 | Onay: {current_count}/3 | Yeni: {best_signal.symbol})")
-                                    swap_confirmation_tracker[symbol] = 0 # Reset
-                                else:
-                                    log(f"⏳ Sniper Modu: {symbol} için swap şartı sağlandı ({current_count}/3). Fark: {score_diff:.1f}. Onay bekleniyor...")
-                            else:
-                                # Reset counter if condition is lost
-                                if swap_confirmation_tracker.get(symbol, 0) > 0:
-                                     log(f"✋ Sniper Modu: {symbol} swap onayı sıfırlandı. Fark düştü ({score_diff:.1f}).")
-                                swap_confirmation_tracker[symbol] = 0
-                                log(f"✋ Sniper Modu: {symbol} tutuluyor. Fark yetersiz ({score_diff:.1f} < 5.0).")
-                        
-                        # Durum B: En iyi sinyal yok ama elimizde pozisyon var -> 
-                        # Eğer çoklu pozisyon varsa ve bu en iyisi değilse sat. 
-                        # Veya hiç sinyal yoksa nakite geçmek isteyebiliriz? 
-                        # Şimdilik: Sadece daha iyi fırsat varsa veya çoklu pozisyon varsa satalım.
-                        elif len(current_positions) > 1:
-                            # Birden fazla ise, sadece en iyisini (veya rastgele birini) tutmak yerine
-                            # Hepsini satıp yeniden en iyisini almak daha temiz.
-                            should_sell = True
-                            log(f"📉 Sniper Modu: Portföy tekilleştiriliyor. {symbol} satılıyor.")
-                            
-                        if should_sell:
-                            # FIX: Get current price for correct valuation
-                            price = current_prices_map.get(symbol, 0.0)
-                            if price == 0.0:
-                                # Try to fallback to position entry price or 0
-                                price = executor.paper_positions.get(symbol, {}).get('entry_price', 0.0)
-                            
-                            # FIX: Check for Dust (< 6.0 USDT) and convert directly
-                            pos_qty = executor.paper_positions.get(symbol, {}).get('quantity', 0.0)
-                            value_est = pos_qty * price
-                            
-                            # If value is small but > 0, try dust conversion immediately
-                            if 0.0 < value_est < 6.0 and not settings.IS_TR_BINANCE:
-                                log(f"🧹 Sniper Modu: {symbol} (Değer: ${value_est:.2f}) Dust Convert'e yönlendiriliyor.")
-                                await executor.convert_dust_to_bnb()
-                                # Wait for sync
-                                await asyncio.sleep(1.0)
-                                continue
-
-                            # Satış Sinyali Oluştur
-                            sell_signal = TradeSignal(
-                                symbol=symbol,
-                                action="EXIT",
-                                direction="LONG",
-                                score=-10.0, # Acil Satış
-                                estimated_yield=0.0,
-                                timestamp=int(time.time() * 1000),
-                                details={
-                                    "reason": "SNIPER_MODE_LIQUIDATION",
-                                    "close": price  # Pass price to avoid 0.0 in executor
-                                }
-                            )
-                            await executor.execute_strategy(sell_signal)
-                            # Bakiye güncellemesi için kısa bekleme
-                            await asyncio.sleep(1.0)
-
-                    # 2.5. Dust Temizliği (BNB Convert) ve Likidasyon
-                    # Satılamayan (Min limit altı) bakiyeleri BNB'ye çevir
-                    if not settings.IS_TR_BINANCE:
-                         log("🧹 Sniper Modu: Dust Temizliği Başlatılıyor...")
-                         await executor.convert_dust_to_bnb()
-                         # Cüzdanı tekrar senkronize et ki yeni BNB/USDT bakiyesi görünsün
-                         await executor.sync_wallet()
-                         
-                         # CRITICAL: Dust convert sonrası biriken BNB'yi satmayı dene (Eğer hedef BNB değilse)
-                         # Bu adım, 3.70$ BNB + 1.50$ Dust -> 5.20$ BNB -> USDT dönüşümünü sağlar.
-                         if best_signal and not best_signal.symbol.startswith('BNB'):
-                             # BNB/USDT var mı kontrol et
-                             if 'BNB/USDT' in executor.paper_positions:
-                                 log("🧹 Sniper Modu: Biriken BNB bakiyesi USDT'ye çevriliyor...")
-                                 bnb_sell_signal = TradeSignal(
-                                     symbol='BNB/USDT',
-                                     action="EXIT",
-                                     direction="LONG",
-                                     score=-10.0,
-                                     estimated_yield=0.0,
-                                     timestamp=int(time.time() * 1000),
-                                     details={"reason": "SNIPER_MODE_BNB_LIQUIDATION"}
-                                 )
-                                 await executor.execute_strategy(bnb_sell_signal)
-                                 await asyncio.sleep(1.0)
-                                 await executor.sync_wallet_balances()
-                         
-                    # 3. Alım Yap (Tek Atış)
-                    # Eğer elimiz boşaldıysa (veya sadece hedef varlık kaldıysa) ve en iyi sinyal varsa -> FULL GİR
-                    # Not: Dust convert sonrası elimizde BNB olabilir. Eğer hedef BNB değilse ve BNB satılabiliyorsa satılmalıydı.
-                    # Ama BNB dust convert'ten geldiği için muhtemelen satılamaz.
-                    # Bu durumda elimizdeki BNB'yi "boş" sayıp kalan USDT ile girebiliriz.
-                    
-                    # paper_positions'da sadece hedef varlık varsa veya hiç yoksa
-                    can_buy = False
-                    if len(executor.paper_positions) == 0:
-                        can_buy = True
-                    elif len(executor.paper_positions) == 1 and best_signal and best_signal.symbol in executor.paper_positions:
-                        # Zaten hedef varlıktayız, belki ekleme yapabiliriz? 
-                        # Ama Sniper modu "Tek Coin" diyor. Zaten ondaysak işlem yapmaya gerek yok.
-                        can_buy = False 
-                        log(f"🎯 Zaten hedef varlıktayız: {best_signal.symbol}")
-                    else:
-                        # Belki elimizde sadece BNB kaldı (Convert sonrası)
-                        # Eğer hedef BNB değilse, BNB harici USDT ile girebiliriz.
-                        # Executor bakiyeyi kontrol edip alacak.
-                        can_buy = True
-
-                    if can_buy and best_signal:
-                        log(f"🎯 Sniper Modu: {best_signal.symbol} için tam bakiye ile giriş yapılıyor!")
-                        
-                        # Force All-In Flag
-                        if best_signal.details is None: best_signal.details = {}
-                        best_signal.details['force_all_in'] = True
-                        
-                        await executor.execute_strategy(best_signal)
-                        
-                        # Döngüyü burada kes (başka işlem yapma)
-                        all_market_signals = [] 
-
+                    await trade_manager.handle_sniper_mode(all_market_signals, current_prices_map)
+                
                 # --- Opportunity Cost Management (Swap Logic) ---
                 # Eğer alım yapılmadıysa veya bakiye kısıtlıysa takas fırsatlarını kontrol et
-                # Not: Bakiye kontrolünü Executor içinde yapmak daha doğru ama şimdilik sinyal bazlı bakalım
-                # Sniper Modu aktifse burayı atla (zaten yukarıda hallettik)
+                # Sniper Modu aktifse burayı atla
                 elif executor.paper_positions and all_market_signals:
-                    swap_opp = opportunity_manager.check_for_swap_opportunity(
-                        executor.paper_positions, 
-                        all_market_signals
-                    )
-                    
-                    if swap_opp:
-                        # 3-Loop Confirmation Logic (Extended to Normal Mode)
-                        sell_symbol = swap_opp['sell_symbol']
-                        buy_symbol = swap_opp['buy_signal'].symbol
-                        
-                        current_count = swap_confirmation_tracker.get(sell_symbol, 0) + 1
-                        swap_confirmation_tracker[sell_symbol] = current_count
-                        
-                        if current_count >= 3:
-                            log(f"🔄 SWAP CONFIRMED: Sell {sell_symbol} -> Buy {buy_symbol} ({swap_opp['reason']} | Count: {current_count}/3)")
-                            
-                            # 1. Sell the old asset
-                            sell_signal = TradeSignal(
-                                symbol=sell_symbol,
-                                action="EXIT",
-                                direction="LONG",
-                                score=-1.0, # Zorunlu çıkış
-                                estimated_yield=0.0,
-                                timestamp=int(time.time() * 1000),
-                                details={"reason": "SWAP_FOR_BETTER_OPPORTUNITY"}
-                            )
-                            await executor.execute_strategy(sell_signal)
-                            
-                            # 2. Buy the new asset
-                            # Biraz bekle ki bakiye güncellensin
-                            await asyncio.sleep(2.0) 
-                            await executor.sync_wallet_balances()
-                            await executor.execute_strategy(swap_opp['buy_signal'])
-                            
-                            # Reset tracker
-                            swap_confirmation_tracker[sell_symbol] = 0
-                        else:
-                            log(f"⏳ Swap Opportunity Detected: {sell_symbol} -> {buy_symbol}. Waiting for confirmation ({current_count}/3)...")
-                    else:
-                        # No swap opportunity found (diff < 5.0 or hold time constraint)
-                        # Reset trackers for all held positions to be safe
-                        if swap_confirmation_tracker:
-                            # Only clear if we are in this block (meaning not in Sniper Mode)
-                            # log("✋ Swap conditions not met. Resetting confirmation trackers.")
-                            swap_confirmation_tracker.clear()
+                    await trade_manager.handle_normal_swap_logic(all_market_signals)
                         
                 # Her döngü sonunda cüzdanı güncelle
                 if settings.LIVE_TRADING:

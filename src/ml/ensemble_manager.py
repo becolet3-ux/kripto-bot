@@ -33,11 +33,19 @@ except ImportError:
 logger = logging.getLogger("EnsembleManager")
 
 class EnsembleManager:
-    def __init__(self, models_dir: str = "models"):
-        self.models_dir = models_dir
-        if not os.path.exists(self.models_dir):
-            os.makedirs(self.models_dir)
+    def __init__(self, models_dir: str = None):
+        if models_dir is None:
+            # Default to data/models for persistence (since data is volume mounted)
+            self.models_dir = os.path.join(os.getcwd(), 'data', 'models')
+        else:
+            self.models_dir = models_dir
             
+        if not os.path.exists(self.models_dir):
+            try:
+                os.makedirs(self.models_dir)
+            except OSError as e:
+                logger.warning(f"Model dizini oluşturulamadı: {e}")
+                
         self.models = {}
         if SKLEARN_AVAILABLE:
             self.models['rf'] = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
