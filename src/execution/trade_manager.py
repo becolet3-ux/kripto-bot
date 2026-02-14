@@ -155,7 +155,7 @@ class TradeManager:
             log(f"⚠️ Bağlantı Hatası ({symbol}): {e}")
             return None
         except Exception as e:
-            log(f"⚠️ Error processing {symbol}: {e}")
+            log(f"⚠️ Error processing {symbol} [{e.__class__.__name__}]: {e}")
             return None
 
     async def _handle_grid_trading(self, symbol, current_price, market_regime):
