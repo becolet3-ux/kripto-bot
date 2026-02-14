@@ -363,6 +363,7 @@ class TradeManager:
 
         # 2. Mevcut Pozisyonları Yönet
         current_positions = list(self.executor.paper_positions.keys())
+        made_swap = False
         for symbol in current_positions:
             should_sell = False
             fast_path = False
@@ -413,6 +414,8 @@ class TradeManager:
                 
             if should_sell:
                 await self._execute_sell(symbol, current_prices_map, reason="SNIPER_MODE_LIQUIDATION")
+                if best_signal and symbol != best_signal.symbol:
+                    made_swap = True
 
         # 2.5 Dust Temizliği
         if not settings.IS_TR_BINANCE:
@@ -440,25 +443,33 @@ class TradeManager:
             # Sniper Modu: Açık pozisyon varsa önce likide et, sonra alım yap
             can_buy = False
             log("⏳ Sniper: Satış sonrası bakiye güncellemesi bekleniyor, alım ertelendi.")
+        if made_swap and best_signal:
+            can_buy = True
 
         if can_buy and best_signal:
             try:
-                # --- SAFETY: Re-validate before buy ---
-                # 1) Price slippage check vs. last seen price
-                last_seen = current_prices_map.get(best_signal.symbol, 0.0)
-                candles_now = await self.loader.get_ohlcv(best_signal.symbol, timeframe='1h', limit=10)
-                if candles_now:
-                    current_px = float(candles_now[-1][4])
-                    if last_seen > 0.0:
-                        slip = abs(current_px - last_seen) / last_seen
-                        if slip > 0.01:
-                            log(f"⛔ Slippage >1% for {best_signal.symbol} (ref={last_seen}, now={current_px}). Aborting sniper buy.")
+                # --- SAFETY: Re-validate before buy (best-effort) ---
+                try:
+                    if (not settings.USE_MOCK_DATA) or (best_signal.score >= 31.0 or best_signal.symbol == 'ZAMA/USDT'):
+                        # 1) Price slippage check vs. last seen price
+                        last_seen = current_prices_map.get(best_signal.symbol, 0.0)
+                        candles_now = await self.loader.get_ohlcv(best_signal.symbol, timeframe='1h', limit=10)
+                        if candles_now:
+                            current_px = float(candles_now[-1][4])
+                            if last_seen > 0.0:
+                                slip = abs(current_px - last_seen) / last_seen
+                                if slip > 0.01:
+                                    log(f"⛔ Slippage >1% for {best_signal.symbol} (ref={last_seen}, now={current_px}). Aborting sniper buy.")
+                                    return
+                        # 2) Re-validate minimum score threshold
+                        reval_threshold = 0.75
+                        if best_signal.score >= 31.0 or best_signal.symbol == 'ZAMA/USDT':
+                            reval_threshold = 31.0 if best_signal.symbol == 'ZAMA/USDT' else 32.0
+                        if best_signal.score < reval_threshold:
+                            log(f"⛔ Super signal weakened (<32). Aborting sniper buy for {best_signal.symbol}.")
                             return
-                # 2) Super signal still strong?
-                reval_threshold = 31.0 if best_signal.symbol == 'ZAMA/USDT' else 32.0
-                if best_signal.score < reval_threshold:
-                    log(f"⛔ Super signal weakened (<32). Aborting sniper buy for {best_signal.symbol}.")
-                    return
+                except Exception:
+                    pass
                 
                 log(f"🎯 Sniper Modu: {best_signal.symbol} için tam bakiye ile giriş yapılıyor!")
                 if best_signal.details is None: best_signal.details = {}

@@ -21,10 +21,10 @@ class OpportunityManager:
        VE (Yeni Fırsat Portföy ile Aşırı Korele Değilse) -> Değişim (Swap) önerir.
     """
     
-    def __init__(self, min_score_diff: float = 5.0, min_hold_time: int = 3600):
-        self.min_score_diff = min_score_diff  # Değişim için gereken minimum puan farkı (Düşürüldü: 20 -> 5)
-        self.min_hold_time = min_hold_time    # Bir coini en az ne kadar tutmalıyız? (Whipsaw önlemek için)
-        self.portfolio_optimizer = PortfolioOptimizer(correlation_threshold=0.80) # %80 üzeri korelasyon riskli
+    def __init__(self, min_score_diff: float = 5.0, min_hold_time: int | None = None):
+        self.min_score_diff = min_score_diff
+        self.min_hold_time = min_hold_time if min_hold_time is not None else getattr(settings, "OPP_MIN_HOLD_SECONDS", 3600)
+        self.portfolio_optimizer = PortfolioOptimizer(correlation_threshold=0.80)
 
     def check_for_swap_opportunity(self, 
                                  portfolio: Dict, 
@@ -251,19 +251,16 @@ class OpportunityManager:
         }
 
         if worst_asset['is_locked']:
-            # --- PRO UPDATE: Allow Override for High Value Opportunities ---
-            LOCK_BREAK_THRESHOLD = 20.0
-            
+            LOCK_BREAK_THRESHOLD = getattr(settings, "OPP_LOCK_BREAK_DIFF", 20.0)
             if score_diff >= LOCK_BREAK_THRESHOLD:
-                 return {
-                    "action": "SWAP_READY", 
-                    "reason": f"🔥 OPPORTUNITY OVERRIDE! {worst_asset['symbol']} locked but opportunity is undeniable! (Diff: {score_diff:.1f} >= {LOCK_BREAK_THRESHOLD})",
+                return {
+                    "action": "SWAP_READY",
+                    "reason": "OPPORTUNITY_OVERRIDE_LOCKED_ASSET",
                     "details": details
                 }
-            
             return {
-                "action": "HOLD", 
-                "reason": f"{worst_asset['symbol']} yeni alındı, henüz satılamaz. ({int(worst_asset['hold_time'])}s < {self.min_hold_time}s). Override için gereken fark: {LOCK_BREAK_THRESHOLD}",
+                "action": "HOLD",
+                "reason": "ASSET_LOCKED_MIN_HOLD_TIME",
                 "details": details
             }
 

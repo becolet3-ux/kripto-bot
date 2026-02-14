@@ -214,14 +214,29 @@ end
 - Aksiyon: Mevcut pozisyon derhal satılır, ardından 5 sn beklenir ve cüzdan bakiyesi senkronize edilir.
 - Yeniden Doğrulama: Alımdan hemen önce sinyal skoru eşik üzerinde mi ve fiyat kayması (slippage) ≤%1 mi kontrol edilir; şartlar bozulduysa alım iptal edilir.
 - Korelasyon: Süper sinyallerde korelasyon filtresi bypass edilir; diğerlerinde korelasyon >0.85 ise atlanır.
+- Not: Mock/Test ortamında (USE_MOCK_DATA=True) hızlı akışta satış sonrası aynı döngüde alım tetiklenebilir; canlıda bakiye senkronizasyonu beklidir.
 
 ##### 3.1.2. Kilit Kırma (Hold-Time Lock Override)
 - Koşul: Skor farkı ≥20 olduğunda, “kilitli varlık/hold-time” engeli tüm modlarda aşılır.
 - Amaç: Çok yüksek fırsat farklarında bekleme nedeniyle fırsat kaçırmayı engellemek.
+- Sabit: LOCK_BREAK_THRESHOLD = 20.0 (Genel kural; Sniper ve Normal modlarda geçerli).
 
 ##### 3.1.3. Adaptif Sniper Eşiği
 - Volatilite düşükse gerekli skor farkı 3.5’e iner; yüksek volatilitede 5.0 olarak kalır.
 - Eşik hesaplaması, en iyi sinyalin `details.volatility` alanına dayalıdır.
+- Teyit: Gerekli fark sağlanırsa 3 döngü (3/3) teyit sonrası satış tetiklenir; “super signal” hızlı yolunda ≥20 fark varsa anında satış yapılır.
+
+##### 3.1.4. Alım Öncesi Yeniden Doğrulama
+- Normal Yol: Skor ≥0.75 olmalı. Mock/Test ortamında slippage kontrolü atlanır.
+- Süper Sinyal Yolu: Skor (≥32 veya ZAMA için ≥31) korunmalı ve slippage ≤%1 olmalı. Mock/Test ortamında da bu kontrol uygulanabilir.
+
+##### 3.1.5. Operasyonel Notlar
+- Bakiye Senkronu: Canlıda satış sonrası 5 sn beklenir ve cüzdan senkronize edilir; Mock/Test ortamında bazı akışlarda satışla aynı döngü içinde alım tetiklenebilir.
+- Kilit Kırma: LOCK_BREAK_THRESHOLD = 20.0; skor farkı ≥20 ise hold-time kilidi bypass edilir.
+- Dust Koruması: convert_dust_to_bnb aktif pozisyonları (10 USDT altı olsa bile) atlar; yanlışlıkla süpürme engellenir.
+- Skor Kapası: Mock/Test ortamında skor [-20, 20], canlıda [-20, 40]; 31+ “super signal” canlıda korunur.
+- Slippage Kontrolü: Normal alımlarda Mock/Test ortamında slippage kontrolü atlanır; süper sinyal yolunda canlıda zorunlu, mock’ta uygulanabilir.
+- Korelasyon: Süper sinyaller için korelasyon filtresi bypass edilebilir; standart akışta yüksek korelasyon (>0.85) atlama sebebidir.
 
 #### B. Normal Mod (Yüksek Bakiye)
 Bakiye varsa ve `Score > Eşik Değer` (Genelde 1.0) ise alım yapar.
@@ -277,6 +292,23 @@ async def execute_buy(self, symbol, quantity, price):
 4.  **Stablecoin Blacklist:**
     USDT, USDC, FDUSD, TUSD gibi coinler kara listededir, bot bunları asla almaz (Parite/Churning önlemi).
 
+### Freqtrade’den Esinlenilen Özellikler
+
+- Dinamik ROI (Zaman Tabanlı Kâr Alma)
+  - Pozisyon süresine göre hedef kâr yüzdesi kademeli düşer (örn. 0dk: %10 → 4s: %0.5).
+  - Ayar: settings.DYNAMIC_ROI_ENABLED, settings.DYNAMIC_ROI_TABLE
+  - Uygulama: StopLossManager.check_exit_conditions içinde “DYNAMIC_ROI_HIT”.
+
+- Cooldown Mekanizması (Kazanç/Kayıp Sonrası Bekleme)
+  - Kayıp sonrası aynı coinde belirli süre işlem açmaz (örn. 120 dk), kazanç sonrası kısa dinlenme (örn. 30 dk).
+  - Ayar: settings.COOLDOWN_ENABLED, settings.COOLDOWN_MINUTES_AFTER_LOSS, settings.COOLDOWN_MINUTES_AFTER_WIN
+  - Uygulama: Güvenlik kontrolleri ve Brain istatistikleri üzerinden.
+
+- Edge Filtresi (Win Rate Tabanlı Giriş Filtresi)
+  - Yeterli geçmiş yoksa veya kazanma oranı eşik altındaysa (örn. %35) giriş yapma.
+  - Ayar: settings.EDGE_FILTER_ENABLED, settings.MIN_WIN_RATE_FOR_ENTRY, settings.MIN_TRADES_FOR_EDGE
+  - Uygulama: Brain performans istatistikleri ve giriş validasyonunda.
+
 ---
 
 ## 5. Öğrenme Katmanı (BotBrain) & Yapay Zeka
@@ -320,6 +352,38 @@ def record_ghost_trade(self, symbol, price, reason):
 ```
 
 ---
+
+## 10. Backtesting ve Kalite Ölçümü
+
+### 10.1 Backtest Çerçevesi
+- Konum: `src/backtest.py`, çalıştırma aracı: `run_backtest.py`
+- Tek/Çoklu Sembol: Virgülle ayrılmış sembollerle çoklu koşum
+- Çoklu Borsa: `exchange_id` parametresi (varsayılan `binance`) ile CCXT destekli
+- Portföy Modu: Birden fazla sembolü eşit sermaye ile aynı anda koşturan portföy backtest
+- ATR Tabanlı Trailing Stop: Backtester, canlıya yakınlaştırmak için ATR*2 trailing stop ve %10 TP uygular
+
+Örnekler:
+
+```
+python run_backtest.py BTC/USDT 30 binance
+python run_backtest.py BTC/USDT,ETH/USDT 14 bybit
+python run_backtest.py BTC/USDT,ETH/USDT 30 binance portfolio
+```
+
+Çıktılar:
+- Konsolda özet metrikler (Final Bakiye, Getiri, Win Rate, PF, MDD)
+- İşlem geçmişi CSV: `data/backtest_{SYMBOL}.csv`
+
+### 10.2 Test ve Kapsam (Coverage)
+- Çerçeve: `pytest` + `pytest-cov`
+- Komut: `pytest -q` (kapsam raporu terminalde görünür)
+- Hedef: Orta vadede ≥%50 toplam kapsam
+- Kısa Yol Planı:
+  - Risk katmanı: `risk/volatility_calculator.py`, `risk/position_sizer.py`
+  - Strateji katmanı: `strategies/*` fonksiyonel testler
+  - Yürütme katmanı: `execution/trade_manager.py` davranış testleri
+
+Not: Üretim entegrasyon bileşenleri (dashboard, main döngüsü) kapsam dışında tutulabilir.
 
 ## 6. Sıkça Sorulan Sorular ve Sorun Giderme
 

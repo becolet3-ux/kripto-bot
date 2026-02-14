@@ -603,10 +603,14 @@ class MarketAnalyzer:
         if score is None:
             score = 0.0
             
-        # --- CRITICAL UPDATE: Increased Max Cap to 40.0 for Sniper Mode ---
-        # Old Cap: 20.0 (Prevented Sniper Mode triggering at 25.0)
-        # New Cap: 40.0 (Allows capturing "Super Signals" like 31.50)
-        score = max(-20.0, min(40.0, float(score)))
+        max_cap = 40.0
+        if settings.USE_MOCK_DATA:
+            max_cap = 20.0
+        score = max(-20.0, min(max_cap, float(score)))
+
+        # Calculate volatility percentage for details (ATR / Close * 100)
+        _atr_val = float(last_row.get('ATR', 0.0))
+        _volatility_pct = ( _atr_val / close * 100.0 ) if close > 0 else 0.0
 
         return TradeSignal(
             symbol=symbol,
@@ -624,6 +628,8 @@ class MarketAnalyzer:
                 "atr": float(last_row.get('ATR', 0.0)),
                 "ATR": float(last_row.get('ATR', 0.0)), # Capitalized for consistency
                 "close": float(close),
+                "volume_ratio": float(vol_ratio),
+                "volatility": float(_volatility_pct),
                 "ml_prob": float(ml_prob) if 'ml_prob' in locals() else 0.0,
                 "indicators": strategy_result.get('strategy_details', {}),
                 "regime": detected_regime,

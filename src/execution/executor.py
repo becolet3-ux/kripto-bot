@@ -931,7 +931,10 @@ class BinanceExecutor:
                         qty = qty * qty_pct
                         log(f"🌗 Kısmi Çıkış Sinyali: %{qty_pct*100} oranında satış.")
                         
-                    await self.execute_sell(symbol, qty, price, current_pos, is_partial=is_partial)
+                    exit_reason = None
+                    if hasattr(sig, 'details') and isinstance(sig.details, dict):
+                        exit_reason = sig.details.get('reason')
+                    await self.execute_sell(symbol, qty, price, current_pos, is_partial=is_partial, exit_reason=exit_reason)
 
     async def execute_buy(self, symbol: str, quantity: float, price: float, features: dict = None) -> bool:
         """Alım emri"""
@@ -1053,65 +1056,86 @@ class BinanceExecutor:
                             qty_to_send = int(qty_to_send)
 
                     log(f"🛒 Global Alış Emri: {symbol} - Miktar: {qty_to_send}")
-                    try:
-                        order = await asyncio.to_thread(
-                            self.exchange_spot.create_market_buy_order,
-                            symbol,
-                            qty_to_send
-                        )
-                        log(f"✅ Global ALIŞ Başarılı: {order.get('id')}")
-                    except Exception as e:
-                        # RETRY LOGIC FOR INSUFFICIENT BALANCE
-                        err_msg = str(e)
-                        if 'Insufficient balance' in err_msg or 'Account has insufficient balance' in err_msg or '-2010' in err_msg:
-                            log(f"⚠️ Yetersiz Bakiye Hatası alındı. Miktar güncellenip tekrar deneniyor... (Hata: {err_msg[:50]}...)")
-                            
-                            # 1. Get Fresh Free Balance
-                            base_asset = 'USDT' # Global default
-                            free_balance = await self.get_free_balance(base_asset)
-                            
-                            # 2. Calculate Max Safe Quantity (98% of free balance)
-                            # Assuming Leverage 1x for retry to be safe, or use current leverage if futures
-                            current_leverage = settings.LEVERAGE if (not self.is_tr and settings.TRADING_MODE == 'futures') else 1.0
-                            new_notional = free_balance * current_leverage * 0.98
-                            
-                            # Min Notional Check for Retry
-                            min_notional_retry = 5.0
-                            if info:
-                                min_notional_retry = float(info.get('minNotional', 5.0))
-
-                            if new_notional < min_notional_retry:
-                                log(f"❌ Retry İptal: Güncel bakiye ({free_balance:.2f} {base_asset}) min notional ({min_notional_retry}) karşılanamıyor.")
-                                return False
-                            
-                            new_qty = new_notional / price
-                            
-                            # 3. Re-apply Precision
-                            qty_to_send = new_qty
-                            if info:
-                                step_size = float(info.get('stepSize', '1.0'))
-                                if step_size > 0:
-                                    steps = int(new_qty / step_size)
-                                    qty_to_send = steps * step_size
-                                    precision = int(round(-math.log10(step_size))) if step_size < 1 else 0
-                                    if precision > 0:
-                                        qty_to_send = float("{:.{p}f}".format(qty_to_send, p=precision))
-                                    else:
-                                        qty_to_send = int(qty_to_send)
-                                else:
-                                    qty_to_send = int(new_qty)
-                            
-                            log(f"🛒 Global Alış Emri (RETRY): {symbol} - Yeni Miktar: {qty_to_send}")
-                            
-                            # 4. Retry Order
+                    # Idempotent Order ID
+                    params = {}
+                    if settings.IDEMPOTENT_ORDERS_ENABLED:
+                        client_id = f"kbB{int(time.time()*1000)%100000000}"
+                        params['newClientOrderId'] = client_id
+                    
+                    # Retry with exponential backoff for rate limits
+                    attempt = 0
+                    while True:
+                        try:
                             order = await asyncio.to_thread(
                                 self.exchange_spot.create_market_buy_order,
                                 symbol,
-                                qty_to_send
+                                qty_to_send,
+                                params
                             )
-                            log(f"✅ Global ALIŞ Başarılı (Retry): {order.get('id')}")
-                        else:
-                            raise ExchangeError(f"Buy failed after retry check: {e}") from e
+                            log(f"✅ Global ALIŞ Başarılı: {order.get('id') if isinstance(order, dict) else 'OK'}")
+                            break
+                        except Exception as e:
+                            err_msg = str(e)
+                            retryable = ('Too many requests' in err_msg) or ('429' in err_msg) or ('503' in err_msg) or ('timeout' in err_msg.lower())
+                            if retryable and attempt < settings.ORDER_RETRY_MAX:
+                                delay_ms = settings.ORDER_RETRY_BASE_MS * (2 ** attempt)
+                                log(f"⚠️ Buy Rate-Limit/Retryable Error: retrying in {delay_ms}ms ({attempt+1}/{settings.ORDER_RETRY_MAX})")
+                                await asyncio.sleep(delay_ms / 1000.0)
+                                attempt += 1
+                                continue
+                            # RETRY: Insufficient balance path
+                        # RETRY LOGIC FOR INSUFFICIENT BALANCE
+                            err_msg = str(e)
+                            if 'Insufficient balance' in err_msg or 'Account has insufficient balance' in err_msg or '-2010' in err_msg:
+                                log(f"⚠️ Yetersiz Bakiye Hatası alındı. Miktar güncellenip tekrar deneniyor... (Hata: {err_msg[:50]}...)")
+                                
+                                # 1. Get Fresh Free Balance
+                                base_asset = 'USDT' # Global default
+                                free_balance = await self.get_free_balance(base_asset)
+                                
+                                # 2. Calculate Max Safe Quantity (98% of free balance)
+                                # Assuming Leverage 1x for retry to be safe, or use current leverage if futures
+                                current_leverage = settings.LEVERAGE if (not self.is_tr and settings.TRADING_MODE == 'futures') else 1.0
+                                new_notional = free_balance * current_leverage * 0.98
+                                
+                                # Min Notional Check for Retry
+                                min_notional_retry = 5.0
+                                if info:
+                                    min_notional_retry = float(info.get('minNotional', 5.0))
+        
+                                if new_notional < min_notional_retry:
+                                    log(f"❌ Retry İptal: Güncel bakiye ({free_balance:.2f} {base_asset}) min notional ({min_notional_retry}) karşılanamıyor.")
+                                    return False
+                                
+                                new_qty = new_notional / price
+                                
+                                # 3. Re-apply Precision
+                                qty_to_send = new_qty
+                                if info:
+                                    step_size = float(info.get('stepSize', '1.0'))
+                                    if step_size > 0:
+                                        steps = int(new_qty / step_size)
+                                        qty_to_send = steps * step_size
+                                        precision = int(round(-math.log10(step_size))) if step_size < 1 else 0
+                                        if precision > 0:
+                                            qty_to_send = float("{:.{p}f}".format(qty_to_send, p=precision))
+                                        else:
+                                            qty_to_send = int(qty_to_send)
+                                    else:
+                                        qty_to_send = int(new_qty)
+                                
+                                log(f"🛒 Global Alış Emri (RETRY): {symbol} - Yeni Miktar: {qty_to_send}")
+                                
+                                # 4. Retry Order
+                                order = await asyncio.to_thread(
+                                    self.exchange_spot.create_market_buy_order,
+                                    symbol,
+                                    qty_to_send,
+                                    params
+                                )
+                                log(f"✅ Global ALIŞ Başarılı (Retry): {order.get('id') if isinstance(order, dict) else 'OK'}")
+                            else:
+                                raise ExchangeError(f"Buy failed after retry check: {e}") from e
 
             except Exception as e:
                 log(f"❌ Canlı ALIŞ Hatası: {e}")
@@ -1175,7 +1199,7 @@ class BinanceExecutor:
         log(f"📝 Pozisyon açıldı: {symbol} @ {price}")
         return True
 
-    async def execute_sell(self, symbol: str, quantity: float, price: float, position: dict, is_partial: bool = False) -> bool:
+    async def execute_sell(self, symbol: str, quantity: float, price: float, position: dict, is_partial: bool = False, exit_reason: str = None) -> bool:
         """Satış emri"""
         
         # Safety: If price is 0, try to fetch it
@@ -1311,14 +1335,31 @@ class BinanceExecutor:
                     params = {}
                     if settings.TRADING_MODE == 'futures':
                          params['reduceOnly'] = True
+                    if settings.IDEMPOTENT_ORDERS_ENABLED:
+                         params['newClientOrderId'] = f"kbS{int(time.time()*1000)%100000000}"
                     
                     log(f"💰 Global Satış Emri: {symbol} - Miktar: {qty_to_send}")
-                    order = await asyncio.to_thread(
-                        self.exchange_spot.create_market_sell_order,
-                        symbol,
-                        qty_to_send,
-                        params
-                    )
+                    # Retry wrapper for sell requests
+                    attempt = 0
+                    while True:
+                        try:
+                            order = await asyncio.to_thread(
+                                self.exchange_spot.create_market_sell_order,
+                                symbol,
+                                qty_to_send,
+                                params
+                            )
+                            break
+                        except Exception as e:
+                            err_msg = str(e)
+                            retryable = ('Too many requests' in err_msg) or ('429' in err_msg) or ('503' in err_msg) or ('timeout' in err_msg.lower())
+                            if retryable and attempt < settings.ORDER_RETRY_MAX:
+                                delay_ms = settings.ORDER_RETRY_BASE_MS * (2 ** attempt)
+                                log(f"⚠️ Sell Rate-Limit/Retryable Error: retrying in {delay_ms}ms ({attempt+1}/{settings.ORDER_RETRY_MAX})")
+                                await asyncio.sleep(delay_ms / 1000.0)
+                                attempt += 1
+                                continue
+                            raise
                     
                     # CCXT returns dict directly usually
                     order_id = order.get('id') if isinstance(order, dict) else str(order)
@@ -1395,6 +1436,14 @@ class BinanceExecutor:
         self.state_manager.save_stats(self.stats)
         
         log(f"📝 Pozisyon kapatıldı: {symbol} @ {price} | PnL: %{pnl_pct:.2f}")
+        
+        # SL Guard: Record stop-loss events
+        try:
+            if exit_reason:
+                if ('STOP' in exit_reason) or ('TRAILING' in exit_reason) or ('SL_' in exit_reason) or ('_STOP_' in exit_reason):
+                    self.brain.record_stop_loss_event(symbol, exit_reason)
+        except Exception:
+            pass
         return True
 
     def check_risk_conditions(self, symbol: str, current_price: float, df: pd.DataFrame = None) -> dict:
@@ -1416,6 +1465,11 @@ class BinanceExecutor:
             position['stop_loss'] = result['new_stop_price']
             # log(f"🛡️ Stop Loss Güncellendi ({symbol}): {result['new_stop_price']:.4f}")
             self.save_positions()
+        if 'new_highest_price' in result:
+            try:
+                position['highest_price'] = float(result['new_highest_price'])
+            except Exception:
+                pass
             
         return result
 

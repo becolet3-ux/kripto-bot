@@ -47,7 +47,7 @@ class BotBrain:
             except:
                 pass
         return {
-            "coin_performance": {},  # symbol -> {wins: 0, losses: 0, consecutive_losses: 0, last_loss_time: 0}
+            "coin_performance": {},  # symbol -> {wins, losses, consecutive_losses, last_loss_time, total_trades, win_rate, last_trade_time, last_trade_result}
             "global_stats": {"total_trades": 0, "wins": 0, "win_rate": 0.0},
             "regime_performance": {
                 "TRENDING": {"wins": 0, "losses": 0, "pnl": 0.0},
@@ -72,7 +72,8 @@ class BotBrain:
                 "adx": 1.0,
                 "mfi": 1.0,
                 "patterns": 1.0
-            }
+            },
+            "sl_guard": {}  # symbol -> [timestamps of recent stop-loss events]
         }
 
     def _save_memory(self):
@@ -255,7 +256,11 @@ class BotBrain:
                 "wins": 0, 
                 "losses": 0, 
                 "consecutive_losses": 0,
-                "last_loss_time": 0
+                "last_loss_time": 0,
+                "total_trades": 0,
+                "win_rate": 0.0,
+                "last_trade_time": 0,
+                "last_trade_result": "unknown"
             }
             
         coin_stats = self.memory["coin_performance"][symbol]
@@ -266,6 +271,14 @@ class BotBrain:
             coin_stats["losses"] += 1
             coin_stats["consecutive_losses"] += 1
             coin_stats["last_loss_time"] = timestamp
+        
+        # Update per-coin totals and rolling stats
+        coin_stats["total_trades"] = coin_stats.get("total_trades", 0) + 1
+        total = coin_stats["total_trades"]
+        wr_num = coin_stats["wins"]
+        coin_stats["win_rate"] = (wr_num / total) * 100 if total > 0 else 0.0
+        coin_stats["last_trade_time"] = timestamp
+        coin_stats["last_trade_result"] = "win" if is_win else "loss"
 
         # 3. Add to History (Keep last 100)
         trade_record = {
@@ -282,6 +295,27 @@ class BotBrain:
             
         self._save_memory()
         return f"Brain updated: Global WR {stats['win_rate']:.1f}%, {symbol} Streak: {coin_stats['consecutive_losses']}L"
+
+    def record_stop_loss_event(self, symbol: str, reason: str):
+        """
+        Kaydedilen stop-loss tetiklerini (özellikle ATR_TRAILING_STOP_HIT vb.) SL Guard için takip eder.
+        """
+        now = int(time.time())
+        if "sl_guard" not in self.memory:
+            self.memory["sl_guard"] = {}
+        events = self.memory["sl_guard"].get(symbol, [])
+        events.append(now)
+        # Keep last 10 events for memory efficiency
+        self.memory["sl_guard"][symbol] = events[-10:]
+        self._save_memory()
+
+    def get_recent_sl_events(self, symbol: str, window_seconds: int) -> int:
+        """
+        Belirli bir zaman penceresinde (window_seconds) SL event sayısını döndürür.
+        """
+        current_time = int(time.time())
+        events = self.memory.get("sl_guard", {}).get(symbol, [])
+        return len([t for t in events if (current_time - t) <= window_seconds])
 
     def record_ghost_trade(self, symbol: str, entry_price: float, reason: str, signal_score: float):
         """
@@ -463,7 +497,22 @@ class BotBrain:
                 "modifier": 0
             }
 
-        # --- 4. COOLDOWN MECHANISM (Freqtrade Inspired) ---
+        # --- 4. STOPLOSS GUARD (Rolling Window) ---
+        if settings.STOPLOSS_GUARD_ENABLED:
+            window_sec = settings.SL_GUARD_WINDOW_MINUTES * 60
+            sl_events = self.get_recent_sl_events(symbol, window_sec)
+            if sl_events >= settings.SL_GUARD_MAX_SL_HITS:
+                # Find remaining time until earliest event expires (approximate by last_trade_time if unavailable)
+                # For user feedback, we show required wait minutes generically
+                return {
+                    "safe": False,
+                    "reason": settings.SL_GUARD_BLOCK_MESSAGE % (
+                        sl_events, settings.SL_GUARD_MAX_SL_HITS, settings.SL_GUARD_WINDOW_MINUTES, "bir süre"
+                    ),
+                    "modifier": 0
+                }
+
+        # --- 5. COOLDOWN MECHANISM (Freqtrade Inspired) ---
         last_trade_time = coin_stats.get("last_trade_time", 0)
         last_trade_result = coin_stats.get("last_trade_result", "unknown") # 'win' or 'loss'
         
@@ -485,7 +534,7 @@ class BotBrain:
                     "modifier": 0
                 }
 
-        # --- 5. EDGE FILTER (Win Rate Check) ---
+        # --- 6. EDGE FILTER (Win Rate Check) ---
         total_trades = coin_stats.get("total_trades", 0)
         win_rate = coin_stats.get("win_rate", 50.0) # Default to 50 if new
         
@@ -497,7 +546,7 @@ class BotBrain:
                     "modifier": 0
                 }
 
-        # 6. Consecutive Loss Cooldown (Legacy - Kept as backup)
+        # 7. Consecutive Loss Cooldown (Legacy - Kept as backup)
         consecutive_losses = coin_stats.get("consecutive_losses", 0)
         last_loss_time = coin_stats.get("last_loss_time", 0)
         

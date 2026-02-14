@@ -70,7 +70,7 @@ class Settings(BaseSettings):
     EMERGENCY_STOP_FILE: str = "data/emergency_stop.flag"
     STATE_FILE: str = "data/bot_state.json"
     STATS_FILE: str = "data/bot_stats.json"
-    LOG_FILE: str = "data/bot_activity.log"
+    LOG_FILE: str = "data/bot_activity_paper.log"
     
     # Alerting
     TELEGRAM_BOT_TOKEN: Optional[str] = None
@@ -90,7 +90,7 @@ class Settings(BaseSettings):
     SNIPER_MAX_RISK_PCT: float = 98.0 # %98 of free balance for All-In
 
     # Dev Mode
-    USE_MOCK_DATA: bool = False # Set to False to use real API
+    USE_MOCK_DATA: bool = True  # Default to True for safe local paper runs
     LIVE_TRADING: bool = False   # Set to True to enable real orders
     PAPER_TRADING_BALANCE: float = 10000.0 # Virtual balance (USDT) for paper trading
     SLEEP_INTERVAL: int = 10    # Sleep time between scans in seconds
@@ -126,6 +126,25 @@ class Settings(BaseSettings):
     EDGE_FILTER_ENABLED: bool = True
     MIN_WIN_RATE_FOR_ENTRY: float = 35.0   # %35'in altında kazanma oranı varsa girme (Bear markette esnek)
     MIN_TRADES_FOR_EDGE: int = 5           # En az 5 işlemden sonra karar ver
+    
+    # 4. Stoploss Guard (Rolling Window)
+    STOPLOSS_GUARD_ENABLED: bool = True
+    SL_GUARD_WINDOW_MINUTES: int = 60      # Son 60 dakikada
+    SL_GUARD_MAX_SL_HITS: int = 2          # En fazla 2 stop-loss
+    SL_GUARD_BLOCK_MESSAGE: str = "🛡️ SL GUARD: Çok fazla stop (%d/%d) son %d dk. Bekle %s"
+    
+    # 5. Idempotent Orders & Retry
+    IDEMPOTENT_ORDERS_ENABLED: bool = True
+    ORDER_RETRY_MAX: int = 3
+    ORDER_RETRY_BASE_MS: int = 300         # Exponential backoff tabanı (ms)
+    
+    # 6. Step Trailing (Basamaklı Trailing Stop)
+    TRAILING_STEP_ENABLED: bool = True
+    TRAILING_STEP_PCT: float = 0.8         # Fiyat, son zirveyi en az %0.8 aşınca stop yukarı taşınır
+    
+    # Opportunity Manager
+    OPP_MIN_HOLD_SECONDS: int = 3600       # En az 1 saat elde tut
+    OPP_LOCK_BREAK_DIFF: float = 20.0      # Kilidi kırmak için gereken skor farkı
 
     class Config:
         env_file = ".env"

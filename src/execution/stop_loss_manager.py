@@ -124,12 +124,18 @@ class StopLossManager:
         # 3. Trailing Stop Logic
         # FIX: Use 'stop_loss' key to match Executor
         current_stop_price = float(position.get('stop_loss', 0.0))
+        entry_price = float(position.get('entry_price', 0.0))
+        highest_price = float(position.get('highest_price', entry_price if entry_price > 0 else current_price))
+        
+        # Update highest price
+        if current_price > highest_price:
+            highest_price = current_price
         
         # Initial stop setup
         if current_stop_price == 0:
             current_stop_price = entry_price - stop_distance
             # FIX: Return update immediately to save initial stop
-            return {'action': 'UPDATE_STOP', 'new_stop_price': current_stop_price}
+            return {'action': 'UPDATE_STOP', 'new_stop_price': current_stop_price, 'new_highest_price': highest_price}
 
         # --- PRO UPDATE: ATR Based Dynamic Stop ---
         # Stop fiyatını sadece fiyat yükseldiğinde yukarı taşı (Trailing)
@@ -138,8 +144,15 @@ class StopLossManager:
         
         new_stop_price = current_price - stop_distance
         
-        # Only move stop UP (Trailing)
-        if new_stop_price > current_stop_price:
+        # Step Trailing: Only trail if price advanced at least TRAILING_STEP_PCT above last high
+        allow_trail = True
+        if settings.TRAILING_STEP_ENABLED and highest_price > 0:
+            step_threshold = highest_price * (1 + (settings.TRAILING_STEP_PCT / 100.0))
+            if current_price < step_threshold:
+                allow_trail = False
+        
+        # Only move stop UP (Trailing) with step gating
+        if allow_trail and new_stop_price > current_stop_price:
             final_stop_price = new_stop_price
             update_stop = True
         else:
@@ -157,11 +170,12 @@ class StopLossManager:
                     'action': 'PARTIAL_CLOSE', 
                     'reason': f'PARTIAL_PROFIT_TARGET (PnL: {pnl_pct:.2f}%)',
                     'qty_pct': settings.PARTIAL_EXIT_RATIO,
-                    'new_stop_price': final_stop_price
+                    'new_stop_price': final_stop_price,
+                    'new_highest_price': highest_price
                 }
 
         # Return update if stop price changed (and no other action taken)
         if update_stop:
-             return {'action': 'UPDATE_STOP', 'new_stop_price': final_stop_price}
+             return {'action': 'UPDATE_STOP', 'new_stop_price': final_stop_price, 'new_highest_price': highest_price}
 
-        return {'action': 'NONE'}
+        return {'action': 'NONE', 'new_highest_price': highest_price}

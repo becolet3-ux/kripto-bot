@@ -7,7 +7,7 @@ from typing import List, Dict
 from src.strategies.analyzer import MarketAnalyzer, TradeSignal
 
 class Backtester:
-    def __init__(self, symbol: str, timeframe: str = '1h', initial_balance: float = 1000.0):
+    def __init__(self, symbol: str, timeframe: str = '1h', initial_balance: float = 1000.0, exchange_id: str = 'binance'):
         self.symbol = symbol
         self.timeframe = timeframe
         self.initial_balance = initial_balance
@@ -16,6 +16,9 @@ class Backtester:
         self.trades = []
         self.equity_curve = []
         self.analyzer = MarketAnalyzer()
+        self.exchange_id = exchange_id
+        self.atr_mult = 2.0
+        self.take_profit_pct = 10.0
         
         # Simulation settings
         self.commission = 0.001 # 0.1%
@@ -23,8 +26,10 @@ class Backtester:
         
     def fetch_data(self, days: int = 30):
         """Fetches historical data from Binance (Public API)"""
-        print(f"⏳ Fetching {days} days of history for {self.symbol}...")
-        exchange = ccxt.binance()
+        print(f"⏳ Fetching {days} days of history for {self.symbol} via {self.exchange_id}...")
+        if not hasattr(ccxt, self.exchange_id):
+            raise ValueError(f"Unsupported exchange_id: {self.exchange_id}")
+        exchange = getattr(ccxt, self.exchange_id)()
         since = exchange.milliseconds() - (days * 24 * 60 * 60 * 1000)
         all_candles = []
         
@@ -80,11 +85,11 @@ class Backtester:
             
             # Execute Logic
             if signal:
-                self._process_signal(signal, current_price, current_time)
+                self._process_signal(signal, current_price, current_time, window_df)
             
             # Stop Loss / Take Profit Logic (if holding)
             if self.position:
-                self._check_risk_management(current_price, current_time)
+                self._check_risk_management(current_price, current_time, window_df)
                 
             # Record Equity
             total_value = self.balance
@@ -95,7 +100,7 @@ class Backtester:
         self._finalize()
         return self.get_results()
 
-    def _process_signal(self, signal: TradeSignal, price: float, time: datetime):
+    def _process_signal(self, signal: TradeSignal, price: float, time: datetime, window_df: pd.DataFrame):
         if signal.action == "ENTRY" and not self.position:
             # Buy
             entry_price = price * (1 + self.slippage)
@@ -104,11 +109,15 @@ class Backtester:
             fee = cost * self.commission
             
             self.balance -= (cost + fee)
+            atr = self._calc_atr(window_df)
+            trail = entry_price - (atr * self.atr_mult) if atr > 0 else entry_price * 0.95
             self.position = {
                 'entry_price': entry_price,
                 'amount': amount,
                 'entry_time': time,
-                'features': signal.details
+                'features': signal.details,
+                'trail_stop': trail,
+                'max_price': entry_price
             }
             
             self.trades.append({
@@ -122,20 +131,23 @@ class Backtester:
             # Sell
             self._close_position(price, time, 'SIGNAL')
 
-    def _check_risk_management(self, price: float, time: datetime):
+    def _check_risk_management(self, price: float, time: datetime, window_df: pd.DataFrame):
         if not self.position:
             return
             
         entry_price = self.position['entry_price']
         pnl_pct = ((price - entry_price) / entry_price) * 100
-        
-        # Hardcoded SL/TP for backtest (match settings.py defaults)
-        STOP_LOSS = 5.0
-        TAKE_PROFIT = 10.0
-        
-        if pnl_pct <= -STOP_LOSS:
-            self._close_position(price, time, 'STOP_LOSS')
-        elif pnl_pct >= TAKE_PROFIT:
+        atr = self._calc_atr(window_df)
+        if atr > 0:
+            new_trail = price - (atr * self.atr_mult)
+            if new_trail > self.position['trail_stop']:
+                self.position['trail_stop'] = new_trail
+        if price > self.position['max_price']:
+            self.position['max_price'] = price
+        if price <= self.position['trail_stop']:
+            self._close_position(price, time, 'TRAILING_STOP')
+            return
+        if pnl_pct >= self.take_profit_pct:
             self._close_position(price, time, 'TAKE_PROFIT')
 
     def _close_position(self, price: float, time: datetime, reason: str):
@@ -204,6 +216,42 @@ class Backtester:
             stats['max_drawdown'] = df_equity['drawdown'].min() * 100
             
         return stats, df_trades, df_equity
+
+    def _calc_atr(self, window_df: pd.DataFrame, period: int = 14) -> float:
+        if window_df.empty or len(window_df) < period:
+            return 0.0
+        h = window_df['high']
+        l = window_df['low']
+        c = window_df['close']
+        tr1 = h - l
+        tr2 = (h - c.shift()).abs()
+        tr3 = (l - c.shift()).abs()
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+        atr = tr.rolling(window=period).mean().iloc[-1]
+        return float(atr) if pd.notnull(atr) else 0.0
+
+class PortfolioBacktester:
+    def __init__(self, symbols: list[str], timeframe: str = '1h', initial_balance: float = 1000.0, exchange_id: str = 'binance'):
+        self.symbols = symbols
+        self.timeframe = timeframe
+        self.initial_balance = initial_balance
+        self.exchange_id = exchange_id
+        self.backtesters = {s: Backtester(s, timeframe, initial_balance / len(symbols), exchange_id) for s in symbols}
+
+    def run_on_dfs(self, df_map: Dict[str, pd.DataFrame]):
+        total_equity = []
+        all_stats = {}
+        for s, bt in self.backtesters.items():
+            df = df_map.get(s)
+            stats, trades, equity = bt.run(df)
+            all_stats[s] = stats
+            total_equity.append(equity['equity'])
+        combined = pd.concat(total_equity, axis=1).sum(axis=1).to_frame('equity')
+        stats = {
+            'initial_balance': self.initial_balance,
+            'final_balance': float(combined['equity'].iloc[-1]),
+        }
+        return stats, all_stats, combined
 
 if __name__ == "__main__":
     # Test Run
