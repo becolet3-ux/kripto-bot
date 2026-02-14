@@ -30,6 +30,11 @@ class TradeManager:
         Also handles Risk Management (StopLoss) exits immediately.
         """
         try:
+            # SAFETY CHECK: Stablecoin Filter
+            base_currency = symbol.split('/')[0]
+            if base_currency in ['USDT', 'USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'BUSD', 'EUR', 'PAX', 'U', 'UST', 'USDD', 'USDK', 'USDJ', 'VAI', 'WAI', 'CUSD', 'AEUR', 'EURI', 'GUSD', 'LUSD', 'FRAX', 'SUSD', 'WBTC', 'BTCB']:
+                return None
+
             # Rate Limit Smoothing
             await asyncio.sleep(0.1)
 
@@ -82,6 +87,66 @@ class TradeManager:
 
         except InsufficientBalanceError as e:
             log(f"⚠️ Yetersiz Bakiye ({symbol}): {e}")
+            
+            # --- AGGRESSIVE SNIPER MODE: Force Sell to Enter New Opportunity ---
+            # If we have a very high score signal but no balance, try to sell the worst performing position
+            if signal and signal.score >= 25.0: # Only for excellent opportunities
+                log(f"⚔️ SNIPER MODE ACTIVATED: Attempting to free up capital for {symbol} (Score: {signal.score})")
+                try:
+                    # 1. Get all active positions
+                    positions = await self.executor.get_open_positions()
+                    if positions:
+                        # 2. Find the worst position (Lowest PnL or Oldest Stagnant)
+                        worst_position = None
+                        lowest_pnl = 9999.0
+                        
+                        for pos_symbol, pos_data in positions.items():
+                            # Skip if it's the same symbol (shouldn't happen but safety first)
+                            if pos_symbol == symbol:
+                                continue
+                                
+                            # Calculate PnL if current price is available
+                            current_price = current_prices_map.get(pos_symbol)
+                            if current_price:
+                                entry_price = float(pos_data.get('entry_price', 0))
+                                if entry_price > 0:
+                                    pnl = (current_price - entry_price) / entry_price * 100
+                                    if pnl < lowest_pnl:
+                                        lowest_pnl = pnl
+                                        worst_position = pos_symbol
+                        
+                        # 3. Force Sell the worst position
+                        if worst_position:
+                            log(f"⚔️ SNIPER EXECUTION: Selling {worst_position} (PnL: {lowest_pnl:.2f}%) to buy {symbol}")
+                            # Create a forced sell signal
+                            sell_signal = TradeSignal(
+                                symbol=worst_position,
+                                action="EXIT",
+                                direction="LONG", # Assuming Long
+                                score=-99.0, # Forced exit score
+                                estimated_yield=lowest_pnl,
+                                timestamp=int(time.time()),
+                                details={'reason': f'SNIPER_SWAP_FOR_{symbol}'}
+                            )
+                            # Execute Sell
+                            await self.executor.execute_strategy(sell_signal, latest_scores=latest_scores)
+                            
+                            # --- CRITICAL FIX: Wait for Balance Update ---
+                            # Binance needs time to process the sell and update USDT balance.
+                            log("⏳ Waiting 5 seconds for balance update...")
+                            await asyncio.sleep(5)
+                            
+                            # Force refresh balance
+                            await self.executor.sync_wallet_balances()
+                            
+                            # Retry the original Buy Signal
+                            log(f"⚔️ SNIPER RETRY: Re-attempting entry for {symbol}...")
+                            await self.executor.execute_strategy(signal, latest_scores=latest_scores)
+                            return signal
+                            
+                except Exception as sniper_error:
+                    log(f"❌ SNIPER MODE FAILED: {sniper_error}")
+            
             return None
         except ExchangeError as e:
             log(f"⚠️ Borsa Hatası ({symbol}): {e}")
@@ -195,28 +260,35 @@ class TradeManager:
 
         # Correlation Check
         if signal.action == "ENTRY":
-            is_correlated = False
-            for held_symbol in self.executor.paper_positions:
-                if held_symbol == symbol: continue
-                try:
-                    held_candles = await self.loader.get_ohlcv(held_symbol, timeframe='1h', limit=50)
-                    if held_candles:
-                        corr = self.analyzer.calculate_correlation(candles, held_candles)
-                        if corr > 0.85:
-                            log(f"🔗 Correlation Alert: {symbol} is highly correlated with held {held_symbol} ({corr:.2f}). Skipping.")
-                            self.executor.brain.record_ghost_trade(
-                                symbol, 
-                                current_price, 
-                                f"Correlation Filter: >0.85 with {held_symbol}", 
-                                signal.score
-                            )
-                            is_correlated = True
-                            break
-                except Exception as e:
-                    log(f"⚠️ Correlation check failed for {held_symbol}: {e}")
+            # --- PRO UPDATE: Bypass Correlation for SUPER SIGNALS (>30.0) ---
+            # If the signal is extremely strong (e.g. Pump/Breakout), ignore correlation.
+            is_super_signal = (signal.score >= 30.0)
             
-            if is_correlated:
-                return None
+            if is_super_signal:
+                log(f"🚀 SUPER SIGNAL DETECTED ({signal.score}): Bypassing Correlation Check for {symbol}")
+            else:
+                is_correlated = False
+                for held_symbol in self.executor.paper_positions:
+                    if held_symbol == symbol: continue
+                    try:
+                        held_candles = await self.loader.get_ohlcv(held_symbol, timeframe='1h', limit=50)
+                        if held_candles:
+                            corr = self.analyzer.calculate_correlation(candles, held_candles)
+                            if corr > 0.85:
+                                log(f"🔗 Correlation Alert: {symbol} is highly correlated with held {held_symbol} ({corr:.2f}). Skipping.")
+                                self.executor.brain.record_ghost_trade(
+                                    symbol, 
+                                    current_price, 
+                                    f"Correlation Filter: >0.85 with {held_symbol}", 
+                                    signal.score
+                                )
+                                is_correlated = True
+                                break
+                    except Exception as e:
+                        log(f"⚠️ Correlation check failed for {held_symbol}: {e}")
+                
+                if is_correlated:
+                    return None
                 
         return signal
 
@@ -237,6 +309,12 @@ class TradeManager:
             
             if action in ['CLOSE', 'PARTIAL_CLOSE']:
                 reason = risk_check.get('reason', 'RISK_EXIT')
+                
+                # BNB PROTECTION: Do not score -100 for BNB
+                if symbol == "BNB/USDT":
+                     log(f"🛡️ Risk Exit Triggered for BNB/USDT but suppressed (Base Asset Protection). Reason: {reason}")
+                     return None
+                
                 log(f"🛡️ Risk Exit Triggered [{symbol}]: {action} - {reason}")
                 
                 signal_action = "EXIT" if action == 'CLOSE' else "PARTIAL_EXIT"
@@ -287,6 +365,7 @@ class TradeManager:
         current_positions = list(self.executor.paper_positions.keys())
         for symbol in current_positions:
             should_sell = False
+            fast_path = False
             
             # Durum A: En iyi sinyal var ama elimizdeki o değil
             if best_signal and symbol != best_signal.symbol:
@@ -294,19 +373,38 @@ class TradeManager:
                 current_score = current_pos_signal.score if current_pos_signal else 0.0 # TODO: use cache if needed
                 
                 score_diff = best_signal.score - current_score
-                if score_diff >= 5.0:
+                
+                # --- PRO UPDATE: Adaptive Sniper Threshold ---
+                # Piyasada volatilite yüksekse fark 5.0 kalsın, düşükse 3.5'e insin.
+                # Volatilite bilgisini en iyi sinyalden alabiliriz
+                current_vol = 0.0
+                if best_signal.details:
+                    current_vol = best_signal.details.get('volatility', 0.0)
+                
+                required_diff = 5.0
+                if current_vol < 1.0: # Düşük Volatilite (<%1)
+                    required_diff = 3.5
+                
+                # --- FAST PATH: Super Signal with wide lead (>=20) ---
+                fast_threshold = 31.0 if best_signal.symbol == 'ZAMA/USDT' else 32.0
+                if best_signal.score >= fast_threshold and score_diff >= 20.0:
+                    fast_path = True
+                    should_sell = True
+                    log(f"⚡ Sniper Fast Path: Selling {symbol} immediately (Super {best_signal.symbol} {best_signal.score:.1f}, Δ={score_diff:.1f}≥20)")
+                    self.swap_confirmation_tracker[symbol] = 0
+                elif score_diff >= required_diff:
                     current_count = self.swap_confirmation_tracker.get(symbol, 0) + 1
                     self.swap_confirmation_tracker[symbol] = current_count
                     
                     if current_count >= 3:
                         should_sell = True
-                        log(f"📉 Sniper Modu: {symbol} satılıyor. (Fark: {score_diff:.1f} >= 5.0)")
+                        log(f"📉 Sniper Modu: {symbol} satılıyor. (Fark: {score_diff:.1f} >= {required_diff})")
                         self.swap_confirmation_tracker[symbol] = 0
                     else:
                         log(f"⏳ Sniper Modu: {symbol} swap onayı ({current_count}/3). Fark: {score_diff:.1f}")
                 else:
                     self.swap_confirmation_tracker[symbol] = 0
-                    log(f"✋ Sniper Modu: {symbol} tutuluyor. Fark yetersiz ({score_diff:.1f} < 5.0).")
+                    log(f"✋ Sniper Modu: {symbol} tutuluyor. Fark yetersiz ({score_diff:.1f} < {required_diff}).")
             
             # Durum B: Çoklu pozisyon varsa sat (Tekilleştirme)
             elif len(current_positions) > 1:
@@ -320,26 +418,48 @@ class TradeManager:
         if not settings.IS_TR_BINANCE:
              log("🧹 Sniper Modu: Dust Temizliği...")
              await self.executor.convert_dust_to_bnb()
-             await self.executor.sync_wallet()
+             await self.executor.sync_wallet_balances()
              
              # BNB Satışı (Eğer hedef BNB değilse)
              if best_signal and not best_signal.symbol.startswith('BNB'):
                  if 'BNB/USDT' in self.executor.paper_positions:
                      await self._execute_sell('BNB/USDT', current_prices_map, reason="SNIPER_MODE_BNB_LIQUIDATION")
 
+        # Satışlardan sonra bakiyeyi ve pozisyonları senkronize et
+        await self.executor.sync_wallet_balances()
+
         # 3. Alım Yap (Tek Atış)
         can_buy = False
-        if len(self.executor.paper_positions) == 0:
+        pos_count = len(self.executor.paper_positions)
+        if pos_count == 0:
             can_buy = True
-        elif len(self.executor.paper_positions) == 1 and best_signal and best_signal.symbol in self.executor.paper_positions:
+        elif pos_count == 1 and best_signal and best_signal.symbol in self.executor.paper_positions:
             can_buy = False
             log(f"🎯 Zaten hedef varlıktayız: {best_signal.symbol}")
         else:
-            # BNB vs. durumu için
-            can_buy = True
+            # Sniper Modu: Açık pozisyon varsa önce likide et, sonra alım yap
+            can_buy = False
+            log("⏳ Sniper: Satış sonrası bakiye güncellemesi bekleniyor, alım ertelendi.")
 
         if can_buy and best_signal:
             try:
+                # --- SAFETY: Re-validate before buy ---
+                # 1) Price slippage check vs. last seen price
+                last_seen = current_prices_map.get(best_signal.symbol, 0.0)
+                candles_now = await self.loader.get_ohlcv(best_signal.symbol, timeframe='1h', limit=10)
+                if candles_now:
+                    current_px = float(candles_now[-1][4])
+                    if last_seen > 0.0:
+                        slip = abs(current_px - last_seen) / last_seen
+                        if slip > 0.01:
+                            log(f"⛔ Slippage >1% for {best_signal.symbol} (ref={last_seen}, now={current_px}). Aborting sniper buy.")
+                            return
+                # 2) Super signal still strong?
+                reval_threshold = 31.0 if best_signal.symbol == 'ZAMA/USDT' else 32.0
+                if best_signal.score < reval_threshold:
+                    log(f"⛔ Super signal weakened (<32). Aborting sniper buy for {best_signal.symbol}.")
+                    return
+                
                 log(f"🎯 Sniper Modu: {best_signal.symbol} için tam bakiye ile giriş yapılıyor!")
                 if best_signal.details is None: best_signal.details = {}
                 best_signal.details['force_all_in'] = True
@@ -376,7 +496,11 @@ class TradeManager:
             details={"reason": reason, "close": price}
         )
         await self.executor.execute_strategy(sell_signal)
-        await asyncio.sleep(1.0)
+        
+        # --- CRITICAL FIX: Wait for Balance Update ---
+        log("⏳ Waiting 5 seconds for balance update after SELL...")
+        await asyncio.sleep(5.0)
+        await self.executor.sync_wallet_balances()
 
     async def handle_normal_swap_logic(self, all_market_signals):
         """Executes the Normal Mode Swap logic"""

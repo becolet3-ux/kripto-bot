@@ -2,6 +2,7 @@ import json
 import os
 import time
 from typing import Dict, Optional
+from config.settings import settings
 
 class BotBrain:
     def __init__(self, data_file="data/learning_data.json"):
@@ -431,6 +432,7 @@ class BotBrain:
     def check_safety(self, symbol: str, current_volatility: float = 0, volume_ratio: float = 1.0, current_rsi: float = 50.0) -> Dict:
         """
         Advanced safety check with Market Regime, Volatility analysis AND Pattern Matching.
+        Includes Cooldown & Edge Protection.
         """
         current_time = int(time.time())
         coin_stats = self.memory["coin_performance"].get(symbol, {})
@@ -454,7 +456,6 @@ class BotBrain:
             }
 
         # 3. Volume Check (Avoid low volume pumps)
-        # Lowered threshold to 0.2 to allow trades in quiet markets (especially for 1h timeframe)
         if volume_ratio < 0.2:
              return {
                 "safe": False,
@@ -462,7 +463,41 @@ class BotBrain:
                 "modifier": 0
             }
 
-        # 4. Consecutive Loss Cooldown
+        # --- 4. COOLDOWN MECHANISM (Freqtrade Inspired) ---
+        last_trade_time = coin_stats.get("last_trade_time", 0)
+        last_trade_result = coin_stats.get("last_trade_result", "unknown") # 'win' or 'loss'
+        
+        if settings.COOLDOWN_ENABLED and last_trade_time > 0:
+            minutes_since_last = (current_time - last_trade_time) / 60
+            cooldown_period = 0
+            
+            if last_trade_result == "loss":
+                cooldown_period = settings.COOLDOWN_MINUTES_AFTER_LOSS
+                reason_suffix = "LOSS"
+            elif last_trade_result == "win":
+                cooldown_period = settings.COOLDOWN_MINUTES_AFTER_WIN
+                reason_suffix = "WIN"
+                
+            if minutes_since_last < cooldown_period:
+                 return {
+                    "safe": False, 
+                    "reason": f"🧊 COOLDOWN ({reason_suffix}): Wait {cooldown_period - minutes_since_last:.1f}m for {symbol}",
+                    "modifier": 0
+                }
+
+        # --- 5. EDGE FILTER (Win Rate Check) ---
+        total_trades = coin_stats.get("total_trades", 0)
+        win_rate = coin_stats.get("win_rate", 50.0) # Default to 50 if new
+        
+        if settings.EDGE_FILTER_ENABLED and total_trades >= settings.MIN_TRADES_FOR_EDGE:
+            if win_rate < settings.MIN_WIN_RATE_FOR_ENTRY:
+                 return {
+                    "safe": False, 
+                    "reason": f"📉 BAD EDGE: Win Rate {win_rate:.1f}% < {settings.MIN_WIN_RATE_FOR_ENTRY}% for {symbol}",
+                    "modifier": 0
+                }
+
+        # 6. Consecutive Loss Cooldown (Legacy - Kept as backup)
         consecutive_losses = coin_stats.get("consecutive_losses", 0)
         last_loss_time = coin_stats.get("last_loss_time", 0)
         
@@ -476,7 +511,7 @@ class BotBrain:
                     "modifier": 0
                 }
         
-        # 5. Smart Modifiers based on Regime AND Patterns
+        # 7. Smart Modifiers based on Regime AND Patterns
         rsi_modifier = 0
         
         # Regime Base
@@ -497,7 +532,7 @@ class BotBrain:
             
         return {
             "safe": True, 
-            "reason": f"✅ Safe (Regime: {regime['status']})", 
+            "reason": "Passed all safety checks",
             "modifier": rsi_modifier
         }
 

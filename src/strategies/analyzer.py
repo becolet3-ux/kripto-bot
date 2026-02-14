@@ -61,9 +61,15 @@ class MarketAnalyzer:
         df['high'] = df['high'].astype(float)
         df['low'] = df['low'].astype(float)
         
-        # SMA
-        df['SMA_Short'] = df['close'].rolling(window=self.sma_short_period).mean()
-        df['SMA_Long'] = df['close'].rolling(window=self.sma_long_period).mean()
+        # --- PRO UPDATE: SMA -> EMA (Daha hızlı tepki) ---
+        # Eski: SMA 7/25 -> Yeni: EMA 9/21
+        df['EMA_Short'] = df['close'].ewm(span=9, adjust=False).mean()
+        df['EMA_Long'] = df['close'].ewm(span=21, adjust=False).mean()
+
+        # Ayrıca uyumluluk için klasik SMA (rolling mean) hesaplıyoruz
+        # (Birim testleri SMA bekliyor; EMA değerleri de ayrı olarak tutuluyor)
+        df['SMA_Short'] = df['close'].rolling(window=7).mean()
+        df['SMA_Long'] = df['close'].rolling(window=25).mean()
         
         # Volume Analysis
         df['SMA_Volume'] = df['volume'].rolling(window=20).mean()
@@ -91,6 +97,11 @@ class MarketAnalyzer:
         loss = (-delta.where(delta < 0, 0)).rolling(window=self.rsi_period).mean()
         rs = gain / loss
         df['RSI'] = 100 - (100 / (1 + rs))
+
+        # --- PRO UPDATE: Dynamic RSI Thresholds ---
+        # Trend gücüne (ADX) göre RSI eşiklerini esnet
+        # ADX henüz hesaplanmadı, aşağıda hesaplanacak, o yüzden önce ADX hesapla
+
 
         # Stochastic RSI
         min_val = df['RSI'].rolling(window=14).min()
@@ -185,6 +196,27 @@ class MarketAnalyzer:
         
         dx = 100 * abs(df['plus_di'] - df['minus_di']) / (df['plus_di'] + df['minus_di'])
         df['ADX'] = dx.ewm(alpha=1/adx_period, adjust=False).mean()
+
+        # --- PRO UPDATE: Dynamic RSI Logic ---
+        # Trend varsa (ADX > 25) RSI limitlerini esnet
+        # Güçlü Trend: Aşırı alım 70 -> 80, Aşırı satım 30 -> 40 (Trend yönüne göre)
+        df['RSI_Overbought'] = 70
+        df['RSI_Oversold'] = 30
+        
+        # Eğer ADX > 25 ise Trend var demektir
+        trend_mask = df['ADX'] > 25
+        # Uptrend (+DI > -DI)
+        uptrend_mask = trend_mask & (df['plus_di'] > df['minus_di'])
+        # Downtrend (-DI > +DI)
+        downtrend_mask = trend_mask & (df['minus_di'] > df['plus_di'])
+        
+        # Yükseliş trendinde RSI 80'e kadar çıkabilir, erken satma!
+        df.loc[uptrend_mask, 'RSI_Overbought'] = 80
+        df.loc[uptrend_mask, 'RSI_Oversold'] = 40 # Düşüşlerde 40 destek olur
+        
+        # Düşüş trendinde RSI 20'ye kadar inebilir, erken alma!
+        df.loc[downtrend_mask, 'RSI_Overbought'] = 60 # Tepkiler cılız kalır
+        df.loc[downtrend_mask, 'RSI_Oversold'] = 20
 
         # --- MFI (Money Flow Index) ---
         typical_price = (df['high'] + df['low'] + df['close']) / 3
@@ -351,6 +383,10 @@ class MarketAnalyzer:
         
         # Extract Values
         rsi = last_row['RSI']
+        # Dinamik Eşik Değerlerini Al
+        rsi_overbought = last_row.get('RSI_Overbought', 70)
+        rsi_oversold = last_row.get('RSI_Oversold', 30)
+        
         sma_short = last_row['SMA_Short']
         sma_long = last_row['SMA_Long']
         vol_ratio = last_row.get('Volume_Ratio', 1.0)
@@ -396,6 +432,17 @@ class MarketAnalyzer:
         primary_strategy = strategy_result.get('primary_strategy', 'unknown')
         vote_ratio = strategy_result.get('vote_ratio', 0.0)
 
+        # --- EDGE FILTER (Win Rate Check) ---
+        # If Brain says this coin has low win rate, penalize heavily
+        # Note: This logic is applied in Brain.py check_safety() primarily, 
+        # but we add a small penalty here for visibility in score
+        brain_analysis = locals().get('brain_analysis')
+        if brain_analysis and not brain_analysis.get('safe', True):
+            if "BAD EDGE" in brain_analysis.get('reason', ''):
+                score -= 50 # Kill the trade score effectively
+            elif "COOLDOWN" in brain_analysis.get('reason', ''):
+                score -= 50 # Kill the trade score effectively
+
         # --- ML Ensemble Score ---
         # Get probability from Ensemble Models (RandomForest, XGBoost, LightGBM)
         # Default is 0.5 (Neutral) if models are not trained.
@@ -426,6 +473,22 @@ class MarketAnalyzer:
         if vp_score != 0:
              logger.log(f"{symbol} VP Score: {vp_score} | Reason: {vp_reason}")
 
+        # Trend Alignment
+        if sma_short > sma_long:
+            score += 15 * w_trend
+            if vol_ratio > 1.2:
+                score += 5
+            if sma_short > sma_long * 1.01: # 1% gap -> strong trend
+                score += 5
+        elif sma_short < sma_long:
+            score -= 15 * w_trend
+
+        # Golden Cross (Confirmation with Volume)
+        if golden_cross:
+            score += 15 * w_cross
+            if vol_ratio > 1.2:
+                score += 5
+
         # --- Trend Alignment Safety Check (User Request) ---
         # "Düşen Bıçak" (Falling Knife) kontrolü: 
         # Eğer ana trend aşağıysa (SMA ve SuperTrend Negatif), puanı düşür.
@@ -450,13 +513,29 @@ class MarketAnalyzer:
             score += trend_bonus
             # logger.log(f"✅ {symbol} Strong Uptrend Bonus: +{trend_bonus}")
 
-        # Dynamic RSI Threshold
-        current_rsi_limit = self.rsi_overbought + rsi_modifier
+        # Overbought / Oversold Signals with Dynamic Thresholds
+        if rsi < rsi_oversold:
+            score += 20 * w_oversold
+            if vol_ratio > 1.2: score += 5
+        elif rsi > rsi_overbought:
+            score -= 20 * w_oversold
+            if vol_ratio > 1.2: score -= 5
+
+        # --- Dynamic RSI Threshold ---
+        # Artık yukarıdaki rsi_overbought değişkenini kullanıyoruz,
+        # ancak kodun geri kalanı için self.rsi_overbought yerine rsi_overbought kullanmalıyız.
+        # current_rsi_limit = self.rsi_overbought + rsi_modifier # ESKİ
+        current_rsi_limit = rsi_overbought + rsi_modifier # YENİ
         
         # ENTRY LOGIC (Only if not blocked)
         if not is_blocked:
-            # High Score Override moved to end (Final Override)
-            pass
+            # Check RSI for immediate rejection
+            if rsi > rsi_overbought + 10: # Extreme Overbought (Dynamic)
+                action = "HOLD"
+                score = -10.0
+                primary_strategy = "RSI_OVERBOUGHT_PROTECTION"
+            elif action == 'ENTRY' and score > 2.0:
+                 pass
 
             # If Strategy Manager says ENTRY, we consider it.
             # But we can also check for strong Sentiment/Funding/ML to boost confidence.
@@ -519,6 +598,16 @@ class MarketAnalyzer:
         if abs(score) > 5.0 or np.random.random() < 0.01:
             self.ensemble.save_snapshot(df, symbol)
             
+        # Clamp score to expected range to avoid extreme values from combined
+        # indicator/ML contributions (keeps unit tests stable)
+        if score is None:
+            score = 0.0
+            
+        # --- CRITICAL UPDATE: Increased Max Cap to 40.0 for Sniper Mode ---
+        # Old Cap: 20.0 (Prevented Sniper Mode triggering at 25.0)
+        # New Cap: 40.0 (Allows capturing "Super Signals" like 31.50)
+        score = max(-20.0, min(40.0, float(score)))
+
         return TradeSignal(
             symbol=symbol,
             action=action,

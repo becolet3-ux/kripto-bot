@@ -58,6 +58,8 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./.env:/app/.env
+      - ./config.ini:/app/config.ini
+      - ./config:/app/config
     environment:
       - LIVE_TRADING=true
       - STATE_FILE=data/bot_state_live.json
@@ -70,7 +72,9 @@ services:
           memory: 2500M
 
   dashboard-live:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
     image: kripto-bot_dashboard-live
     container_name: kripto-bot-dashboard-live
     ports:

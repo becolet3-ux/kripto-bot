@@ -83,7 +83,7 @@ class Settings(BaseSettings):
     REDDIT_USER_AGENT: Optional[str] = "kripto-bot/1.0"
 
     # Emergency & Limits
-    MAX_DAILY_LOSS_PCT: float = 5.0  # Günlük maksimum %5 zarar
+    MAX_DAILY_LOSS_PCT: float = 50.0  # Günlük maksimum %50 zarar (User request: 50 dolar limit -> high percentage)
     EMERGENCY_SHUTDOWN_ENABLED: bool = True
     
     # Sniper Mode Risk
@@ -98,6 +98,34 @@ class Settings(BaseSettings):
     # Feature Flags
     SENTIMENT_ENABLED: bool = False
     DISABLE_SENTIMENT_ANALYSIS: bool = True
+    
+    # --- FREQTRADE INSPIRED FEATURES ---
+    
+    # 1. Dynamic ROI (Time-Based Take Profit)
+    # Format: {minutes: profit_pct}
+    # Example: {0: 10.0, 30: 5.0, 60: 2.0, 120: 1.0}
+    # 0-30 min: Aim for 10%
+    # 30-60 min: Aim for 5%
+    # 60-120 min: Aim for 2%
+    # >120 min: Aim for 1% (Just get out with profit)
+    DYNAMIC_ROI_ENABLED: bool = True
+    DYNAMIC_ROI_TABLE: dict = {
+        0: 10.0,   # İlk 30 dk hedef %10 (Pump yakalama)
+        30: 5.0,   # 30. dk'dan sonra hedef %5'e düşer
+        60: 3.0,   # 1 saatten sonra hedef %3'e düşer
+        120: 1.5,  # 2 saatten sonra hedef %1.5 (Parayı kurtar)
+        240: 0.5   # 4 saatten sonra %0.5 kârla çık (Zaman maliyeti)
+    }
+    
+    # 2. Cooldown Mechanism
+    COOLDOWN_ENABLED: bool = True
+    COOLDOWN_MINUTES_AFTER_LOSS: int = 120 # Zarar eden coine 2 saat girme
+    COOLDOWN_MINUTES_AFTER_WIN: int = 30   # Kâr eden coine 30 dk girme (Dinlen)
+    
+    # 3. Edge Calculation (Win Rate Filter)
+    EDGE_FILTER_ENABLED: bool = True
+    MIN_WIN_RATE_FOR_ENTRY: float = 35.0   # %35'in altında kazanma oranı varsa girme (Bear markette esnek)
+    MIN_TRADES_FOR_EDGE: int = 5           # En az 5 işlemden sonra karar ver
 
     class Config:
         env_file = ".env"

@@ -85,8 +85,9 @@ class BinanceExecutor:
         else:
              # Increase to 10.0 to prevent NOTIONAL filter failures (Code -1013)
              # Binance often enforces 10 USDT min notional for API orders
-             # UPDATE: Lowered to 5.5 to allow trading with small balances (User has ~6 USD)
-             self.min_trade_amount = 5.5 # USDT
+             # UPDATE: Lowered to 5.1 to allow trading with small balances (User has ~6 USD)
+             # Binance min is usually 5.0, so 5.1 is safe buffer
+             self.min_trade_amount = 5.1 # USDT
             
         log(f"Executor başlatıldı. Mod: {'CANLI' if self.is_live else 'KAĞIT'} | Min İşlem: {self.min_trade_amount} {'TRY' if self.is_tr else 'USDT'}")
         
@@ -153,7 +154,7 @@ class BinanceExecutor:
                  log(f"⚠️ Kaldıraç ayarlama hatası: {e}")
 
         if self.is_live:
-             await self.sync_wallet()
+             await self.sync_wallet_balances()
 
 
 
@@ -279,6 +280,18 @@ class BinanceExecutor:
             for asset, amount in balances.items():
                 if asset in ['USDT', 'BNB', 'TRY', 'USDC', 'FDUSD']: continue # Skip bases
                 if amount <= 0: continue
+
+                # SAFETY: Do not sweep assets that are currently in our active positions (Strategies)
+                # Check for direct match (e.g. 'DOGE') or mapped symbol (e.g. 'DOGE/USDT')
+                is_active_position = False
+                for pos_sym in self.paper_positions:
+                    if pos_sym.startswith(asset + "/") or pos_sym == asset:
+                        is_active_position = True
+                        break
+                
+                if is_active_position:
+                    log(f"🛡️ Skipping Dust Check for active position: {asset}")
+                    continue
                 
                 # Symbol check
                 symbol = f"{asset}/USDT"
@@ -470,7 +483,7 @@ class BinanceExecutor:
             log(f"⚠️ Free Bakiye hatası: {e}")
             return 0.0
 
-    async def sync_wallet(self):
+    async def sync_wallet_balances(self):
         """Gerçek cüzdan bakiyelerini state'e senkronize et (Auto-Redeem dahil)"""
         if not self.is_live or not self.exchange_spot:
             # log(f"DEBUG: Skipping wallet sync. Live: {self.is_live}, Client: {self.exchange_spot}")
@@ -1511,13 +1524,13 @@ class BinanceExecutor:
             bool: Eğer True dönerse bot durmalı.
         """
         # 0. Global Hard Stop (Survival Mode)
-        # Eğer toplam bakiye $5.0'ın altına düşerse botu zorla durdur.
+        # Eğer toplam bakiye $1.0'ın altına düşerse botu zorla durdur.
         # Bu, kalan son parayı komisyonlara kaptırmamak için son çaredir.
         if self.is_live and not self.is_tr:
              total_balance = await self.get_total_balance()
-             # Sadece 0.1'den büyük ve 5'ten küçükse durdur (Hata durumunda 0 dönebilir)
-             if 0.1 < total_balance < 5.0:
-                 log(f"💀 CRITICAL WARNING: Bakiye kritik seviyenin altında (${total_balance:.2f} < $5.00). Bot durduruluyor.")
+             # Sadece 0.1'den büyük ve 1.0'den küçükse durdur (Hata durumunda 0 dönebilir)
+             if 0.1 < total_balance < 1.0:
+                 log(f"💀 CRITICAL WARNING: Bakiye kritik seviyenin altında (${total_balance:.2f} < $1.00). Bot durduruluyor.")
                  return True
 
         # 1. Günlük başlangıç bakiyesini belirle (Eğer yoksa)

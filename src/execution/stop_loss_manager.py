@@ -66,9 +66,30 @@ class StopLossManager:
 
         # Calculate PnL %
         pnl_pct = (current_price - entry_price) / entry_price * 100
+        
+        # Calculate Duration in Minutes
+        duration_minutes = (current_time - entry_time).total_seconds() / 60.0
 
-        # 1. Time-Based Exit
-        hours_held = (current_time - entry_time).total_seconds() / 3600
+        # --- 1. DYNAMIC ROI (Freqtrade Style) ---
+        if settings.DYNAMIC_ROI_ENABLED:
+            # Sort keys to find the correct time bracket
+            roi_table = dict(sorted(settings.DYNAMIC_ROI_TABLE.items(), reverse=True))
+            target_roi = settings.TAKE_PROFIT_PCT # Default Fallback
+            
+            for time_threshold, roi_target in roi_table.items():
+                if duration_minutes >= time_threshold:
+                    target_roi = roi_target
+                    break # Found the applicable bracket (since we sorted reverse)
+            
+            # Check if PnL meets the dynamic target
+            if pnl_pct >= target_roi:
+                return {
+                    'action': 'CLOSE', 
+                    'reason': f'DYNAMIC_ROI_HIT (Time: {duration_minutes:.1f}m, Target: {target_roi}%, PnL: {pnl_pct:.2f}%)'
+                }
+
+        # 2. Time-Based Exit (Legacy Hard Limits)
+        hours_held = duration_minutes / 60.0
         
         # Hard Stop (48h)
         if hours_held >= settings.MAX_HOLD_TIME_HOURS:
@@ -83,7 +104,7 @@ class StopLossManager:
         if df is not None:
             atr_value = self.calculate_atr(df)
         
-        # Determine Stop Distance
+        # Determine Stop Distance (ATR Based)
         if atr_value > 0:
             # Tighten stop after partial exit
             multiplier = settings.TRAILING_STOP_TIGHT_MULTIPLIER if position.get('partial_exit_executed') else settings.TRAILING_STOP_ATR_MULTIPLIER
@@ -94,8 +115,10 @@ class StopLossManager:
             
             stop_distance = atr_value * multiplier
         else:
-            # Fallback to fixed percentage if ATR failed
-            fallback_pct = settings.STOP_LOSS_PCT / 100
+            # Fallback to dynamic percentage based on volatility if ATR failed
+            # If no DF, assume standard volatility
+            # Phase 3 Improvement: Use symbol specific default if possible, or config
+            fallback_pct = settings.STOP_LOSS_PCT / 100 # Default %5
             stop_distance = current_price * fallback_pct
 
         # 3. Trailing Stop Logic
@@ -108,6 +131,11 @@ class StopLossManager:
             # FIX: Return update immediately to save initial stop
             return {'action': 'UPDATE_STOP', 'new_stop_price': current_stop_price}
 
+        # --- PRO UPDATE: ATR Based Dynamic Stop ---
+        # Stop fiyatını sadece fiyat yükseldiğinde yukarı taşı (Trailing)
+        # Ancak, ATR çok arttıysa (volatilite patlaması), stop mesafesini biraz açmak gerekebilir mi?
+        # Hayır, genelde trailing stop sıkılaşır.
+        
         new_stop_price = current_price - stop_distance
         
         # Only move stop UP (Trailing)
@@ -120,7 +148,7 @@ class StopLossManager:
             
         # Check if Price hit Stop
         if current_price <= final_stop_price:
-            return {'action': 'CLOSE', 'reason': f'TRAILING_STOP_HIT (Price: {current_price:.4f} <= Stop: {final_stop_price:.4f})'}
+            return {'action': 'CLOSE', 'reason': f'ATR_TRAILING_STOP_HIT (Price: {current_price:.4f} <= Stop: {final_stop_price:.4f})'}
 
         # 4. Partial Take Profit
         if not position.get('partial_exit_executed', False):

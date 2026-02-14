@@ -5,7 +5,7 @@ WORKDIR /app
 ENV TMPDIR=/var/tmp
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     wget \
     curl \
@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     openssl \
     libgomp1 \
     cmake \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TA-Lib C library
@@ -32,7 +33,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt && rm -rf /root/.cache/pip
 
 # Stage 2: Runtime
 FROM python:3.11-slim
@@ -60,6 +61,7 @@ RUN mkdir -p data logs
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 # Default command
 CMD ["python", "src/main.py"]

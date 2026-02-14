@@ -56,18 +56,15 @@ class OpportunityManager:
         signal_map = {s.symbol: s for s in market_signals}
         
         for symbol, data in portfolio.items():
-            # Çok yeni alınanları filtrele (Hemen satmayalım)
-            if current_time - data.get('timestamp', 0) < self.min_hold_time:
-                continue
+            # --- PRO FIX: Allow analysis of locked assets for High Score Diff overrides ---
+            # Old: if current_time - data.get('timestamp', 0) < self.min_hold_time: continue
+            
+            hold_time = current_time - data.get('timestamp', 0)
+            is_locked = hold_time < self.min_hold_time
 
             # DUST CHECK: 20 TL altı bakiyeleri takas adayı yapma (Kilitlenmeyi önle)
-            # Not: Bu değer 'paper_positions' içinde anlık güncellenmiyor olabilir ama
-            # tahmini bir kontrol faydalı olur. Gerçek kontrol executor.py'de.
-            # Burada mantıksal elemeyi yapıyoruz.
-            # data içinde 'quantity' ve 'entry_price' var. Anlık fiyatı bilmiyorsak entry_price kullan.
             est_value = data.get('quantity', 0) * data.get('entry_price', 0)
             if est_value < 20.0:
-                 # log(f"🧹 Dust Filter: {symbol} (Est. Val: {est_value:.2f}) swap adayı olamaz.")
                  continue
                 
             # Eğer portföydeki coinin güncel sinyali yoksa (belki hacim düştü), skoru 0 varsay
@@ -77,14 +74,26 @@ class OpportunityManager:
             portfolio_scores.append({
                 'symbol': symbol,
                 'score': score,
-                'data': data
+                'data': data,
+                'is_locked': is_locked, # Added flag
+                'hold_time': hold_time
             })
             
         if not portfolio_scores:
             return None
             
         # En düşük skorlu (satılmaya aday) coin
-        worst_asset = min(portfolio_scores, key=lambda x: x['score'])
+        # PRO FIX: BNB/USDT satılmaya aday olamaz (Komisyon indirimi için gerekli)
+        valid_candidates = [
+            x for x in portfolio_scores 
+            if x['symbol'] != "BNB/USDT"
+        ]
+        
+        if not valid_candidates:
+             # Sadece BNB varsa ve başka fırsat yoksa bekle
+             return None
+
+        worst_asset = min(valid_candidates, key=lambda x: x['score'])
         
         # 2. Piyasadaki en iyi fırsatları bul (Elimizde OLMAYANLAR arasından)
         for signal in market_signals:
@@ -100,6 +109,20 @@ class OpportunityManager:
         # 3. Karşılaştırma ve Korelasyon Kontrolü
         for candidate in available_opportunities:
             score_diff = candidate.score - worst_asset['score']
+            
+            # --- LOCK CHECK WITH OVERRIDE ---
+            if worst_asset['is_locked']:
+                # GENERAL RULE: If score difference is MASSIVE (> 20.0), break the lock.
+                # SNIPER RULE (Implicit): If we are in sniper mode, we might want even lower threshold (15.0),
+                # but 20.0 is a safe "Universal" threshold for "Undeniable Opportunity".
+                # Example: Holding Coin A (Score 5) vs Opportunity B (Score 26) -> Diff 21 -> SWAP!
+                
+                LOCK_BREAK_THRESHOLD = 20.0
+                
+                if score_diff < LOCK_BREAK_THRESHOLD: 
+                    # log(f"🔒 Locked: {worst_asset['symbol']} (Held {int(worst_asset['hold_time'])}s). Diff {score_diff:.1f} < {LOCK_BREAK_THRESHOLD}")
+                    break 
+                    return None
             
             # Eğer en iyi fırsat bile yeterli fark atmıyorsa, diğerlerine bakmaya gerek yok
             if score_diff <= self.min_score_diff:
@@ -173,8 +196,14 @@ class OpportunityManager:
                     score = score_cache[symbol]
                     score_source = "cached"
                 else:
-                    score = 0
-                    score_source = "missing_data"
+                    # PRO FIX: Eksik veri cezası -100 yerine 0 (Nötr) yapıldı.
+                    # Ayrıca BNB/USDT için özel koruma.
+                    if symbol == "BNB/USDT":
+                         score = 0.0 # BNB her zaman nötr kalmalı (Base asset)
+                         score_source = "base_asset_protection"
+                    else:
+                         score = 0.0 # Bilinmeyen varlık nötr kabul edilir
+                         score_source = "missing_data"
                 # If truly unknown, maybe mark it? But 0 is safe for comparison.
             
             # Hold time check
@@ -222,9 +251,19 @@ class OpportunityManager:
         }
 
         if worst_asset['is_locked']:
+            # --- PRO UPDATE: Allow Override for High Value Opportunities ---
+            LOCK_BREAK_THRESHOLD = 20.0
+            
+            if score_diff >= LOCK_BREAK_THRESHOLD:
+                 return {
+                    "action": "SWAP_READY", 
+                    "reason": f"🔥 OPPORTUNITY OVERRIDE! {worst_asset['symbol']} locked but opportunity is undeniable! (Diff: {score_diff:.1f} >= {LOCK_BREAK_THRESHOLD})",
+                    "details": details
+                }
+            
             return {
                 "action": "HOLD", 
-                "reason": f"{worst_asset['symbol']} yeni alındı, henüz satılamaz. ({int(worst_asset['hold_time'])}s < {self.min_hold_time}s)",
+                "reason": f"{worst_asset['symbol']} yeni alındı, henüz satılamaz. ({int(worst_asset['hold_time'])}s < {self.min_hold_time}s). Override için gereken fark: {LOCK_BREAK_THRESHOLD}",
                 "details": details
             }
 

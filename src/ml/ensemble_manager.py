@@ -67,7 +67,40 @@ class EnsembleManager:
             'SMA_50', 'SMA_200', 'VWAP'
         ]
         
+        self.last_load_time = 0
+        self.last_check_time = 0
         self.load_models()
+
+    def check_for_updates(self):
+        """
+        Checks if model files have been updated and reloads them if necessary.
+        This allows 'Hot Reloading' without restarting the bot.
+        """
+        import time
+        now = time.time()
+        
+        # Check at most once per minute
+        if now - self.last_check_time < 60:
+            return
+
+        self.last_check_time = now
+        should_reload = False
+        
+        for name in self.models.keys():
+            path = os.path.join(self.models_dir, f"{name}_model.pkl")
+            if os.path.exists(path):
+                try:
+                    mtime = os.path.getmtime(path)
+                    if mtime > self.last_load_time:
+                        should_reload = True
+                        logger.info(f"Yeni model dosyası tespit edildi: {name}")
+                        break
+                except OSError:
+                    pass
+        
+        if should_reload:
+            logger.info("Modeller yeniden yükleniyor (Hot Reload)...")
+            self.load_models()
 
     def prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -178,6 +211,9 @@ class EnsembleManager:
         """
         Returns the ensemble probability score (0.0 to 1.0) for the *last* row of the dataframe.
         """
+        # Hot reload check
+        self.check_for_updates()
+        
         if not self.is_trained:
             return 0.5 # Neutral
             
@@ -205,6 +241,7 @@ class EnsembleManager:
         return avg_proba
 
     def load_models(self):
+        import time
         loaded_count = 0
         for name in self.models.keys():
             path = os.path.join(self.models_dir, f"{name}_model.pkl")
@@ -214,6 +251,8 @@ class EnsembleManager:
                     loaded_count += 1
                 except Exception as e:
                     logger.error(f"Model yüklenemedi ({name}): {e}")
+        
+        self.last_load_time = time.time()
         
         if loaded_count == len(self.models):
             self.is_trained = True

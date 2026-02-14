@@ -1,6 +1,6 @@
-# Proje Algoritma ve Mimari Dokümantasyonu (v2.7 - ML & Automation)
+# Proje Algoritma ve Mimari Dokümantasyonu (v2.8 - Professional Standards)
 
-Bu doküman, Kripto Bot projesinin en güncel (v2.6) teknik mimarisini, algoritma detaylarını ve kod yapısını **en ince ayrıntısına kadar** açıklamaktadır.
+Bu doküman, Kripto Bot projesinin en güncel (v2.8) teknik mimarisini, algoritma detaylarını ve kod yapısını **en ince ayrıntısına kadar** açıklamaktadır.
 
 ---
 
@@ -89,7 +89,7 @@ class TradeSignal(BaseModel):
     symbol: str
     action: str            # "ENTRY", "EXIT", "HOLD"
     direction: str         # "LONG" (Spot için)
-    score: float           # -20.0 ile +20.0 arası puan
+    score: float           # -20.0 ile +40.0 arası puan
     estimated_yield: float # Tahmini getiri (Opsiyonel)
     timestamp: int         # Sinyal üretim zamanı (Unix Epoch)
     details: Dict          # İndikatör değerleri (RSI, MACD vb.)
@@ -209,6 +209,20 @@ else Sayaç >= 3
 end
 ```
 
+##### 3.1.1. Süper Sinyal Hızlı Yol (Fast Path) – Güvenli
+- Koşul: En iyi sinyal skoru ≥32 (ZAMA/USDT için ≥31) ve eldeki varlığa göre skor farkı ≥20.
+- Aksiyon: Mevcut pozisyon derhal satılır, ardından 5 sn beklenir ve cüzdan bakiyesi senkronize edilir.
+- Yeniden Doğrulama: Alımdan hemen önce sinyal skoru eşik üzerinde mi ve fiyat kayması (slippage) ≤%1 mi kontrol edilir; şartlar bozulduysa alım iptal edilir.
+- Korelasyon: Süper sinyallerde korelasyon filtresi bypass edilir; diğerlerinde korelasyon >0.85 ise atlanır.
+
+##### 3.1.2. Kilit Kırma (Hold-Time Lock Override)
+- Koşul: Skor farkı ≥20 olduğunda, “kilitli varlık/hold-time” engeli tüm modlarda aşılır.
+- Amaç: Çok yüksek fırsat farklarında bekleme nedeniyle fırsat kaçırmayı engellemek.
+
+##### 3.1.3. Adaptif Sniper Eşiği
+- Volatilite düşükse gerekli skor farkı 3.5’e iner; yüksek volatilitede 5.0 olarak kalır.
+- Eşik hesaplaması, en iyi sinyalin `details.volatility` alanına dayalıdır.
+
 #### B. Normal Mod (Yüksek Bakiye)
 Bakiye varsa ve `Score > Eşik Değer` (Genelde 1.0) ise alım yapar.
 
@@ -225,7 +239,7 @@ Binance'in "En az 5 USDT'lik işlem" kuralına takılmamak için miktar dinamik 
 async def execute_buy(self, symbol, quantity, price):
     # Min Notional (Tutar) Kontrolü
     total_value = quantity * price
-    min_notional = 5.5 # USDT (Güvenlik payı ile)
+    min_notional = 5.1 # USDT (Konfigüre edilebilir)
     
     if total_value < min_notional:
         # Eğer bakiye yetiyorsa miktarı artır
@@ -235,6 +249,15 @@ async def execute_buy(self, symbol, quantity, price):
     # Emir Gönder
     order = await client.create_order(...)
 ```
+
+### Satış Sonrası Senkronizasyon ve Alım Öncesi Doğrulama
+- Satıştan sonra 5 saniye beklenir ve cüzdan bakiyesi zorla senkronize edilir (bakiye gecikmeleri için).
+- Alım öncesi sinyal yeniden doğrulanır: skor eşik üzerinde mi ve slippage ≤%1 mi.
+- Şartlar sağlanmıyorsa alım iptal edilir; bot USDT’de güvenli şekilde bekler.
+
+### Toz Dönüşümü (Dust Conversion) Koruması
+- `convert_dust_to_bnb` aktif pozisyon sembollerini atlar; açık pozisyonlar 10 USDT altı olsa dahi süpürülmez.
+- Amaç: Aktif pozisyonların yanlışlıkla BNB’ye dönüştürülmesini önlemek.
 
 ### Güvenlik Duvarları (Safety Valves)
 
@@ -317,16 +340,18 @@ Düşük bakiye ile yapılan testlerde "Min Notional" (Minimum İşlem Tutarı) 
 
 Sistemin "kendi kendine yetebilmesi" için otomatik eğitim mekanizması kurulmuştur.
 
-### 7.1. Aylık Otomatik Eğitim
-Sunucu tarafında çalışan bir Cron Job, her ayın 1'inde tetiklenir ve modeli güncel verilerle yeniden eğitir.
+### 7.1. Otomatik Eğitim (Sürekli Öğrenme)
+Sunucu tarafında çalışan bir Cron Job, **Her Saat Başı** tetiklenir ve modeli güncel verilerle yeniden eğitir.
 
 *   **Script:** `scripts/auto_train_ml.sh`
-*   **Zamanlama:** Her ayın 1. günü, saat 03:00.
+*   **Zamanlama:** Her saat başı (`0 * * * *`).
+*   **Hot Reload:** Bot, eğitim tamamlandığında yeni model dosyasını otomatik olarak algılar ve yeniden başlatmaya gerek kalmadan hafızaya yükler.
 *   **Akış:**
     1.  `src/train_models.py` çalıştırılır (Son 50.000 veri satırı ile).
     2.  Yeni model `rf_model.pkl` üretilir.
     3.  Model `data/models/` klasörüne taşınır.
-    4.  Bot servisi (`bot-live`) yeniden başlatılarak yeni model belleğe yüklenir.
+    4.  Bot (`EnsembleManager`) dosya değişimini fark eder ve yeni modeli yükler.
+
 
 ```bash
 # auto_train_ml.sh (Özet)
@@ -335,9 +360,75 @@ LOG_FILE="/home/ubuntu/kripto-bot/data/auto_train.log"
 # 1. Modeli Eğit
 sudo docker exec kripto-bot-live python src/train_models.py
 
-# 2. Başarılıysa Modeli Taşı ve Botu Yeniden Başlat
+# 2. Başarılıysa Modeli Taşı (Hot Reload için)
 if [ $? -eq 0 ]; then
-    sudo docker exec kripto-bot-live mv /app/models/rf_model.pkl /app/data/models/
-    sudo docker-compose restart bot-live
+    sudo docker exec kripto-bot-live bash -c "cp /app/models/*.pkl /app/data/models/"
+    
+    # Botu yeniden başlatmaya gerek YOK (Hot Reload aktif)
+    # sudo docker-compose restart bot-live
 fi
+```
+
+---
+
+## 8. Profesyonel Standartlar ve İyileştirmeler (v2.8 Update)
+
+Botun statik parametreleri, kurumsal algoritmik ticaret standartlarına göre analiz edilmiş ve **Dinamik/Adaptif** yapıya dönüştürülmüştür.
+
+| Özellik | Eski Yöntem (Amatör/Statik) | Yeni Yöntem (Profesyonel/Dinamik) | Kazanım |
+| :--- | :--- | :--- | :--- |
+| **Trend Göstergesi** | SMA (Simple Moving Average) - 7/25 | **EMA (Exponential Moving Average) - 9/21** | Fiyat değişimlerine çok daha hızlı tepki verilir, gecikme (lag) azaltıldı. |
+| **RSI Limitleri** | Sabit 30 (Al) / 70 (Sat) | **Trende Duyarlı (Adaptive)** | Yükseliş trendinde RSI 80'e kadar çıkabilir, düşüşte 20'ye inebilir. Erken çıkışları engeller. |
+| **Zarar Kes (Stop Loss)** | Sabit Yüzde (%5) | **ATR Tabanlı (Volatility Adjusted)** | Piyasa çok oynaksa stop mesafesi açılır, durgunsa daralır. "Stop Avı"ndan (Whipsaw) korur. |
+| **Sniper Modu** | Sabit Skor Farkı (5.0) | **Volatiliteye Duyarlı Eşik** | Düşük volatilitede 3.5 puana iner, yüksek volatilitede 5.0 kalır. Fırsat kaçırmayı önler. |
+| **Sürekli Eğitim** | Manuel / Aylık | **Saatlik Otomatik (Hot Reload)** | Model her saat başı yeni verilerle kendini günceller, restart gerekmez. |
+
+### 8.1. Neden Bu Değişiklikler Yapıldı?
+Kurumsal fonlar ve profesyonel algoritmalar asla "sihirli rakamlar" (sabit %5 stop gibi) kullanmazlar. Çünkü piyasa koşulları (volatilite, trend gücü) sürekli değişir. Sabit parametreler, piyasa değiştiğinde (örneğin boğadan ayıya geçişte) botun zarar etmesine neden olur. 
+
+Yapılan bu **Adaptif** güncellemeler sayesinde bot, piyasanın o anki "nabzına" göre risk toleransını ve giriş/çıkış noktalarını otomatik ayarlar.
+
+---
+
+## 9. Gelişmiş Güvenlik ve Varlık Yönetimi
+
+### 9.1. Çok Katmanlı Stablecoin ve İstenmeyen Varlık Filtresi
+Botun yanlışlıkla stablecoin veya değeri olmayan "wrapped" token (örn: WBTC) alıp satmasını önlemek için çok katmanlı bir filtreleme sistemi mevcuttur. Bu, gereksiz komisyon ödemelerini (churning) ve portföyün kilitlenmesini engeller.
+
+*   **Katman 1: Ana Döngü Filtresi (`src/main.py`)**
+    *   Daha analiz başlamadan, `main.py` içindeki ana döngü, sembol listesini bir "blacklist" (kara liste) ile karşılaştırır. Eğer bir sembolün base currency'si (örn: `U`/USDT'deki `U`) bu listedeyse, o sembol tüm analiz sürecinden dışlanır. Bu, en verimli filtreleme yöntemidir.
+
+*   **Katman 2: TradeManager Güvenlik Duvarı (`src/execution/trade_manager.py`)**
+    *   Her ihtimale karşı, bir sinyal `TradeManager`'a ulaştığında ikinci bir kontrol yapılır. Bu, `main.py`'deki filtreden kaçabilecek veya gelecekte eklenebilecek yeni bir giriş noktasından gelebilecek sinyallere karşı bir "son kale" görevi görür.
+    *   **Genişletilmiş Liste:** Bu liste, `U`, `UST`, `WBTC` (Wrapped BTC), `BTCB` (Binance-Peg BTC) gibi daha geniş bir yelpazeyi kapsar.
+
+```python
+# src/execution/trade_manager.py -> process_symbol_logic
+
+# SAFETY CHECK: Stablecoin and Unwanted Asset Filter
+base_currency = symbol.split('/')[0]
+blacklist = ['USDT', 'USDC', 'TUSD', 'FDUSD', 'DAI', 'U', 'WBTC', 'BTCB', ...]
+if base_currency in blacklist:
+    return None # Sinyali tamamen iptal et
+```
+
+### 9.2. Özel Varlık Koruması: BNB (Base Asset Protection)
+`BNB`, Binance borsasında komisyon indirimleri sağlayan temel bir varlıktır ve genellikle portföyde tutulması stratejik bir avantaj sağlar. Botun, normal risk yönetimi kuralları (örn: stop-loss) gereği panikle `BNB` satmasını önlemek için özel bir koruma mekanizması geliştirilmiştir.
+
+*   **Mantık:** `TradeManager` içindeki `_check_risk_management` fonksiyonu, bir `EXIT` (pozisyonu kapat) sinyali üretmeden önce sembolü kontrol eder.
+*   **Uygulama:** Eğer sembol `BNB/USDT` ise, risk sinyali ne olursa olsun (`TAKE_PROFIT` hariç) dikkate alınmaz. Sinyal loglanır ancak `-100` skorlu bir `EXIT` işlemi tetiklenmez. Bu, `BNB`'nin sadece manuel müdahale veya çok özel stratejik kararlarla satılmasını sağlar.
+
+```python
+# src/execution/trade_manager.py -> _check_risk_management
+
+if action in ['CLOSE', 'PARTIAL_CLOSE']:
+    # ...
+    # BNB PROTECTION: Do not score -100 for BNB
+    if symbol == "BNB/USDT":
+         log("🛡️ Risk Exit Triggered for BNB/USDT but suppressed (Base Asset Protection).")
+         return None # EXIT sinyalini üretme, işlemi iptal et
+    
+    # Diğer varlıklar için normal risk yönetimi uygula
+    score = -100.0
+    # ...
 ```

@@ -230,18 +230,26 @@ async def run_bot():
                         is_usdt_pair = '/USDT' in symbol
                         is_active = loader.exchange.markets.get(symbol, {}).get('active', False)
                         
-                        # Blacklist check
-                        blacklist = ['USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USDe', 'EURI', 'EUR', 'AEUR', 'USD1', 'BUSD', 'RLUSD']
-                        base_currency = symbol.split('/')[0]
-                        if base_currency in blacklist:
+                        if not is_usdt_pair or not is_active:
                             continue
 
-                        if is_usdt_pair and is_active:
-                            active_symbols.append(symbol)
+                        # Blacklist check (Stablecoins & Fiat)
+                        blacklist = [
+                            'USDT', 'USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USDe', 
+                            'EURI', 'EUR', 'AEUR', 'USD1', 'BUSD', 'RLUSD',
+                            'PAX', 'UST', 'SUSD', 'GUSD', 'LUSD', 'FRAX'
+                        ]
+                        base_currency = symbol.split('/')[0]
+                        if base_currency in blacklist:
+                            # log(f"🚫 Blacklisted Base Currency: {base_currency} ({symbol})")
+                            continue
+
+                        # Check if quote currency is valid (USDT, TRY, FDUSD etc.)
+                        active_symbols.append(symbol)
                 
                 if active_symbols:
-                    # Limit to top 400 for broad market coverage
-                    settings.SYMBOLS = active_symbols[:400]
+                    # Limit to top 100 for broad market coverage
+                    settings.SYMBOLS = active_symbols[:100]
                     log(f"✅ Updated Scanning List: {len(settings.SYMBOLS)} Symbols (Top Volume {quote_currency} Pairs)")
                 else:
                     log("⚠️ No active symbols found, using default list.")
@@ -285,7 +293,7 @@ async def run_bot():
             log("\n--- Scanning Market ---")
             
             # Sync Wallet First!
-            await executor.sync_wallet()
+            await executor.sync_wallet_balances()
 
             # Ensure held positions are always scanned (Zombie Position Fix)
             try:

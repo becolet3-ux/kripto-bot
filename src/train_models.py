@@ -61,9 +61,18 @@ def main():
         logger.info(f"Data loaded: {len(df)} rows")
         
         # Use only last 50k rows to avoid OOM on small servers
-        if len(df) > 50000:
-            logger.info("Trimming data to last 50,000 rows for memory safety...")
-            df = df.iloc[-50000:]
+        # AND prune the file to prevent infinite growth (Rolling Window)
+        MAX_ROWS = 200000  # Keep ~200k rows (approx 30MB)
+        if len(df) > MAX_ROWS:
+            logger.info(f"Trimming data to last {MAX_ROWS} rows for memory safety and storage...")
+            df = df.iloc[-MAX_ROWS:]
+            
+            # Write back the trimmed version to disk (Data Rotation)
+            try:
+                df.to_csv(data_path, index=False)
+                logger.info(f"✅ Data file pruned to last {MAX_ROWS} rows.")
+            except Exception as e:
+                logger.error(f"Failed to save pruned data: {e}")
             
     except Exception as e:
         logger.error(f"Failed to load data: {e}")
