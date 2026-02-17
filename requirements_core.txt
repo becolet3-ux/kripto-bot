@@ -1,0 +1,15 @@
+ccxt
+pandas
+python-dotenv
+ta-lib
+numpy
+aiohttp
+tweepy
+praw
+textblob
+binance-connector
+requests
+urllib3
+pydantic>=2.0
+pydantic-settings
+scikit-learn

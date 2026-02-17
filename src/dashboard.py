@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 
 import ccxt
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 # from src.collectors.binance_tr_client import BinanceTRClient
 
 # Set page config
@@ -22,9 +22,57 @@ st.set_page_config(
 )
 
 # Constants
-STATE_FILE = os.getenv("STATE_FILE", "data/bot_state.json")
+APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def resolve_state_file():
+    candidates = []
+    env_path = os.getenv("STATE_FILE")
+    if env_path:
+        candidates.append(env_path)
+    candidates.extend([
+        "data/bot_state_live.json",
+        "data/bot_state.json",
+        "bot_state_live.json",
+        "bot_state.json",
+        "local_backup_data/bot_state_live.json",
+        "local_backup_data/bot_state.json"
+    ])
+    resolved = None
+    for candidate in candidates:
+        if not candidate:
+            continue
+        if not os.path.isabs(candidate):
+            candidate_path = os.path.join(APP_ROOT, candidate.lstrip("/"))
+        else:
+            candidate_path = candidate
+        if os.path.exists(candidate_path):
+            resolved = candidate_path
+            break
+        if resolved is None:
+            resolved = candidate_path
+    return resolved
+
+STATE_FILE = resolve_state_file()
 LEARNING_FILE = "data/learning_data.json"
 LOG_FILE = os.getenv("LOG_FILE", "data/bot_activity.log")
+
+def ensure_state_file(path: str):
+    try:
+        if not path:
+            return
+        directory = os.path.dirname(path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory, exist_ok=True)
+        if not os.path.exists(path):
+            initial = {}
+            live_env = os.getenv("LIVE_TRADING")
+            if isinstance(live_env, str):
+                is_live_flag = live_env.lower() in ("1", "true", "yes", "on")
+                initial["is_live"] = is_live_flag
+            with open(path, "w") as f:
+                json.dump(initial, f)
+    except Exception:
+        pass
 
 @st.cache_resource
 def get_exchange():
@@ -32,18 +80,12 @@ def get_exchange():
 
 @st.cache_data(ttl=60)
 def get_asset_prices_in_usdt(assets):
-    """
-    Varlıkların USDT karşılıklarını çeker. 60 saniye önbellekte tutar.
-    """
     exchange = get_exchange()
     prices = {}
-    
     for asset in assets:
         if asset == 'USDT':
             prices[asset] = 1.0
             continue
-            
-        # 1. Doğrudan USDT çiftine bak (Örn: BTC -> BTC/USDT)
         try:
             symbol = f"{asset}/USDT"
             ticker = exchange.fetch_ticker(symbol)
@@ -51,32 +93,54 @@ def get_asset_prices_in_usdt(assets):
             continue
         except:
             pass
-            
-        # 2. Bulunamadı
         prices[asset] = 0.0
-        
     return prices
 
 def load_json(filepath):
-    if not os.path.exists(filepath):
-        return None
     try:
+        if not os.path.exists(filepath):
+            return {}
         with open(filepath, 'r') as f:
             return json.load(f)
     except:
-        return None
+        return {}
 
 def load_logs(filepath, lines=100):
     if not os.path.exists(filepath):
         return []
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
-            # Use deque to efficiently read only the last N lines
             return list(deque(f, maxlen=lines))
     except:
         return []
 
+def load_logs_by_hours(filepath, hours, max_lines=10000):
+    if not os.path.exists(filepath):
+        return ""
+    cutoff = datetime.now() - timedelta(hours=hours)
+    selected = []
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            for line in f:
+                if len(line) < 19:
+                    continue
+                ts_str = line[:19]
+                try:
+                    ts = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    continue
+                if ts >= cutoff:
+                    selected.append(line)
+        if not selected:
+            return ""
+        if len(selected) > max_lines:
+            selected = selected[-max_lines:]
+        return "".join(selected)
+    except Exception:
+        return ""
+
 # Header
+ensure_state_file(STATE_FILE)
 state = load_json(STATE_FILE)
 learning_data = load_json(LEARNING_FILE)
 
@@ -97,15 +161,25 @@ if state:
 # Debug Info in Sidebar
 with st.sidebar.expander("🔍 Debug Info", expanded=False):
     st.write(f"**Last Load:** {datetime.now().strftime('%H:%M:%S')}")
+    st.caption(f"STATE_FILE: {STATE_FILE}")
+    try:
+        exists = os.path.exists(STATE_FILE)
+    except Exception:
+        exists = False
+    st.caption(f"STATE_FILE exists: {exists}")
     if state:
         st.write(f"**State Keys:** {list(state.keys())}")
         com = state.get('commentary', {})
+        wallet_debug = state.get('wallet_assets', {})
         if com:
             st.write(f"**Commentary Keys:** {list(com.keys())}")
         else:
             st.error("Commentary is empty or missing!")
+        if wallet_debug:
+            st.caption("Wallet Assets (Raw)")
+            st.json(wallet_debug)
     else:
-        st.error("State is None (File Load Failed)")
+        st.warning("State yüklenemedi veya henüz oluşturulmadı.")
 
 mode_title = "CANLI İŞLEM (LIVE TRADING)" if is_live else "Paper Trading (Simülasyon)"
 icon = "🔥" if is_live else "🧪"
@@ -227,9 +301,54 @@ else:
     col3.metric("Tamamlanan İşlem", f"{total_trades}")
     col4.metric("Kazanma Oranı", f"%{win_rate:.1f}")
     col5.metric("Ortalama PnL", f"%{avg_pnl:.2f}", delta=f"{avg_pnl:.2f}%")
-
+    
+    with st.expander("🧠 Parametre Danışmanı ve Meta Skor Önerileri", expanded=False):
+        if not learning_data:
+            st.info("Henüz öğrenme verisi yok.")
+        else:
+            advisor = learning_data.get("param_advisor", {})
+            last_result = advisor.get("last_result", {})
+            suggestions = last_result.get("suggestions", [])
+            if not last_result or not suggestions:
+                st.info("Henüz kaydedilmiş parametre önerisi yok.")
+            else:
+                ts = last_result.get("timestamp", 0)
+                if ts:
+                    dt_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+                    st.caption(f"Son Çalışma: {dt_str}")
+                regime_info = last_result.get("regime", {})
+                if regime_info:
+                    st.write(f"Piyasa Rejimi: {regime_info.get('status', 'Bilinmiyor')} | WinRate 24h: %{regime_info.get('win_rate_24h', 0):.1f}")
+                type_counts = {}
+                for s in suggestions:
+                    t = s.get("type", "unknown")
+                    type_counts[t] = type_counts.get(t, 0) + 1
+                if type_counts:
+                    st.write("Öneri Tipleri:")
+                    for t, c in type_counts.items():
+                        st.write(f"- {t}: {c} adet")
+                meta_sugs = [s for s in suggestions if s.get("type") == "meta_score"]
+                if meta_sugs:
+                    m = meta_sugs[0]
+                    conf = m.get("suggested", {})
+                    trsi = conf.get("target_rsi")
+                    tvol = conf.get("target_volume_ratio")
+                    if trsi is not None and tvol is not None:
+                        st.write(f"CUSTOM_EDGE_SCORE hedefleri: RSI ≈ {float(trsi):.1f}, Volume Ratio ≈ {float(tvol):.2f}")
+                tune_sugs = [s for s in suggestions if s.get("type") == "tune"]
+                if tune_sugs:
+                    df_tune = []
+                    for s in tune_sugs:
+                        df_tune.append({
+                            "Parametre": s.get("target"),
+                            "Mevcut": s.get("current"),
+                            "Önerilen": s.get("suggested"),
+                            "Açıklama": s.get("reason", "")
+                        })
+                    st.dataframe(pd.DataFrame(df_tune), hide_index=True, use_container_width=True)
+    
     st.markdown("---")
-
+    
     # --- NEW SECTION: Bot Commentary ---
     commentary = state.get('commentary', {})
     
@@ -247,7 +366,11 @@ else:
         with c2:
             regime = commentary.get('market_regime', {})
             if regime:
-                st.write(f"**Piyasa Durumu:** Trend: `{regime.get('trend')}` | Volatilite: `{regime.get('volatility')}`")
+                trend = regime.get('trend', 'SIDEWAYS')
+                if trend == 'ANALYZING':
+                    trend = 'SIDEWAYS'
+                vol = regime.get('volatility', 'LOW')
+                st.write(f"**Piyasa Durumu:** Trend: `{trend}` | Volatilite: `{vol}`")
             else:
                 st.write("**Piyasa Durumu:** Veri yok")
 
@@ -352,10 +475,11 @@ else:
                 
         w_df['Tahmini Değer (USDT)'] = asset_values_display
         
-        # Display Total Value Metric prominently above the table
         st.metric("💎 Toplam Varlık Değeri (Cüzdan)", f"${total_asset_value_usdt:,.2f}", help="Cüzdanınızdaki tüm varlıkların (USDT + Kripto) güncel kurdan hesaplanan toplam değeri.")
         
         st.dataframe(w_df, hide_index=True)
+        st.subheader("🔎 Ham Cüzdan Verisi (API Snapshot)")
+        st.json(wallet)
         st.markdown("---")
 
     # 3. Active Positions Table
@@ -562,11 +686,28 @@ else:
     st.subheader("📝 Canlı Loglar")
     
     logs = load_logs(LOG_FILE)
-    if logs:
-        log_text = "".join(logs)
-        st.text_area("Bot Activity Log", log_text, height=300, disabled=True)
-    else:
-        st.info("Henüz log kaydı yok.")
+    log_text = "".join(logs) if logs else "Henüz log kaydı yok."
+    st.text_area("Bot Activity Log", log_text, height=300, disabled=True)
+    
+    col_log_3h, col_log_12h = st.columns(2)
+    logs_3h = load_logs_by_hours(LOG_FILE, hours=3)
+    logs_12h = load_logs_by_hours(LOG_FILE, hours=12)
+    with col_log_3h:
+        st.download_button(
+            label="⬇️ Son 3 Saatlik Logu İndir",
+            data=logs_3h or "Bu aralıkta log bulunamadı.",
+            file_name=f"bot_log_last_3h_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+            mime="text/plain",
+            key="download_log_3h"
+        )
+    with col_log_12h:
+        st.download_button(
+            label="⬇️ Son 12 Saatlik Logu İndir",
+            data=logs_12h or "Bu aralıkta log bulunamadı.",
+            file_name=f"bot_log_last_12h_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+            mime="text/plain",
+            key="download_log_12h"
+        )
 
 # Optional auto-refresh loop
 if st.session_state.get('auto_refresh', False):

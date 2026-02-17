@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Optional, List, Any
+from pydantic import BaseModel, field_validator
 from config.settings import settings
 from src.utils.logger import logger
 from src.ml.ensemble_manager import EnsembleManager
@@ -20,6 +20,14 @@ class TradeSignal(BaseModel):
     estimated_yield: float
     timestamp: int
     details: Dict
+
+    @field_validator("score")
+    @classmethod
+    def clamp_score(cls, v: float) -> float:
+        max_cap = 40.0
+        if settings.USE_MOCK_DATA:
+            max_cap = 20.0
+        return max(-20.0, min(max_cap, float(v)))
 
 class MarketAnalyzer:
     def __init__(self, funding_loader: Optional[FundingRateLoader] = None):

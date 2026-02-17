@@ -28,6 +28,13 @@ async def update_dashboard_commentary(executor, opportunity_manager, market_regi
     Dashboard için yorumları ve durumu günceller.
     """
     try:
+        existing_commentary = executor.full_state.get('commentary', {})
+        if not market_regime:
+            market_regime = existing_commentary.get('market_regime')
+        if not market_regime:
+            market_regime = {"trend": "SIDEWAYS", "volatility": "LOW"}
+            log("⚠️ Market regime missing, defaulting to SIDEWAYS/LOW for commentary.")
+
         # 1. Top Opportunities
         sorted_signals = sorted([s for s in all_market_signals if s.action == 'ENTRY'], key=lambda x: x.score, reverse=True)
         top_opps = []
@@ -87,14 +94,23 @@ async def update_dashboard_commentary(executor, opportunity_manager, market_regi
 
         # --- 4. Brain Plan Log (Why/Why Not Swap) ---
         # Mevcut brain_plan geçmişini koru
-        existing_commentary = executor.full_state.get('commentary', {})
         plan_history = existing_commentary.get('brain_plan_history', [])
 
-        # Portföy boş olsa bile durum analizi yap
+        is_sniper_mode = False
+        try:
+            total_equity = await executor.get_total_balance()
+            LOW_BALANCE_THRESHOLD = 40.0
+            if total_equity < LOW_BALANCE_THRESHOLD and settings.LIVE_TRADING:
+                is_sniper_mode = True
+        except Exception:
+            is_sniper_mode = False
+
         plan_analysis = opportunity_manager.analyze_swap_status(
             executor.paper_positions,
             all_market_signals,
-            score_cache=latest_scores
+            score_cache=latest_scores,
+            min_trade_amount=getattr(executor, "min_trade_amount", None),
+            ignore_lock=is_sniper_mode
         )
         
         # Sadece durum değiştiyse veya son logdan bu yana 5 dakika geçtiyse kaydet
@@ -168,7 +184,7 @@ async def run_bot():
     if hasattr(loader, 'exchange'):
         exchange_client = loader.exchange
         
-    executor = BinanceExecutor(exchange_client=exchange_client, is_tr=settings.IS_TR_BINANCE)
+    executor = BinanceExecutor(exchange_client=exchange_client)
 
     # Initialize TradeManager
     trade_manager = TradeManager(
@@ -198,7 +214,7 @@ async def run_bot():
     #          log(f"⚠️ Failed to update symbols: {e}")
 
     # Dynamic Symbol Loading for Binance Global (Futures/Spot)
-    if not settings.IS_TR_BINANCE and not settings.USE_MOCK_DATA:
+    if not settings.USE_MOCK_DATA:
         log("🔄 Fetching Active Pairs from Binance Global...")
         try:
             if hasattr(loader, 'exchange'):
@@ -233,15 +249,20 @@ async def run_bot():
                         if not is_usdt_pair or not is_active:
                             continue
 
-                        # Blacklist check (Stablecoins & Fiat)
-                        blacklist = [
-                            'USDT', 'USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USDe', 
+                        base_currency = symbol.split('/')[0]
+                        stable_bases = {
+                            'USDT', 'USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USDe', 'XUSD',
                             'EURI', 'EUR', 'AEUR', 'USD1', 'BUSD', 'RLUSD',
                             'PAX', 'UST', 'SUSD', 'GUSD', 'LUSD', 'FRAX'
-                        ]
-                        base_currency = symbol.split('/')[0]
-                        if base_currency in blacklist:
-                            # log(f"🚫 Blacklisted Base Currency: {base_currency} ({symbol})")
+                        }
+                        if base_currency in stable_bases:
+                            continue
+                        last_price = 0.0
+                        try:
+                            last_price = float(ticker.get('last', 0) or 0)
+                        except Exception:
+                            last_price = 0.0
+                        if base_currency.endswith(('USD', 'EUR')) and len(base_currency) <= 6 and 0.9 <= last_price <= 1.1:
                             continue
 
                         # Check if quote currency is valid (USDT, TRY, FDUSD etc.)
@@ -308,12 +329,10 @@ async def run_bot():
 
             # Periodic Dust Cleanup (Every 20 loops ~ 10-20 mins)
             if loop_count % 20 == 0:
-                 if not settings.IS_TR_BINANCE:
-                     await executor.convert_dust_to_bnb()
+                 await executor.convert_dust_to_bnb()
             
             # 0. Update Funding Rates (Phase 4)
-            if not settings.IS_TR_BINANCE:
-                await funding_loader.update_funding_rates()
+            await funding_loader.update_funding_rates()
             
             # 0.5 Fear & Greed Index (Global Sentiment)
             if sentiment_analyzer and loop_count % 20 == 1:
@@ -326,17 +345,19 @@ async def run_bot():
 
             
             # 1. Market Regime Analysis (Global Trend)
-            market_regime = None
+            market_regime = {"trend": "SIDEWAYS", "volatility": "LOW"}
             weights = executor.brain.get_weights()
             indicator_weights = executor.brain.get_indicator_weights()
             try:
-                btc_symbol = "BTC_TRY" if settings.IS_TR_BINANCE else "BTC/USDT"
+                btc_symbol = "BTC/USDT"
                 # Use longer timeframe for regime? 1h is fine for now, maybe 4h better?
                 # Using 1h to match main loop speed
                 btc_candles = await loader.get_ohlcv(btc_symbol, timeframe='1h', limit=50)
                 if btc_candles:
                     market_regime = analyzer.analyze_market_regime(btc_candles)
                     log(f"🌍 Market Regime ({btc_symbol}): Trend={market_regime['trend']}, Volatility={market_regime['volatility']}")
+                else:
+                    log(f"⚠️ Market Regime: No candles for {btc_symbol}, using default SIDEWAYS/LOW.")
             except Exception as e:
                 log(f"⚠️ Failed to detect market regime: {e}")
 
@@ -387,21 +408,31 @@ async def run_bot():
                 # Update Ghost Trades (Paper Trail)
                 if current_prices_map:
                     executor.brain.update_ghost_trades(current_prices_map)
+
+                param_advice = executor.brain.maybe_generate_param_suggestions()
+                if param_advice and param_advice.get("suggestions"):
+                    for s in param_advice["suggestions"]:
+                        action = s.get("type")
+                        target = s.get("target")
+                        current_val = s.get("current")
+                        suggested_val = s.get("suggested")
+                        reason = s.get("reason")
+                        log(f"🧠 PARAM_ADVISOR action={action} target={target} current={current_val} suggested={suggested_val} reason={reason}")
                 
-                # --- Commentary Generation (Dashboard) ---
                 await update_dashboard_commentary(
                     executor, 
                     opportunity_manager, 
                     market_regime, 
                     all_market_signals, 
-                    current_prices_map
+                    current_prices_map,
+                    latest_scores
                 )
                 
-                # --- LOW BALANCE RECOVERY MODE (< $100) ---
-                # Kullanıcı isteği: Toplam varlık < $100 ise tek varlığa düş ve en iyisini al
+                # --- LOW BALANCE RECOVERY MODE (< $40) ---
+                # Kullanıcı isteği: Toplam varlık < $40 ise tek varlığa düş ve en iyisini al
                 total_equity = await executor.get_total_balance()
                 log(f"DEBUG: Total Equity Check: ${total_equity:.2f} (Positions: {len(executor.paper_positions)})")
-                LOW_BALANCE_THRESHOLD = 100.0 
+                LOW_BALANCE_THRESHOLD = 40.0 
                 
                 if total_equity < LOW_BALANCE_THRESHOLD and settings.LIVE_TRADING:
                     await trade_manager.handle_sniper_mode(all_market_signals, current_prices_map)

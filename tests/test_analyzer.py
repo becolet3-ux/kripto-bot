@@ -1,6 +1,7 @@
 import unittest
 import pandas as pd
 import numpy as np
+from unittest.mock import MagicMock
 from src.strategies.analyzer import MarketAnalyzer, TradeSignal
 
 class TestMarketAnalyzer(unittest.TestCase):
@@ -91,6 +92,128 @@ class TestMarketAnalyzer(unittest.TestCase):
         # But analyze_market_regime checks close > SMA_Long * 1.005
         # The last candle in our set is definitely higher than SMA25
         self.assertEqual(regime['trend'], 'UP')
+
+    def test_analyze_spot_high_score_override(self):
+        rows = []
+        for i in range(3):
+            rows.append(
+                {
+                    "timestamp": i,
+                    "open": 100.0,
+                    "high": 101.0,
+                    "low": 99.0,
+                    "close": 100.0,
+                    "RSI": 50.0,
+                    "SMA_Short": 105.0,
+                    "SMA_Long": 100.0,
+                    "Volume_Ratio": 1.0,
+                    "Volatility": 0.0,
+                    "MACD": 0.1,
+                    "Signal_Line": 0.0,
+                    "BB_Upper": 110.0,
+                    "BB_Lower": 90.0,
+                    "Stoch_RSI": 0.5,
+                    "SuperTrend": 95.0,
+                    "ST_Direction": 1,
+                    "CCI": 0.0,
+                    "ADX": 25.0,
+                    "plus_di": 20.0,
+                    "minus_di": 10.0,
+                    "MFI": 50.0,
+                    "VWAP": 100.0,
+                    "is_doji": False,
+                    "is_hammer": False,
+                    "is_bullish_engulfing": False,
+                }
+            )
+        df = pd.DataFrame(rows)
+        self.analyzer.calculate_indicators = MagicMock(return_value=df)
+        self.analyzer.regime_detector.detect_regime = MagicMock(
+            return_value={"regime": "TRENDING", "is_no_trade_zone": False, "bb_width": 0.0}
+        )
+        self.analyzer.strategy_manager.analyze_all = MagicMock(
+            return_value={
+                "action": "HOLD",
+                "weighted_score": 3.0,
+                "primary_strategy": "base",
+                "vote_ratio": 1.0,
+                "strategy_details": {},
+            }
+        )
+        self.analyzer.funding_strategy = None
+        signal = self.analyzer.analyze_spot("BTC/USDT", self.candles, is_blocked=True)
+        self.assertIsNotNone(signal)
+        self.assertEqual(signal.action, "ENTRY")
+        self.assertEqual(signal.primary_strategy, "high_score_override")
+
+    def test_analyze_spot_blocked_by_negative_funding(self):
+        rows = []
+        for i in range(3):
+            rows.append(
+                {
+                    "timestamp": i,
+                    "open": 100.0,
+                    "high": 101.0,
+                    "low": 99.0,
+                    "close": 100.0,
+                    "RSI": 50.0,
+                    "SMA_Short": 105.0,
+                    "SMA_Long": 100.0,
+                    "Volume_Ratio": 1.0,
+                    "Volatility": 0.0,
+                    "MACD": 0.1,
+                    "Signal_Line": 0.0,
+                    "BB_Upper": 110.0,
+                    "BB_Lower": 90.0,
+                    "Stoch_RSI": 0.5,
+                    "SuperTrend": 95.0,
+                    "ST_Direction": 1,
+                    "CCI": 0.0,
+                    "ADX": 25.0,
+                    "plus_di": 20.0,
+                    "minus_di": 10.0,
+                    "MFI": 50.0,
+                    "VWAP": 100.0,
+                    "is_doji": False,
+                    "is_hammer": False,
+                    "is_bullish_engulfing": False,
+                }
+            )
+        df = pd.DataFrame(rows)
+        self.analyzer.calculate_indicators = MagicMock(return_value=df)
+        self.analyzer.regime_detector.detect_regime = MagicMock(
+            return_value={"regime": "TRENDING", "is_no_trade_zone": False, "bb_width": 0.0}
+        )
+        self.analyzer.strategy_manager.analyze_all = MagicMock(
+            return_value={
+                "action": "ENTRY",
+                "weighted_score": 0.0,
+                "primary_strategy": "base",
+                "vote_ratio": 1.0,
+                "strategy_details": {},
+            }
+        )
+
+        class FundingStub:
+            def analyze_funding(self, symbol):
+                return {
+                    "score_boost": -1.0,
+                    "action": "IGNORE_LONG",
+                    "reason": "negative",
+                    "funding_rate_pct": -0.5,
+                }
+
+        self.analyzer.funding_strategy = FundingStub()
+        self.analyzer.orderbook_analyzer.analyze_depth = MagicMock(return_value={})
+        self.analyzer.orderbook_analyzer.get_score_impact = MagicMock(return_value=0.0)
+        self.analyzer.vp_analyzer.calculate_profile = MagicMock(return_value={})
+        self.analyzer.vp_analyzer.get_score_impact = MagicMock(return_value=(0.0, ""))
+
+        weights = {"trend_following": 0.0, "golden_cross": 0.0, "oversold_bounce": 0.0, "sentiment": 0.0}
+        signal = self.analyzer.analyze_spot("BTC/USDT", self.candles, weights=weights, sentiment_score=-1.0)
+        self.assertIsNotNone(signal)
+        self.assertNotEqual(signal.action, "ENTRY")
+        self.assertAlmostEqual(signal.details["funding_rate_pct"], -0.5)
 
 if __name__ == '__main__':
     unittest.main()

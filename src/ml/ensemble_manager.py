@@ -163,7 +163,9 @@ class EnsembleManager:
             last_row['close'] = df['close'].iloc[-1]
             
             # Save to CSV
-            data_file = os.path.join(os.getcwd(), 'data', 'ml_training_data.csv')
+            data_dir = os.path.join(os.getcwd(), 'data')
+            os.makedirs(data_dir, exist_ok=True)
+            data_file = os.path.join(data_dir, 'ml_training_data.csv')
             
             # Check if header is needed
             header = not os.path.exists(data_file)
@@ -262,4 +264,3 @@ class EnsembleManager:
             logger.warning(f"{loaded_count}/{len(self.models)} model yüklendi.")
         else:
             logger.info("Henüz eğitilmiş model bulunamadı.")
-

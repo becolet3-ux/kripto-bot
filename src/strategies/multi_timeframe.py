@@ -3,29 +3,18 @@ import pandas as pd
 import talib as ta
 from typing import Dict, Optional, Any
 from src.utils.logger import logger
-from src.collectors.binance_tr_client import BinanceTRClient
 
 def fetch_data(symbol: str, timeframe: str, exchange: Any, limit: int = 100) -> Optional[pd.DataFrame]:
     """
     Fetches OHLCV data compatible with both CCXT and BinanceTRClient.
     """
     try:
-        if isinstance(exchange, BinanceTRClient):
-            # BinanceTRClient returns dict with 'data' list of lists
-            # Format: [ [time, open, high, low, close, vol, ...], ... ]
-            resp = exchange.get_klines(symbol, interval=timeframe, limit=limit)
-            if resp.get('code') == 0 and 'data' in resp:
-                ohlcv = resp['data']
-            else:
-                logger.log(f"❌ Error fetching data from BinanceTR for {symbol}: {resp}")
-                return None
+        # CCXT Exchange
+        if hasattr(exchange, 'fetch_ohlcv'):
+            ohlcv = exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
         else:
-            # CCXT Exchange
-            if hasattr(exchange, 'fetch_ohlcv'):
-                ohlcv = exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
-            else:
-                logger.log(f"❌ Unknown exchange type: {type(exchange)}")
-                return None
+            logger.log(f"❌ Unknown exchange type: {type(exchange)}")
+            return None
                 
         if not ohlcv or len(ohlcv) < 50: # Need enough data for indicators
             return None

@@ -4,14 +4,13 @@ import random
 import time
 from typing import Dict, List, Optional
 from config.settings import settings
-from src.collectors.binance_tr_client import BinanceTRClient
 from src.utils.rate_limiter import RateLimiter
 from src.utils.circuit_breaker import CircuitBreaker
 
 class BinanceDataLoader:
     def __init__(self):
         self.mock = settings.USE_MOCK_DATA
-        self.is_tr = settings.IS_TR_BINANCE
+        # TR desteği kaldırıldı; yalnızca Global CCXT kullanılır
         
         # Caching & Rate Limiting
         self._cache = {}
@@ -19,60 +18,47 @@ class BinanceDataLoader:
         self.circuit_breaker = CircuitBreaker()
         
         if not self.mock:
-            if self.is_tr:
-                print("🇹🇷 Using Binance TR Client (Sync)")
-                self.exchange = BinanceTRClient()
-            else:
-                mode = 'future' if settings.TRADING_MODE == 'futures' else 'spot'
-                print(f"🌍 Using Binance Global Client (Sync CCXT) - Mode: {mode.upper()}")
-                
-                # Fetch keys directly from env to ensure they are loaded
-                import os
-                api_key = os.getenv("BINANCE_API_KEY", settings.BINANCE_API_KEY)
-                secret_key = os.getenv("BINANCE_SECRET_KEY", settings.BINANCE_SECRET_KEY)
-                
-                self.exchange = ccxt.binance({
-                    'apiKey': api_key,
-                    'secret': secret_key,
-                    'enableRateLimit': True,
-                    'userAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                    'verify': False, # Disable SSL verification
-                    'timeout': 30000,
-                    'options': {
-                        'defaultType': mode, # 'spot' or 'future'
-                    }
-                })
+            mode = 'future' if settings.TRADING_MODE == 'futures' else 'spot'
+            print(f"🌍 Using Binance Global Client (Sync CCXT) - Mode: {mode.upper()}")
+            
+            # Fetch keys directly from env to ensure they are loaded
+            import os
+            api_key = os.getenv("BINANCE_API_KEY", settings.BINANCE_API_KEY)
+            secret_key = os.getenv("BINANCE_SECRET_KEY", settings.BINANCE_SECRET_KEY)
+            
+            self.exchange = ccxt.binance({
+                'apiKey': api_key,
+                'secret': secret_key,
+                'enableRateLimit': True,
+                'userAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'verify': False, # Disable SSL verification
+                'timeout': 30000,
+                'options': {
+                    'defaultType': mode, # 'spot' or 'future'
+                }
+            })
         
     async def initialize(self):
         """Load markets"""
         if not self.mock:
             try:
-                if self.is_tr:
-                    # TR Client doesn't need load_markets yet, but we can verify connection
-                    await asyncio.to_thread(self.exchange.get_time)
-                    print("✅ Binance TR Initialized")
-                else:
-                    await asyncio.wait_for(asyncio.to_thread(self.exchange.load_markets), timeout=30.0)
+                await asyncio.wait_for(asyncio.to_thread(self.exchange.load_markets), timeout=30.0)
             except Exception as e:
                 print(f"Authenticated load_markets failed: {e}")
-                if not self.is_tr:
-                    print("Retrying with Public Client for Data Loading...")
-                    # Re-init as public (no keys)
-                    self.exchange = ccxt.binance({
-                        'enableRateLimit': True,
-                        'userAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                        'verify': False, # Disable SSL verification
-                        'timeout': 60000, # Increase timeout for large exchangeInfo
-                        'options': {'defaultType': 'future' if settings.TRADING_MODE == 'futures' else 'spot'}
-                    })
-                    try:
-                        await asyncio.wait_for(asyncio.to_thread(self.exchange.load_markets), timeout=30.0)
-                        print("✅ Public Client Initialized (Real Data)")
-                    except Exception as e2:
-                        print(f"Public connect failed: {repr(e2)}. Switching to Mock Mode.")
-                        self.mock = True
-                else:
-                    print(f"Failed to connect ({e}). Switching to Mock Mode.")
+                print("Retrying with Public Client for Data Loading...")
+                # Re-init as public (no keys)
+                self.exchange = ccxt.binance({
+                    'enableRateLimit': True,
+                    'userAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    'verify': False, # Disable SSL verification
+                    'timeout': 60000, # Increase timeout for large exchangeInfo
+                    'options': {'defaultType': 'future' if settings.TRADING_MODE == 'futures' else 'spot'}
+                })
+                try:
+                    await asyncio.wait_for(asyncio.to_thread(self.exchange.load_markets), timeout=30.0)
+                    print("✅ Public Client Initialized (Real Data)")
+                except Exception as e2:
+                    print(f"Public connect failed: {repr(e2)}. Switching to Mock Mode.")
                     self.mock = True
         
     async def close(self):

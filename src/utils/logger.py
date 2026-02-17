@@ -21,7 +21,8 @@ class BotLogger:
         self.tg_token = settings.TELEGRAM_BOT_TOKEN
         self.tg_chat_id = settings.TELEGRAM_CHAT_ID
         self.last_alert_time = 0
-        self.alert_cooldown = 60 # Seconds between identical alerts to avoid spam
+        self.alert_cooldown = 60
+        self._last_alert_signature = ""
 
     def ensure_dir(self):
         os.makedirs(os.path.dirname(self.log_file), exist_ok=True)
@@ -51,8 +52,12 @@ class BotLogger:
             return
 
         # Simple cooldown mechanism
-        if time.time() - self.last_alert_time < 2: 
+        if time.time() - self.last_alert_time < self.alert_cooldown:
             return # Avoid hammering API
+        
+        signature = message[:120]
+        if signature == self._last_alert_signature:
+            return
 
         try:
             url = f"https://api.telegram.org/bot{self.tg_token}/sendMessage"
@@ -64,6 +69,7 @@ class BotLogger:
             # Timeout to prevent hanging
             requests.post(url, json=payload, timeout=5)
             self.last_alert_time = time.time()
+            self._last_alert_signature = signature
         except Exception as e:
             self.logger.error(f"Failed to send Telegram alert: {e}")
 

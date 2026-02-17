@@ -3,6 +3,11 @@ import os
 import time
 from typing import Dict, Any
 
+try:
+    import numpy as np
+except ImportError:  # pragma: no cover
+    np = None
+
 class StateManager:
     def __init__(self, filepath: str = "data/bot_state.json", stats_filepath: str = "data/bot_stats.json"):
         self.filepath = filepath
@@ -17,12 +22,27 @@ class StateManager:
         if not os.path.exists(self.stats_filepath):
             self.save_stats({})
 
+    def _to_serializable(self, obj):
+        if isinstance(obj, dict):
+            return {k: self._to_serializable(v) for k, v in obj.items()}
+        if isinstance(obj, (list, tuple)):
+            return [self._to_serializable(v) for v in obj]
+        if np is not None:
+            if isinstance(obj, (np.bool_,)):
+                return bool(obj)
+            if isinstance(obj, (np.integer,)):
+                return int(obj)
+            if isinstance(obj, (np.floating,)):
+                return float(obj)
+        return obj
+
     def _atomic_write(self, filepath: str, data: Dict[str, Any]):
         """Safely write data to file using atomic replacement"""
         temp_path = f"{filepath}.tmp"
         try:
+            clean = self._to_serializable(data)
             with open(temp_path, 'w') as f:
-                json.dump(data, f, indent=4)
+                json.dump(clean, f, indent=4)
                 f.flush()
                 os.fsync(f.fileno()) # Ensure write to disk
             os.replace(temp_path, filepath) # Atomic move

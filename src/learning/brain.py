@@ -586,9 +586,6 @@ class BotBrain:
         }
 
     def get_dynamic_risk_adjustment(self, symbol: str) -> Dict:
-        """
-        Returns multipliers for Stop Loss and Take Profit based on Market Regime.
-        """
         regime = self.analyze_market_regime()
         
         sl_multiplier = 1.0
@@ -612,3 +609,117 @@ class BotBrain:
             "tp_multiplier": tp_multiplier,
             "regime": regime['status']
         }
+
+    def generate_param_suggestions(self) -> Dict:
+        current_time = int(time.time())
+        global_stats = self.memory.get("global_stats", {})
+        coin_perf = self.memory.get("coin_performance", {})
+        suggestions = []
+        total_trades = global_stats.get("total_trades", 0)
+        win_rate = global_stats.get("win_rate", 0.0)
+        min_edge_trades = max(settings.MIN_TRADES_FOR_EDGE, 10)
+        if total_trades >= min_edge_trades:
+            target_min_wr = settings.MIN_WIN_RATE_FOR_ENTRY
+            if win_rate < target_min_wr - 5:
+                new_threshold = min(target_min_wr + 5, 85.0)
+                suggestions.append({
+                    "type": "tune",
+                    "target": "MIN_WIN_RATE_FOR_ENTRY",
+                    "current": float(target_min_wr),
+                    "suggested": float(new_threshold),
+                    "context": {
+                        "global_win_rate": float(win_rate),
+                        "total_trades": int(total_trades)
+                    },
+                    "reason": "Global win rate is below current edge filter threshold."
+                })
+            elif win_rate > target_min_wr + 10:
+                new_threshold = max(target_min_wr - 5, 40.0)
+                suggestions.append({
+                    "type": "tune",
+                    "target": "MIN_WIN_RATE_FOR_ENTRY",
+                    "current": float(target_min_wr),
+                    "suggested": float(new_threshold),
+                    "context": {
+                        "global_win_rate": float(win_rate),
+                        "total_trades": int(total_trades)
+                    },
+                    "reason": "Global win rate is well above edge filter threshold."
+                })
+        threshold_trades = max(settings.MIN_TRADES_FOR_EDGE, 5)
+        bad_symbols = []
+        for sym, stats in coin_perf.items():
+            sym_trades = stats.get("total_trades", 0)
+            sym_wr = stats.get("win_rate", 0.0)
+            if sym_trades >= threshold_trades and sym_wr < settings.MIN_WIN_RATE_FOR_ENTRY - 10:
+                bad_symbols.append((sym, sym_wr, sym_trades))
+        bad_symbols.sort(key=lambda x: x[1])
+        for sym, sym_wr, sym_trades in bad_symbols[:5]:
+            suggestions.append({
+                "type": "symbol_edge",
+                "target": sym,
+                "current": {
+                    "win_rate": float(sym_wr),
+                    "total_trades": int(sym_trades)
+                },
+                "suggested": None,
+                "reason": "Symbol win rate is significantly below edge filter threshold."
+            })
+        weights = self.get_indicator_weights()
+        for ind, w in weights.items():
+            if w <= 0.6:
+                suggestions.append({
+                    "type": "indicator_down",
+                    "target": ind,
+                    "current": float(w),
+                    "suggested": None,
+                    "reason": "Indicator weight is very low compared to default."
+                })
+            elif w >= 2.5:
+                suggestions.append({
+                    "type": "indicator_up",
+                    "target": ind,
+                    "current": float(w),
+                    "suggested": None,
+                    "reason": "Indicator weight is high and may justify dedicated tuning."
+                })
+        patterns = self.analyze_winning_patterns()
+        if patterns:
+            target_rsi = float(patterns.get("target_rsi", 50.0))
+            target_vol = float(patterns.get("target_volume", 1.0))
+            suggestions.append({
+                "type": "new_param",
+                "target": "TARGET_RSI_FOR_ENTRIES",
+                "current": None,
+                "suggested": target_rsi,
+                "reason": "Average RSI of winning trades can be used as target entry zone."
+            })
+            suggestions.append({
+                "type": "meta_score",
+                "target": "CUSTOM_EDGE_SCORE",
+                "current": None,
+                "suggested": {
+                    "target_rsi": target_rsi,
+                    "target_volume_ratio": target_vol
+                },
+                "reason": "Winning trades cluster around this RSI and volume ratio; consider a combined edge score."
+            })
+        regime = self.analyze_market_regime()
+        return {
+            "timestamp": current_time,
+            "regime": regime,
+            "suggestions": suggestions
+        }
+
+    def maybe_generate_param_suggestions(self, min_interval_seconds: int = 3600) -> Optional[Dict]:
+        current_time = int(time.time())
+        advisor_state = self.memory.get("param_advisor", {})
+        last_run = advisor_state.get("last_run_ts", 0)
+        if last_run and current_time - last_run < min_interval_seconds:
+            return None
+        result = self.generate_param_suggestions()
+        advisor_state["last_run_ts"] = current_time
+        advisor_state["last_result"] = result
+        self.memory["param_advisor"] = advisor_state
+        self._save_memory()
+        return result

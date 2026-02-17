@@ -39,6 +39,11 @@ data/
 *.db
 *.sqlite3
 
+# Coverage & artifacts
+.coverage
+*.zip
+*.tar.gz
+
 # IDE
 .vscode/
 .idea/

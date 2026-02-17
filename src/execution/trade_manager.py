@@ -7,6 +7,154 @@ from src.utils.logger import log
 from config.settings import settings
 from src.utils.exceptions import BotError, NetworkError, ExchangeError, InsufficientBalanceError
 
+
+class SignalValidator:
+    def __init__(self, analyzer, executor, loader):
+        self.analyzer = analyzer
+        self.executor = executor
+        self.loader = loader
+        self.brain = executor.brain
+
+    async def validate(self, pre_signal, symbol, candles, current_price, market_regime, sentiment_score):
+        volatility = pre_signal.details.get('volatility', 0)
+        vol_ratio = pre_signal.details.get('volume_ratio', 1.0)
+        current_rsi = pre_signal.details.get('rsi', 50.0)
+
+        safety = self.brain.check_safety(
+            symbol,
+            current_volatility=volatility,
+            volume_ratio=vol_ratio,
+            current_rsi=current_rsi
+        )
+        is_blocked = not safety['safe']
+        modifier = safety.get('modifier', 0)
+
+        if is_blocked and pre_signal.action == "ENTRY":
+            self.brain.record_ghost_trade(
+                symbol,
+                current_price,
+                f"Brain Filter: {safety['reason']}",
+                pre_signal.score
+            )
+
+        adjusted_signal = pre_signal.model_copy(deep=True)
+        base_score = float(pre_signal.score)
+        adjusted_score = base_score + float(modifier)
+        adjusted_signal.score = adjusted_score
+        if is_blocked and adjusted_signal.action == "ENTRY":
+            adjusted_signal.action = "HOLD"
+
+        patterns = self.brain.analyze_winning_patterns()
+        if patterns and adjusted_signal.action == "ENTRY":
+            try:
+                target_rsi = float(patterns.get("target_rsi", 50.0))
+                target_vol = float(patterns.get("target_volume", 1.0))
+                sig_rsi = float(adjusted_signal.details.get("rsi", target_rsi))
+                sig_vol = float(adjusted_signal.details.get("volume_ratio", target_vol))
+
+                rsi_dist = abs(sig_rsi - target_rsi)
+                rsi_score = max(0.0, 10.0 - (rsi_dist / 2.0))
+
+                if target_vol > 0:
+                    vol_rel = sig_vol / target_vol
+                else:
+                    vol_rel = 1.0
+                if vol_rel >= 1.0:
+                    vol_score = min(10.0, (vol_rel - 1.0) * 8.0)
+                else:
+                    vol_score = -min(10.0, (1.0 - vol_rel) * 8.0)
+
+                meta_score = (rsi_score + vol_score) / 4.0
+                meta_score = max(-5.0, min(5.0, meta_score))
+
+                base_after_safety = float(adjusted_signal.score)
+                adjusted_signal.details["custom_edge_score"] = float(meta_score)
+                adjusted_signal.score = float(base_after_safety + meta_score)
+
+                log(
+                    f"🧮 CUSTOM_EDGE_SCORE {symbol}: base={base_score:.2f} meta={meta_score:.2f} "
+                    f"(RSI={sig_rsi:.1f}/{target_rsi:.1f}, Vol={sig_vol:.2f}/{target_vol:.2f})"
+                )
+            except Exception as e:
+                log(f"⚠️ CUSTOM_EDGE_SCORE hesaplanamadı ({symbol}): {e}")
+
+        if adjusted_signal.action == "ENTRY":
+            try:
+                candles_4h = await self.loader.get_ohlcv(symbol, timeframe='4h', limit=30)
+                if candles_4h:
+                    regime_4h = self.analyzer.analyze_market_regime(candles_4h)
+                    if regime_4h['trend'] == 'DOWN':
+                        if hasattr(adjusted_signal, 'primary_strategy') and adjusted_signal.primary_strategy == "high_score_override":
+                            log(f"🚀 {symbol}: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.")
+                        else:
+                            log(f"📉 Filtered {symbol}: 1h Buy Signal but 4h Trend is DOWN.")
+                            self.brain.record_ghost_trade(
+                                symbol,
+                                current_price,
+                                "Multi-TF Filter: 4h Trend DOWN",
+                                adjusted_signal.score
+                            )
+                            return None
+                    else:
+                        log(f"✅ Multi-TF Confirmed {symbol}: 4h Trend is {regime_4h['trend']}")
+            except Exception as e:
+                log(f"⚠️ Multi-TF Check Failed for {symbol}: {e}")
+
+        if adjusted_signal.action == "ENTRY":
+            is_super_signal = (adjusted_signal.score >= 30.0)
+
+            if is_super_signal:
+                log(f"🚀 SUPER SIGNAL DETECTED ({adjusted_signal.score}): Bypassing Correlation Check for {symbol}")
+            else:
+                is_correlated = False
+                try:
+                    held_positions = await self.executor.get_open_positions()
+                except Exception:
+                    held_positions = self.executor.paper_positions
+
+                for held_symbol in held_positions:
+                    if held_symbol == symbol:
+                        continue
+                    try:
+                        held_candles = await self.loader.get_ohlcv(held_symbol, timeframe='1h', limit=50)
+                        if held_candles:
+                            corr = self.analyzer.calculate_correlation(candles, held_candles)
+                            if corr > 0.85:
+                                log(f"🔗 Correlation Alert: {symbol} is highly correlated with held {held_symbol} ({corr:.2f}). Skipping.")
+                                self.brain.record_ghost_trade(
+                                    symbol,
+                                    current_price,
+                                    f"Correlation Filter: >0.85 with {held_symbol}",
+                                    adjusted_signal.score
+                                )
+                                is_correlated = True
+                                break
+                    except Exception as e:
+                        log(f"⚠️ Correlation check failed for {held_symbol}: {e}")
+
+                if is_correlated:
+                    return None
+
+        if adjusted_signal.action == "ENTRY":
+            try:
+                ob_pressure = adjusted_signal.details.get("orderbook_pressure")
+                ob_imbalance = float(adjusted_signal.details.get("orderbook_imbalance", 1.0))
+                ob_spread_pct = float(adjusted_signal.details.get("orderbook_spread_pct", 0.0))
+                max_spread = float(getattr(settings, "MICROSTRUCTURE_MAX_SPREAD_PCT", 0.4))
+                if ob_pressure == "SELL_PRESSURE" and ob_imbalance < 0.7 and ob_spread_pct > max_spread and adjusted_signal.score > 0:
+                    log(f"⛔ Microstructure veto for {symbol}: pressure={ob_pressure}, imbalance={ob_imbalance:.2f}, spread={ob_spread_pct:.2f}%")
+                    self.brain.record_ghost_trade(
+                        symbol,
+                        current_price,
+                        f"Microstructure Veto: {ob_pressure} spread={ob_spread_pct:.2f}%",
+                        adjusted_signal.score
+                    )
+                    return None
+            except Exception as e:
+                log(f"⚠️ Microstructure filter failed for {symbol}: {e}")
+
+        return adjusted_signal
+
 class TradeManager:
     """
     Manages the high-level trading logic, including symbol processing,
@@ -19,9 +167,12 @@ class TradeManager:
         self.opportunity_manager = opportunity_manager
         self.grid_trader = grid_trader
         self.sentiment_analyzer = sentiment_analyzer
+        self.signal_validator = SignalValidator(analyzer, executor, loader)
         
         # State tracking
         self.swap_confirmation_tracker = {}
+        self.swap_last_seen = {}
+        self.swap_last_buy = {}
 
     async def process_symbol_logic(self, symbol: str, market_regime: Dict, latest_scores: Dict, current_prices_map: Dict) -> Optional[TradeSignal]:
         """
@@ -30,13 +181,12 @@ class TradeManager:
         Also handles Risk Management (StopLoss) exits immediately.
         """
         try:
-            # SAFETY CHECK: Stablecoin Filter
             base_currency = symbol.split('/')[0]
-            if base_currency in ['USDT', 'USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'BUSD', 'EUR', 'PAX', 'U', 'UST', 'USDD', 'USDK', 'USDJ', 'VAI', 'WAI', 'CUSD', 'AEUR', 'EURI', 'GUSD', 'LUSD', 'FRAX', 'SUSD', 'WBTC', 'BTCB']:
+            if base_currency in ['USDT', 'USDC', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USDe', 'XUSD', 'BUSD', 'EUR', 'PAX', 'U', 'UST', 'USDD', 'USDK', 'USDJ', 'VAI', 'WAI', 'CUSD', 'AEUR', 'EURI', 'GUSD', 'LUSD', 'FRAX', 'SUSD', 'WBTC', 'BTCB']:
                 return None
-
-            # Rate Limit Smoothing
-            await asyncio.sleep(0.1)
+            if base_currency.endswith(('USD', 'EUR')) and len(base_currency) <= 6:
+                return None
+            
 
             # Fetch 1h candles
             candles = await self.loader.get_ohlcv(symbol, timeframe='1h', limit=50)
@@ -59,13 +209,12 @@ class TradeManager:
             if market_regime and market_regime['trend'] == 'SIDEWAYS':
                 await self._handle_grid_trading(symbol, current_price, market_regime)
 
-            # --- Spot Strategy Analysis ---
-            # 1. Safety Check (Brain)
-            pre_signal = self.analyzer.analyze_spot(symbol, candles, exchange=self.loader.exchange)
+            exchange_client = getattr(self.loader, "exchange", None)
+            pre_signal = self.analyzer.analyze_spot(symbol, candles, exchange=exchange_client)
             
             signal = None
             if pre_signal:
-                signal = await self._validate_signal(pre_signal, symbol, candles, current_price, market_regime, sentiment_score)
+                signal = await self.signal_validator.validate(pre_signal, symbol, candles, current_price, market_regime, sentiment_score)
                 if signal:
                     latest_scores[symbol] = signal.score
 
@@ -136,11 +285,13 @@ class TradeManager:
                             log("⏳ Waiting 5 seconds for balance update...")
                             await asyncio.sleep(5)
                             
-                            # Force refresh balance
                             await self.executor.sync_wallet_balances()
                             
-                            # Retry the original Buy Signal
                             log(f"⚔️ SNIPER RETRY: Re-attempting entry for {symbol}...")
+                            if signal:
+                                if signal.details is None:
+                                    signal.details = {}
+                                signal.details['force_all_in'] = True
                             await self.executor.execute_strategy(signal, latest_scores=latest_scores)
                             return signal
                             
@@ -194,103 +345,7 @@ class TradeManager:
             await self.grid_trader.check_grid_status(symbol, current_price, self.executor)
 
     async def _validate_signal(self, pre_signal, symbol, candles, current_price, market_regime, sentiment_score):
-        """Validates a pre-signal with Brain, Multi-TF, and Correlation checks"""
-        volatility = pre_signal.details.get('volatility', 0)
-        vol_ratio = pre_signal.details.get('volume_ratio', 1.0)
-        current_rsi = pre_signal.details.get('rsi', 50.0)
-        
-        # Brain Check
-        safety = self.executor.brain.check_safety(
-            symbol, 
-            current_volatility=volatility, 
-            volume_ratio=vol_ratio,
-            current_rsi=current_rsi
-        )
-        is_blocked = not safety['safe']
-        modifier = safety.get('modifier', 0)
-        
-        if is_blocked and pre_signal.action == "ENTRY":
-             self.executor.brain.record_ghost_trade(
-                 symbol, 
-                 current_price, 
-                 f"Brain Filter: {safety['reason']}", 
-                 pre_signal.score
-             )
-
-        # Final Analysis
-        weights = self.executor.brain.get_weights()
-        indicator_weights = self.executor.brain.get_indicator_weights()
-        
-        signal = self.analyzer.analyze_spot(
-            symbol, 
-            candles, 
-            rsi_modifier=modifier, 
-            is_blocked=is_blocked,
-            weights=weights,
-            indicator_weights=indicator_weights,
-            market_regime=market_regime,
-            sentiment_score=sentiment_score
-        )
-        
-        if not signal:
-            return None
-            
-        # Multi-timeframe Confirmation (4h) for ENTRIES
-        if signal.action == "ENTRY":
-            try:
-                candles_4h = await self.loader.get_ohlcv(symbol, timeframe='4h', limit=30)
-                if candles_4h:
-                    regime_4h = self.analyzer.analyze_market_regime(candles_4h)
-                    if regime_4h['trend'] == 'DOWN':
-                        if hasattr(signal, 'primary_strategy') and signal.primary_strategy == "high_score_override":
-                            log(f"🚀 {symbol}: 4h Trend is DOWN but High Score Override applies. Allowing ENTRY.")
-                        else:
-                            log(f"📉 Filtered {symbol}: 1h Buy Signal but 4h Trend is DOWN.")
-                            self.executor.brain.record_ghost_trade(
-                                symbol, 
-                                current_price, 
-                                "Multi-TF Filter: 4h Trend DOWN", 
-                                signal.score
-                            )
-                            return None
-                    else:
-                        log(f"✅ Multi-TF Confirmed {symbol}: 4h Trend is {regime_4h['trend']}")
-            except Exception as e:
-                log(f"⚠️ Multi-TF Check Failed for {symbol}: {e}")
-
-        # Correlation Check
-        if signal.action == "ENTRY":
-            # --- PRO UPDATE: Bypass Correlation for SUPER SIGNALS (>30.0) ---
-            # If the signal is extremely strong (e.g. Pump/Breakout), ignore correlation.
-            is_super_signal = (signal.score >= 30.0)
-            
-            if is_super_signal:
-                log(f"🚀 SUPER SIGNAL DETECTED ({signal.score}): Bypassing Correlation Check for {symbol}")
-            else:
-                is_correlated = False
-                for held_symbol in self.executor.paper_positions:
-                    if held_symbol == symbol: continue
-                    try:
-                        held_candles = await self.loader.get_ohlcv(held_symbol, timeframe='1h', limit=50)
-                        if held_candles:
-                            corr = self.analyzer.calculate_correlation(candles, held_candles)
-                            if corr > 0.85:
-                                log(f"🔗 Correlation Alert: {symbol} is highly correlated with held {held_symbol} ({corr:.2f}). Skipping.")
-                                self.executor.brain.record_ghost_trade(
-                                    symbol, 
-                                    current_price, 
-                                    f"Correlation Filter: >0.85 with {held_symbol}", 
-                                    signal.score
-                                )
-                                is_correlated = True
-                                break
-                    except Exception as e:
-                        log(f"⚠️ Correlation check failed for {held_symbol}: {e}")
-                
-                if is_correlated:
-                    return None
-                
-        return signal
+        return await self.signal_validator.validate(pre_signal, symbol, candles, current_price, market_regime, sentiment_score)
 
     async def _check_risk_management(self, symbol, candles, current_price):
         """Checks for StopLoss/TakeProfit conditions"""
@@ -418,15 +473,14 @@ class TradeManager:
                     made_swap = True
 
         # 2.5 Dust Temizliği
-        if not settings.IS_TR_BINANCE:
-             log("🧹 Sniper Modu: Dust Temizliği...")
-             await self.executor.convert_dust_to_bnb()
-             await self.executor.sync_wallet_balances()
-             
-             # BNB Satışı (Eğer hedef BNB değilse)
-             if best_signal and not best_signal.symbol.startswith('BNB'):
-                 if 'BNB/USDT' in self.executor.paper_positions:
-                     await self._execute_sell('BNB/USDT', current_prices_map, reason="SNIPER_MODE_BNB_LIQUIDATION")
+        log("🧹 Sniper Modu: Dust Temizliği...")
+        await self.executor.convert_dust_to_bnb()
+        await self.executor.sync_wallet_balances()
+        
+        # BNB Satışı (Eğer hedef BNB değilse)
+        if best_signal and not best_signal.symbol.startswith('BNB'):
+            if 'BNB/USDT' in self.executor.paper_positions:
+                await self._execute_sell('BNB/USDT', current_prices_map, reason="SNIPER_MODE_BNB_LIQUIDATION")
 
         # Satışlardan sonra bakiyeyi ve pozisyonları senkronize et
         await self.executor.sync_wallet_balances()
@@ -491,7 +545,7 @@ class TradeManager:
         pos_qty = self.executor.paper_positions.get(symbol, {}).get('quantity', 0.0)
         value_est = pos_qty * price
         
-        if 0.0 < value_est < 6.0 and not settings.IS_TR_BINANCE:
+        if 0.0 < value_est < 6.0 and not reason.startswith("SNIPER_MODE"):
             log(f"🧹 {symbol} Dust Convert'e yönlendiriliyor.")
             await self.executor.convert_dust_to_bnb()
             await asyncio.sleep(1.0)
@@ -518,17 +572,29 @@ class TradeManager:
         if self.executor.paper_positions and all_market_signals:
             swap_opp = self.opportunity_manager.check_for_swap_opportunity(
                 self.executor.paper_positions, 
-                all_market_signals
+                all_market_signals,
+                getattr(self.executor, "min_trade_amount", None)
             )
             
             if swap_opp:
                 sell_symbol = swap_opp['sell_symbol']
                 buy_symbol = swap_opp['buy_signal'].symbol
                 
-                current_count = self.swap_confirmation_tracker.get(sell_symbol, 0) + 1
+                prev_buy = self.swap_last_buy.get(sell_symbol)
+                if prev_buy and prev_buy != buy_symbol:
+                    current_count = 1
+                    log(f"🔁 Swap Target Changed: {sell_symbol} {prev_buy} -> {buy_symbol}. Counter=1")
+                else:
+                    current_count = self.swap_confirmation_tracker.get(sell_symbol, 0) + 1
                 self.swap_confirmation_tracker[sell_symbol] = current_count
+                self.swap_last_buy[sell_symbol] = buy_symbol
+                self.swap_last_seen[sell_symbol] = time.time()
+                last_age = 0
+                if sell_symbol in self.swap_last_seen:
+                    last_age = int(time.time() - self.swap_last_seen.get(sell_symbol, 0))
+                log(f"🔁 Swap Counter: {sell_symbol}->{buy_symbol} ({current_count}/{settings.OPP_SWAP_CONFIRMATIONS}), age={last_age}s")
                 
-                if current_count >= 3:
+                if current_count >= settings.OPP_SWAP_CONFIRMATIONS:
                     log(f"🔄 SWAP CONFIRMED: Sell {sell_symbol} -> Buy {buy_symbol}")
                     
                     try:
@@ -555,7 +621,18 @@ class TradeManager:
                     except Exception as e:
                         log(f"❌ Swap İşlemi Beklenmedik Hata: {e}")
                 else:
-                    log(f"⏳ Swap Opportunity Detected: {sell_symbol} -> {buy_symbol}. Waiting ({current_count}/3)...")
+                    log(f"⏳ Swap Opportunity Detected: {sell_symbol} -> {buy_symbol}. Waiting ({current_count}/{settings.OPP_SWAP_CONFIRMATIONS})...")
             else:
-                if self.swap_confirmation_tracker:
-                    self.swap_confirmation_tracker.clear()
+                # Instead of clearing all confirmations on a single miss,
+                # softly expire per-symbol confirmations based on last seen time.
+                if self.swap_last_seen:
+                    now_ts = time.time()
+                    expiry = getattr(settings, "SWAP_CONFIRM_EXPIRY_SECONDS", 600)
+                    for sym in list(self.swap_last_seen.keys()):
+                        last_ts = self.swap_last_seen.get(sym, 0)
+                        if now_ts - last_ts > expiry:
+                            age = int(now_ts - last_ts)
+                            log(f"⌛ Swap Counter Expired: {sym} age={age}s > {expiry}s")
+                            self.swap_confirmation_tracker.pop(sym, None)
+                            self.swap_last_seen.pop(sym, None)
+                            self.swap_last_buy.pop(sym, None)

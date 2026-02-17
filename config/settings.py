@@ -22,7 +22,6 @@ class Settings(BaseSettings):
     
     # Mode
     TRADING_MODE: str = 'spot' # 'spot' or 'futures'
-    IS_TR_BINANCE: bool = False # Set to False for Global
 
     # Futures Settings
     LEVERAGE: int = 1
@@ -68,7 +67,7 @@ class Settings(BaseSettings):
     
     # Files
     EMERGENCY_STOP_FILE: str = "data/emergency_stop.flag"
-    STATE_FILE: str = "data/bot_state.json"
+    STATE_FILE: str = "data/bot_state_live.json"
     STATS_FILE: str = "data/bot_stats.json"
     LOG_FILE: str = "data/bot_activity_paper.log"
     
@@ -143,8 +142,10 @@ class Settings(BaseSettings):
     TRAILING_STEP_PCT: float = 0.8         # Fiyat, son zirveyi en az %0.8 aşınca stop yukarı taşınır
     
     # Opportunity Manager
-    OPP_MIN_HOLD_SECONDS: int = 3600       # En az 1 saat elde tut
+    OPP_MIN_HOLD_SECONDS: int = 900        # En az 15 dk elde tut
     OPP_LOCK_BREAK_DIFF: float = 20.0      # Kilidi kırmak için gereken skor farkı
+    OPP_SWAP_CONFIRMATIONS: int = 3        # SWAP için ardışık onay adedi
+    SWAP_CONFIRM_EXPIRY_SECONDS: int = 600 # Onay sayacı son görülmeden sonra 10 dk içinde sıfırlanır
 
     class Config:
         env_file = ".env"

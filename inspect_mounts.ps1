@@ -1,0 +1,1 @@
+ssh -i kripto-bot-eu.pem -o StrictHostKeyChecking=no ubuntu@3.67.98.132 "echo '--- bot-live mounts ---'; sudo docker inspect -f '{{json .Mounts}}' kripto-bot-live; echo; echo '--- dashboard-live mounts ---'; sudo docker inspect -f '{{json .Mounts}}' kripto-bot-dashboard-live"

@@ -16,8 +16,8 @@ async def main():
         print("❌ Cannot run in Mock Mode. Connect to real API.")
         return
 
-    # Initialize Executor
-    executor = BinanceExecutor(exchange_client=loader.exchange, is_tr=settings.IS_TR_BINANCE)
+    # Initialize Executor (TR desteği kaldırıldı)
+    executor = BinanceExecutor(exchange_client=loader.exchange)
     
     # Run Conversion
     await executor.convert_dust_to_bnb()

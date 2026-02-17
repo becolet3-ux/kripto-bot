@@ -1,0 +1,9 @@
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "I"]
+per-file-ignores = { "tests/*" = ["E501", "I001", "F401"], "test_*.py" = ["E501", "I001", "F401", "E712"] }
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]

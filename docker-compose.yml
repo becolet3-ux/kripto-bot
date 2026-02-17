@@ -62,10 +62,13 @@ services:
       - ./config:/app/config
     environment:
       - LIVE_TRADING=true
+      - USE_MOCK_DATA=false
       - STATE_FILE=data/bot_state_live.json
       - STATS_FILE=data/bot_stats_live.json
       - LOG_FILE=data/bot_activity_live.log
-    command: python src/main.py
+    command: >
+      bash -c "mkdir -p /app/data /app/logs &&
+               python src/main.py"
     deploy:
       resources:
         limits:
@@ -86,11 +89,12 @@ services:
       - LOG_FILE=data/bot_activity_live.log
       - PAPER_TRADING_BALANCE=10000
     volumes:
-      - ./src:/app/src
       - ./data:/app/data
       - ./logs:/app/logs
       - ./config:/app/config
-    command: streamlit run src/dashboard.py --server.port 8501 --server.address 0.0.0.0
+    command: >
+      bash -c "mkdir -p /app/data /app/logs &&
+               streamlit run src/dashboard.py --server.port 8501 --server.address 0.0.0.0"
     depends_on:
       - bot-live
     restart: always

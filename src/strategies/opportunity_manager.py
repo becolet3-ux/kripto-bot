@@ -26,9 +26,23 @@ class OpportunityManager:
         self.min_hold_time = min_hold_time if min_hold_time is not None else getattr(settings, "OPP_MIN_HOLD_SECONDS", 3600)
         self.portfolio_optimizer = PortfolioOptimizer(correlation_threshold=0.80)
 
+    def _get_net_score(self, signal: TradeSignal) -> float:
+        if not signal:
+            return 0.0
+        base_score = float(signal.score)
+        details = signal.details or {}
+        funding_pct = float(details.get("funding_rate_pct", 0.0))
+        if funding_pct == 0.0:
+            return base_score
+        daily_cost = abs(funding_pct) * 3.0
+        weight = float(getattr(settings, "OPP_FUNDING_WEIGHT", 1.0))
+        penalty = daily_cost * weight
+        return base_score - penalty
+
     def check_for_swap_opportunity(self, 
                                  portfolio: Dict, 
-                                 market_signals: List[TradeSignal]) -> Optional[Dict]:
+                                 market_signals: List[TradeSignal],
+                                 min_trade_amount: float | None = None) -> Optional[Dict]:
         """
         Takas fırsatı olup olmadığını kontrol eder.
         
@@ -56,24 +70,32 @@ class OpportunityManager:
         signal_map = {s.symbol: s for s in market_signals}
         
         for symbol, data in portfolio.items():
-            # --- PRO FIX: Allow analysis of locked assets for High Score Diff overrides ---
-            # Old: if current_time - data.get('timestamp', 0) < self.min_hold_time: continue
-            
             hold_time = current_time - data.get('timestamp', 0)
             is_locked = hold_time < self.min_hold_time
+            if data.get('is_imported'):
+                is_locked = False
 
-            # DUST CHECK: 20 TL altı bakiyeleri takas adayı yapma (Kilitlenmeyi önle)
-            est_value = data.get('quantity', 0) * data.get('entry_price', 0)
-            if est_value < 20.0:
+            est_price = data.get('entry_price', 0.0)
+            s_sig = signal_map.get(symbol)
+            if s_sig and s_sig.details.get('price_history'):
+                try:
+                    est_price = float(pd.Series(s_sig.details['price_history']).iloc[-1])
+                except Exception:
+                    pass
+            est_value = data.get('quantity', 0.0) * est_price
+            min_amt = min_trade_amount if min_trade_amount is not None else getattr(settings, "MIN_TRADE_AMOUNT_USDT", 5.0)
+            if est_value < float(min_amt):
                  continue
                 
             # Eğer portföydeki coinin güncel sinyali yoksa (belki hacim düştü), skoru 0 varsay
             signal = signal_map.get(symbol)
-            score = signal.score if signal else 0
+            raw_score = signal.score if signal else 0
+            score = self._get_net_score(signal) if signal else 0
             
             portfolio_scores.append({
                 'symbol': symbol,
                 'score': score,
+                'raw_score': raw_score,
                 'data': data,
                 'is_locked': is_locked, # Added flag
                 'hold_time': hold_time
@@ -103,12 +125,11 @@ class OpportunityManager:
         if not available_opportunities:
             return None
             
-        # Fırsatları skora göre sırala (En yüksekten en düşüğe)
-        available_opportunities.sort(key=lambda x: x.score, reverse=True)
+        available_opportunities.sort(key=lambda x: self._get_net_score(x), reverse=True)
         
         # 3. Karşılaştırma ve Korelasyon Kontrolü
         for candidate in available_opportunities:
-            score_diff = candidate.score - worst_asset['score']
+            score_diff = self._get_net_score(candidate) - worst_asset['score']
             
             # --- LOCK CHECK WITH OVERRIDE ---
             if worst_asset['is_locked']:
@@ -165,7 +186,7 @@ class OpportunityManager:
                 
         return None
 
-    def analyze_swap_status(self, portfolio: Dict, market_signals: List[TradeSignal], score_cache: Dict[str, float] = None) -> Dict:
+    def analyze_swap_status(self, portfolio: Dict, market_signals: List[TradeSignal], score_cache: Dict[str, float] = None, min_trade_amount: float | None = None, ignore_lock: bool = False) -> Dict:
         """
         Detaylı swap analizi durumu döndürür (Raporlama için).
         """
@@ -208,12 +229,13 @@ class OpportunityManager:
             
             # Hold time check
             hold_time = current_time - data.get('timestamp', 0)
-            is_locked = hold_time < self.min_hold_time
+            is_locked = hold_time < self.min_hold_time and not ignore_lock
             
             portfolio_scores.append({
                 'symbol': symbol,
                 'score': score,
                 'score_source': score_source,
+                'data': data,
                 'is_locked': is_locked,
                 'hold_time': hold_time
             })
@@ -239,40 +261,97 @@ class OpportunityManager:
         best_opportunity = max(available_opportunities, key=lambda x: x.score)
         score_diff = best_opportunity.score - worst_asset['score']
         
-        # 3. Karar
+        portfolio_prices = {}
+        signal_map = {s.symbol: s for s in market_signals}
+        for s_sym in portfolio.keys():
+            if s_sym == worst_asset['symbol']:
+                continue
+            s_signal = signal_map.get(s_sym)
+            if s_signal and s_signal.details.get('price_history'):
+                portfolio_prices[s_sym] = pd.Series(s_signal.details['price_history'])
+        candidate_prices = pd.Series(signal_map.get(best_opportunity.symbol).details.get('price_history', [])) if signal_map.get(best_opportunity.symbol) else pd.Series([])
+        risk_analysis = self.portfolio_optimizer.check_correlation_risk(
+            portfolio_prices,
+            best_opportunity.symbol,
+            candidate_prices
+        )
+
+        est_sell_price = None
+        w_signal = signal_map.get(worst_asset['symbol'])
+        if w_signal and w_signal.details.get('price_history'):
+            try:
+                est_sell_price = float(pd.Series(w_signal.details['price_history']).iloc[-1])
+            except Exception:
+                est_sell_price = None
+        if est_sell_price is None:
+            est_sell_price = worst_asset['data'].get('entry_price', 0.0)
+        est_sell_value = worst_asset['data'].get('quantity', 0.0) * est_sell_price
+        min_notional_ok = True
+        if min_trade_amount is not None:
+            min_notional_ok = est_sell_value >= float(min_trade_amount)
+
         details = {
             "worst_asset": worst_asset,
             "best_opportunity": {
                 "symbol": best_opportunity.symbol,
-                "score": best_opportunity.score
+                "score": best_opportunity.score,
+                "net_score": self._get_net_score(best_opportunity)
             },
             "score_diff": score_diff,
-            "threshold": self.min_score_diff
+            "threshold": self.min_score_diff,
+            "risk": {
+                "is_safe": risk_analysis.get("is_safe", True),
+                "max_correlation": risk_analysis.get("max_correlation", 0.0),
+                "correlated_with": risk_analysis.get("correlated_with")
+            },
+            "min_notional": {
+                "min_trade_amount": min_trade_amount,
+                "est_sell_value": est_sell_value,
+                "ok": min_notional_ok
+            }
         }
+
+        try:
+            wa = worst_asset
+            ba = details["best_opportunity"]
+            mn = details["min_notional"]
+            details["explanation"] = (
+                f"Worst={wa['symbol']} score={wa['score']:.2f} raw={wa.get('raw_score', wa['score']):.2f} source={wa.get('score_source','unknown')} | "
+                f"Best={ba['symbol']} score={ba.get('net_score', ba['score']):.2f} raw={ba['score']:.2f} | "
+                f"Δ={score_diff:.2f} (threshold={self.min_score_diff}) | "
+                f"est_sell_value={mn['est_sell_value']:.4f}, "
+                f"min_trade_amount={mn['min_trade_amount']}, "
+                f"min_notional_ok={mn['ok']}"
+            )
+        except Exception:
+            pass
 
         if worst_asset['is_locked']:
             LOCK_BREAK_THRESHOLD = getattr(settings, "OPP_LOCK_BREAK_DIFF", 20.0)
-            if score_diff >= LOCK_BREAK_THRESHOLD:
+            if score_diff >= LOCK_BREAK_THRESHOLD and risk_analysis.get("is_safe", True) and min_notional_ok:
                 return {
                     "action": "SWAP_READY",
                     "reason": "OPPORTUNITY_OVERRIDE_LOCKED_ASSET",
                     "details": details
                 }
-            return {
-                "action": "HOLD",
-                "reason": "ASSET_LOCKED_MIN_HOLD_TIME",
-                "details": details
-            }
+            if not risk_analysis.get("is_safe", True):
+                return {"action": "HOLD", "reason": "RISK_CORRELATED", "details": details}
+            if not min_notional_ok:
+                return {"action": "HOLD", "reason": "MIN_NOTIONAL_BELOW_LIMIT", "details": details}
+            return {"action": "HOLD", "reason": "ASSET_LOCKED_MIN_HOLD_TIME", "details": details}
 
-        if score_diff > self.min_score_diff:
+        if score_diff > self.min_score_diff and risk_analysis.get("is_safe", True) and min_notional_ok:
             return {
                 "action": "SWAP_READY", 
                 "reason": f"Fırsat bulundu! {worst_asset['symbol']} -> {best_opportunity.symbol} (Fark: {score_diff:.1f} > {self.min_score_diff})",
                 "details": details
             }
-        else:
-            return {
-                "action": "HOLD", 
-                "reason": f"Mevcut varlıklar yeterince iyi. En iyi alternatif ({best_opportunity.symbol}) sadece {score_diff:.1f} puan fark attı (Gereken: {self.min_score_diff}).",
-                "details": details
-            }
+        if not risk_analysis.get("is_safe", True):
+            return {"action": "HOLD", "reason": "RISK_CORRELATED", "details": details}
+        if not min_notional_ok:
+            return {"action": "HOLD", "reason": "MIN_NOTIONAL_BELOW_LIMIT", "details": details}
+        return {
+            "action": "HOLD", 
+            "reason": f"Mevcut varlıklar yeterince iyi. En iyi alternatif ({best_opportunity.symbol}) sadece {score_diff:.1f} puan fark attı (Gereken: {self.min_score_diff}).",
+            "details": details
+        }

@@ -13,6 +13,7 @@ class DatabaseHandler:
         self.init_db()
 
     def get_connection(self):
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
         return sqlite3.connect(self.db_path)
 
     def init_db(self):

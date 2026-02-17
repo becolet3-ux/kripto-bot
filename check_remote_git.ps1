@@ -1,0 +1,10 @@
+$Key = "kripto-bot-eu.pem"
+$IP = "3.67.98.132"
+$User = "ubuntu"
+
+Write-Host "Checking remote directory structure...`n"
+ssh -i $Key -o StrictHostKeyChecking=no $User@$IP "ls -F"
+Write-Host "`nChecking inside kripto-bot..."
+ssh -i $Key -o StrictHostKeyChecking=no $User@$IP "ls -F kripto-bot/"
+Write-Host "`nChecking for .git..."
+ssh -i $Key -o StrictHostKeyChecking=no $User@$IP "ls -la kripto-bot/.git"

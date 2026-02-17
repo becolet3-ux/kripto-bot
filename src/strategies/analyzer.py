@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from typing import Dict, Optional, List, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from config.settings import settings
 from src.utils.logger import logger
 from src.ml.ensemble_manager import EnsembleManager
@@ -21,6 +21,14 @@ class TradeSignal(BaseModel):
     timestamp: int
     details: Dict
     primary_strategy: Optional[str] = None
+
+    @field_validator("score")
+    @classmethod
+    def clamp_score(cls, v: float) -> float:
+        max_cap = 40.0
+        if settings.USE_MOCK_DATA:
+            max_cap = 20.0
+        return max(-20.0, min(max_cap, float(v)))
 
 class MarketAnalyzer:
     def __init__(self, funding_loader: Optional[FundingRateLoader] = None):
@@ -358,6 +366,8 @@ class MarketAnalyzer:
         if df.empty:
             return None
             
+        funding_rate_pct = 0.0
+
         # --- Market Regime Detection (Phase 3) ---
         regime_data = self.regime_detector.detect_regime(df)
         detected_regime = regime_data['regime'] # TRENDING, RANGING, NEUTRAL
@@ -398,6 +408,10 @@ class MarketAnalyzer:
         stoch_rsi = last_row.get('Stoch_RSI', 0.5)
         super_trend = last_row.get('SuperTrend', 0.0)
         st_direction = last_row.get('ST_Direction', 1)
+        if pd.isna(super_trend):
+            super_trend = prev_row.get('SuperTrend', 0.0)
+        if pd.isna(super_trend):
+            super_trend = 0.0
         cci = last_row.get('CCI', 0.0)
         adx = last_row.get('ADX', 0.0)
         plus_di = last_row.get('plus_di', 0.0)
@@ -462,16 +476,18 @@ class MarketAnalyzer:
             ob_score = self.orderbook_analyzer.get_score_impact(ob_analysis)
             score += ob_score
             
-            # Log whale walls if significant
             if ob_score != 0:
                 logger.log(f"{symbol} OrderBook Score Impact: {ob_score:.2f} | Imbalance: {ob_analysis.get('imbalance_ratio', 1.0):.2f}")
+        ob_pressure = ob_analysis.get('pressure') if ob_analysis else None
+        ob_imbalance = float(ob_analysis.get('imbalance_ratio', 1.0)) if ob_analysis else 1.0
+        ob_spread_pct = float(ob_analysis.get('spread_pct', 0.0)) if ob_analysis else 0.0
 
         # --- Volume Profile Analysis Score ---
         vp_profile = self.vp_analyzer.calculate_profile(candles)
         vp_score, vp_reason = self.vp_analyzer.get_score_impact(close, vp_profile)
         score += vp_score
         if vp_score != 0:
-             logger.log(f"{symbol} VP Score: {vp_score} | Reason: {vp_reason}")
+            logger.log(f"{symbol} VP Score: {vp_score} | Reason: {vp_reason}")
 
         # Trend Alignment
         if sma_short > sma_long:
@@ -497,7 +513,6 @@ class MarketAnalyzer:
         trend_bonus = 0.0
         
         if close < sma_long and st_direction == -1:
-            # Güçlü Düşüş Trendi (Heavy Downtrend)
             trend_penalty = -3.0
             score += trend_penalty
             logger.log(f"⚠️ {symbol} Strong Downtrend (Falling Knife Risk). Penalty: {trend_penalty}")
@@ -547,26 +562,21 @@ class MarketAnalyzer:
                 score += sentiment_impact
                 
                 # If sentiment is very negative, it can veto a buy signal
-                if sentiment_score < -0.5 and action == "ENTRY":
-                    action = "HOLD"
-                    primary_strategy = "blocked_by_sentiment"
+            if sentiment_score < -0.5 and action == "ENTRY":
+                action = "HOLD"
+                primary_strategy = "blocked_by_sentiment"
                     
-            # --- Phase 4: Funding Rate Logic ---
             if self.funding_strategy:
                 funding_analysis = self.funding_strategy.analyze_funding(symbol)
                 f_score = funding_analysis.get('score_boost', 0.0)
                 f_action = funding_analysis.get('action', 'NEUTRAL')
                 f_reason = funding_analysis.get('reason', '')
-                
+                funding_rate_pct = float(funding_analysis.get('funding_rate_pct', 0.0))
                 score += f_score
-                
                 if f_action == 'IGNORE_LONG':
                     action = "HOLD"
                     primary_strategy = "blocked_by_negative_funding"
                     logger.log(f"🚫 {symbol} blocked by Negative Funding: {funding_analysis['funding_rate_pct']:.4f}%")
-                elif f_action in ['BOOST_LONG', 'AGGRESSIVE_LONG']:
-                    # Ensure we don't flip a HOLD to ENTRY just by funding, unless score is high enough
-                    pass
 
         # --- Phase 3: No-Trade Zone Block ---
         if is_no_trade and action == "ENTRY":
@@ -630,6 +640,10 @@ class MarketAnalyzer:
                 "close": float(close),
                 "volume_ratio": float(vol_ratio),
                 "volatility": float(_volatility_pct),
+                "funding_rate_pct": float(funding_rate_pct),
+                "orderbook_pressure": ob_pressure,
+                "orderbook_imbalance": float(ob_imbalance),
+                "orderbook_spread_pct": float(ob_spread_pct),
                 "ml_prob": float(ml_prob) if 'ml_prob' in locals() else 0.0,
                 "indicators": strategy_result.get('strategy_details', {}),
                 "regime": detected_regime,
